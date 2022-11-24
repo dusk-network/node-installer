@@ -24,6 +24,7 @@ id -u dusk >/dev/null 2>&1 || useradd -r dusk
 curl -so /opt/dusk/installer/itn-pack-binaries-linux.zip "$DUSK_BINARIES_URL"
 unzip -d /opt/dusk /opt/dusk/installer/itn-pack-binaries-linux.zip
 chmod +x /opt/dusk/bin/detect_ips.sh
+chmod +x /opt/dusk/bin/check_consensuskeys.sh
 
 mkdir -p /opt/dusk/data/.rusk
 mkdir -p /opt/dusk/data/chain
