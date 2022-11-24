@@ -1,6 +1,7 @@
 #!/bin/sh
 DUSK_BINARIES_URL="https://dusk-infra.ams3.digitaloceanspaces.com/rusk/itn-pack-binaries-linux.zip"
 VERIFIER_KEYS_URL="https://dusk-infra.ams3.digitaloceanspaces.com/keys/vd-keys.zip"
+WALLET_URL="https://github.com/dusk-network/wallet-cli/releases/download/v0.12.0/ruskwallet0.12.0-linux-x64-libssl3.tar.gz"
 
 
 check_installed() {
@@ -37,6 +38,19 @@ mv /opt/dusk/services/rusk.service /etc/systemd/system/rusk.service
 
 systemctl enable dusk rusk
 systemctl daemon-reload
+
+
+echo "Installing wallet"
+
+curl -so /opt/dusk/installer/wallet.tar.gz -L "$WALLET_URL"
+mkdir -p /opt/dusk/installer/wallet
+tar xf  /opt/dusk/installer/wallet.tar.gz --strip-components 1 --directory /opt/dusk/installer/wallet
+mv /opt/dusk/installer/wallet/rusk-wallet /opt/dusk/bin/
+chmod +x /opt/dusk/bin/rusk-wallet
+ln -s /opt/dusk/bin/rusk-wallet /usr/bin/rusk-wallet
+
+mkdir -p ~/.dusk/rusk-wallet/
+mv /opt/dusk/conf/wallet.toml ~/.dusk/rusk-wallet/config.toml
 
 echo "Dusk node installed"
 echo "-----"
