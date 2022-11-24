@@ -1,0 +1,38 @@
+# log_level = 'info'
+# log_type = 'coloured'
+kadcast_test = false
+
+[grpc]
+socket = '/tmp/rusk_listener'
+host = '127.0.0.1'
+port = '8585'
+ipc_method = 'tcp_ip'
+
+[kadcast]
+public_address = '127.0.0.1:9000'
+listen_address = '127.0.0.1:9000' 
+bootstrapping_nodes = []
+auto_propagate = false
+channel_size = 1000
+recursive_discovery = true
+
+[kadcast.bucket]
+node_ttl = '30s'
+node_evict_after = '5s'
+bucket_ttl = '1h'
+
+[kadcast.network]
+udp_recv_buffer_size = 5000000
+# udp_send_backoff_timeout = '50us'
+udp_send_retry_interval = '5ms'
+udp_send_retry_count = 3
+blocklist_refresh_interval = '10s'
+
+[kadcast.fec.encoder]
+min_repair_packets_per_block = 5
+mtu = 1300
+fec_redundancy = 0.15
+
+[kadcast.fec.decoder]
+cache_ttl = '1m'
+cache_prune_every = '5m'

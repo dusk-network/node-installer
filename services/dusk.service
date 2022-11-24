@@ -1,0 +1,28 @@
+[Unit]
+Description=DUSK Node
+After=network.target
+After=rusk.service
+
+StartLimitIntervalSec=10
+StartLimitBurst=5
+
+[Service]
+Type=simple
+
+EnvironmentFile=/opt/dusk/services/dusk.conf
+
+User=dusk
+WorkingDirectory=/opt/dusk
+ExecStart=/opt/dusk/bin/dusk --config /opt/dusk/conf/dusk.toml
+
+KillSignal=SIGINT
+
+StandardOutput=append:/var/log/dusk.log
+StandardError=append:/var/log/dusk.err
+
+Restart=always
+RestartSec=10
+
+
+[Install]
+WantedBy=multi-user.target
