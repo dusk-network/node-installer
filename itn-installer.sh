@@ -21,7 +21,7 @@ mkdir -p /opt/dusk/installer
 echo "Creating dusk service user"
 id -u dusk >/dev/null 2>&1 || useradd -r dusk
 
-curl -so /opt/dusk/installer/itn-pack-binaries-linux.zip "$DUSK_BINARIES_URL"
+curl -so /opt/dusk/installer/itn-pack-binaries-linux.zip -L "$DUSK_BINARIES_URL"
 unzip -d /opt/dusk /opt/dusk/installer/itn-pack-binaries-linux.zip
 chmod +x /opt/dusk/bin/detect_ips.sh
 chmod +x /opt/dusk/bin/check_consensuskeys.sh
@@ -29,8 +29,8 @@ chmod +x /opt/dusk/bin/check_consensuskeys.sh
 mkdir -p /opt/dusk/data/.rusk
 mkdir -p /opt/dusk/data/chain
 
-curl -so /opt/dusk/installer/vd-keys.zip "$VERIFIER_KEYS_URL"
-unzip -d /opt/dusk/data/ /opt/dusk/installer/vd-keys.zip
+curl -so /opt/dusk/installer/vd-keys.zip -L "$VERIFIER_KEYS_URL"
+unzip -do /opt/dusk/data/ /opt/dusk/installer/vd-keys.zip
 
 mv /opt/dusk/services/dusk.service /etc/systemd/system/dusk.service
 mv /opt/dusk/services/rusk.service /etc/systemd/system/rusk.service
