@@ -71,6 +71,9 @@ ln -s /opt/dusk/bin/rusk-wallet /usr/bin/rusk-wallet
 mkdir -p ~/.dusk/rusk-wallet/
 mv /opt/dusk/conf/wallet.toml ~/.dusk/rusk-wallet/config.toml
 
+echo "Setup local firewall"
+ufw allow 9000:9005/udp
+
 echo "Dusk node installed"
 echo "-----"
 echo "To launch the node: "
