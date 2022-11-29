@@ -13,6 +13,7 @@ EnvironmentFile=/opt/dusk/services/dusk.conf
 
 User=dusk
 WorkingDirectory=/opt/dusk
+ExecStartPre=!/bin/bash -c '/opt/dusk/bin/check_consensuskeys.sh'
 ExecStart=/opt/dusk/bin/dusk --config /opt/dusk/conf/dusk.toml
 
 KillSignal=SIGINT

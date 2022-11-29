@@ -15,6 +15,7 @@ WorkingDirectory=/opt/dusk
 
 ExecStartPre=!/bin/bash -c '/opt/dusk/bin/rusk-recovery-state >> /var/log/rusk_recovery.log'
 ExecStartPre=!/bin/bash -c 'chown -R dusk $RUSK_PROFILE_PATH'
+ExecStartPre=!/bin/bash -c '/opt/dusk/bin/check_consensuskeys.sh'
 ExecStartPre=!/bin/bash -c '/opt/dusk/bin/detect_ips.sh > /opt/dusk/services/rusk.conf.default'
 
 EnvironmentFile=/opt/dusk/services/rusk.conf.default

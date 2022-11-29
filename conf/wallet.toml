@@ -1,0 +1,3 @@
+state = { url = "http://127.0.0.1:8585" }
+prover = { url = "https://provers.dusk.network:8686" }
+graphql = "http://127.0.0.1:9500/graphql"

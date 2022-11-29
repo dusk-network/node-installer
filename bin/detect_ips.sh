@@ -1,6 +1,10 @@
 #!/bin/bash
 
 PUBLIC_IP=`dig +short myip.opendns.com @resolver1.opendns.com`
+## Fallback to a different dns provider
+if [ -z "$PUBLIC_IP" ]; then
+    PUBLIC_IP=`dig -4 TXT +short o-o.myaddr.l.google.com @ns1.google.com | sed 's|"||g'`
+fi
 
 runOnMac=false
 int2ip() { printf ${2+-v} $2 "%d.%d.%d.%d" \
