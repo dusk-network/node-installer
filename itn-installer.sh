@@ -76,9 +76,17 @@ ufw allow 9000:9005/udp
 
 echo "Dusk node installed"
 echo "-----"
+echo "Prerequisites for launching:"
+echo "1. Provide CONSENSUS_KEYS file"
+echo "2. Set DUSK_CONSENSUS_KEYS_PASS"
+echo
+echo "-----"
 echo "To launch the node: "
 echo "service rusk start;"
 echo "service dusk start;"
+echo
+echo "To run the Rusk wallet:"
+echo "rusk-wallet;"
 echo 
 echo "To check the logs"
 echo "tail -F /var/log/{d,r}usk.{log,err}"
