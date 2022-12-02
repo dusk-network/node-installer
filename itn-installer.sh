@@ -1,7 +1,7 @@
 #!/bin/sh
 PACKER_SOURCE_URL="https://github.com/dusk-network/itn-installer/archive/refs/tags/v0.0.2.tar.gz"
 VERIFIER_KEYS_URL="https://dusk-infra.ams3.digitaloceanspaces.com/keys/vd-keys.zip"
-WALLET_URL="https://github.com/dusk-network/wallet-cli/releases/download/v0.12.0/ruskwallet0.12.0-linux-x64-libssl3.tar.gz"
+WALLET_URL="https://github.com/dusk-network/wallet-cli/releases/download/v0.13.0/ruskwallet0.13.0-linux-x64-libssl3.tar.gz"
 
 
 check_installed() {
@@ -76,9 +76,17 @@ ufw allow 9000:9005/udp
 
 echo "Dusk node installed"
 echo "-----"
+echo "Prerequisites for launching:"
+echo "1. Provide CONSENSUS_KEYS file"
+echo "2. Set DUSK_CONSENSUS_KEYS_PASS"
+echo
+echo "-----"
 echo "To launch the node: "
 echo "service rusk start;"
 echo "service dusk start;"
+echo
+echo "To run the Rusk wallet:"
+echo "rusk-wallet;"
 echo 
 echo "To check the logs"
 echo "tail -F /var/log/{d,r}usk.{log,err}"
