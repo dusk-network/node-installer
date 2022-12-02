@@ -39,16 +39,16 @@ The `CONSENSUS_KEYS` can be either moved to `/opt/dusk/conf/` from another syste
 
 To generate the provisioner keys locally, run `rusk-wallet` and either create a new wallet or use a recovery phrase. Access your wallet and export your provisioner key-pair. 
 
-The `.keys` file will be appended with the wallet address you have selected. Move this file to the Dusk node configuration folder and rename it:
+The `.keys` file will be appended with the wallet address you have selected. Move this file to the Dusk node configuration folder and rename it. Copy the following command, replace it with your key and execute:
 ```sh
-mv /root/.dusk/rusk-wallet/<ADDRESS>.keys /opt/dusk/conf/consensus.keys
+mv /root/.dusk/rusk-wallet/5YgmFvL5WKVbff9LtNwaY5VU17w93CXEs9ujPVRnEkcDko6Fsiv9moNBG1B2qxSh6F2m4qqDGvBFMThSii431BzN.keys /opt/dusk/conf/consensus.keys
 ```
 
 ### Set consensus password
 
-Set the password by running the following command:
+Replace the password with yours and run following command:
 ```sh
-echo 'DUSK_CONSENSUS_KEYS_PASS=<PROVISIONER_KEY_PASSWORD>' > /opt/dusk/services/dusk.conf
+echo 'DUSK_CONSENSUS_KEYS_PASS=Test123' > /opt/dusk/services/dusk.conf
 ```
 
 ### Start services
