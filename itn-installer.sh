@@ -1,5 +1,5 @@
 #!/bin/sh
-PACKER_SOURCE_URL="https://github.com/dusk-network/itn-installer/archive/refs/tags/v0.0.2.tar.gz"
+PACKER_SOURCE_URL="https://github.com/dusk-network/itn-installer/archive/refs/tags/v0.0.3.tar.gz"
 VERIFIER_KEYS_URL="https://dusk-infra.ams3.digitaloceanspaces.com/keys/vd-keys.zip"
 WALLET_URL="https://github.com/dusk-network/wallet-cli/releases/download/v0.13.0/ruskwallet0.13.0-linux-x64-libssl3.tar.gz"
 
