@@ -67,12 +67,16 @@ service dusk status
 
 ## Diagnostics
 
-Check if your node is syncing and processing new blocks:
+Check if your node is syncing, processing and accepting new blocks:
 ```sh
 tail -F /var/log/dusk.log | grep "accept_block"
 ```
+Or
+```sh
+tail -F /var/log/dusk.log | grep "Accepted"
+```
 
-Check if your node is participating in consensus and accepting blocks:
+Check if your node is participating in consensus and trying to create blocks:
 ```sh
 tail -F /var/log/rusk.log | grep "ExecuteStateTransition"
 ```
