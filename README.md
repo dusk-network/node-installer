@@ -74,7 +74,12 @@ tail -F /var/log/dusk.log | grep "accept_block"
 
 Check if your node is participating in consensus and accepting blocks:
 ```sh
-tail -F /var/log/dusk.log | grep "Accepted"
+tail -F /var/log/rusk.log | grep "ExecuteStateTransition"
+```
+
+Or to check if it did so in the past:
+```sh
+ grep ExecuteStateTransition /var/log/rusk.log
 ```
 
 To check for errors in the Dusk and Rusk log:
