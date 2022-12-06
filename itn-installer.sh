@@ -15,6 +15,10 @@ check_installed() {
     fi
 }
 
+echo "Stopping previous services"
+service dusk stop || true;
+service rusk stop || true;
+
 echo "Checking prerequisites"
 check_installed unzip unzip
 check_installed route net-tools
