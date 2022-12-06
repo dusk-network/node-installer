@@ -18,6 +18,7 @@ check_installed() {
 echo "Checking prerequisites"
 check_installed unzip unzip
 check_installed route net-tools
+check_installed logrotate logrotate
 
 echo "Creating dusk service user"
 id -u dusk >/dev/null 2>&1 || useradd -r dusk
@@ -55,6 +56,7 @@ echo "Installing services"
 # Overwrite previous service definitions
 mv -f /opt/dusk/services/dusk.service /etc/systemd/system/dusk.service
 mv -f /opt/dusk/services/rusk.service /etc/systemd/system/rusk.service
+mv -f /opt/dusk/services/logrotate.conf /etc/logrotate.d/dusk.conf
 
 systemctl enable dusk rusk
 systemctl daemon-reload
