@@ -40,5 +40,9 @@ while read lhs rhs; do
 done < <(/sbin/ifconfig)
 
 echo "KADCAST_PUBLIC_ADDRESS=$PUBLIC_IP:9000"
-echo "KADCAST_LISTEN_ADDRESS=$myIp:9000"
+if [ -z "$myIp" ]; then
+    echo "KADCAST_LISTEN_ADDRESS=$PUBLIC_IP:9000"
+else
+    echo "KADCAST_LISTEN_ADDRESS=$myIp:9000"
+fi
 
