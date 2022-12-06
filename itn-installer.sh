@@ -1,5 +1,5 @@
 #!/bin/sh
-PACKER_SOURCE_URL="https://github.com/dusk-network/itn-installer/archive/refs/tags/v0.0.3.tar.gz"
+PACKER_SOURCE_URL="https://github.com/dusk-network/itn-installer/tarball/main"
 VERIFIER_KEYS_URL="https://dusk-infra.ams3.digitaloceanspaces.com/keys/vd-keys.zip"
 WALLET_URL="https://github.com/dusk-network/wallet-cli/releases/download/v0.13.0/ruskwallet0.13.0-linux-x64-libssl3.tar.gz"
 
@@ -18,6 +18,7 @@ check_installed() {
 echo "Checking prerequisites"
 check_installed unzip unzip
 check_installed route net-tools
+check_installed logrotate logrotate
 
 echo "Creating dusk service user"
 id -u dusk >/dev/null 2>&1 || useradd -r dusk
@@ -55,6 +56,7 @@ echo "Installing services"
 # Overwrite previous service definitions
 mv -f /opt/dusk/services/dusk.service /etc/systemd/system/dusk.service
 mv -f /opt/dusk/services/rusk.service /etc/systemd/system/rusk.service
+mv -f /opt/dusk/services/logrotate.conf /etc/logrotate.d/dusk.conf
 
 systemctl enable dusk rusk
 systemctl daemon-reload
