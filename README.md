@@ -51,9 +51,9 @@ mv /root/.dusk/rusk-wallet/5YgmFvL5WKVbff9LtNwaY5VU17w93CXEs9ujPVRnEkcDko6Fsiv9m
 
 ### Set consensus password
 
-Replace the password with yours and run following command:
+Run the following command and it will prompt you to enter the password for the consensus keys file:
 ```sh
-echo 'DUSK_CONSENSUS_KEYS_PASS=Test123' > /opt/dusk/services/dusk.conf
+read -p "Consensus keys password:" ckp && echo "DUSK_CONSENSUS_KEYS_PASS=$ckp" > /opt/dusk/services/dusk.conf
 ```
 
 ### Start services
