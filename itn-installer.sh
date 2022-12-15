@@ -45,8 +45,7 @@ mv -n /opt/dusk/installer/conf/* /opt/dusk/conf/
 # Don't overwrite previous services conf
 mv -n /opt/dusk/installer/services/* /opt/dusk/services/
 
-chmod +x /opt/dusk/bin/detect_ips.sh
-chmod +x /opt/dusk/bin/check_consensuskeys.sh
+chmod +x /opt/dusk/bin/*
 
 mkdir -p /opt/dusk/data/.rusk
 mkdir -p /opt/dusk/data/chain
@@ -86,8 +85,8 @@ ufw allow 9000:9005/udp
 echo "Dusk node installed"
 echo "-----"
 echo "Prerequisites for launching:"
-echo "1. Provide CONSENSUS_KEYS file"
-echo "2. Set DUSK_CONSENSUS_KEYS_PASS"
+echo "1. Provide CONSENSUS_KEYS file (default in /opt/dusk/conf/consensus.keys)"
+echo "2. Set DUSK_CONSENSUS_KEYS_PASS (use /opt/dusk/bin/setup_consensus_pwd.sh)"
 echo
 echo "-----"
 echo "To launch the node: "
