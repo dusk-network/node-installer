@@ -1,3 +1,3 @@
-state = { url = "http://127.0.0.1:8585" }
-prover = { url = "https://provers.dusk.network:8686" }
-graphql = "http://127.0.0.1:9500/graphql"
+state = "http://127.0.0.1:8080"
+prover = "http://127.0.0.1:8080"
+explorer = "https://explorer.dusk.network/transactions/transaction/?id="
