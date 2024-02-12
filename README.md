@@ -4,23 +4,22 @@ This repository contains an easy to use installer to run a Dusk Network node for
 
 ## Prerequisites
 
-- Ubuntu 22.10 x64
+- Ubuntu 22.04 LTS x64
 - OpenSSL 3
 
-This installer is specifically built for Ubuntu 22.10 x64. It might work on older or new version.
+This installer is specifically built for Ubuntu 22.04 x64. It might work on older or newer versions.
 
 ## Packages
 
 The installer comes with the following packages:
-- Dusk node service
-- Rusk VM service
+- Rusk service
 - Rusk wallet CLI
 
 ## Folder layout 
 
 The configuration files, binaries, services and scripts can be found in `/opt/dusk/`. 
 
-The log files can be found in `/var/logs/{d,r}usk.{err,log}`.
+The log files can be found in `/var/logs/rusk.{err,log}`.
 
 ## Installation
 
@@ -36,7 +35,7 @@ curl --proto '=https' --tlsv1.2 -sSfL https://raw.githubusercontent.com/dusk-net
 
 ## Configuration
 
-The installer comes with sane defaults, only requiring minimal configuration. Before the Dusk and Rusk service can be started, the `CONSENSUS_KEYS` and `DUSK_CONSENSUS_KEYS_PASS` need to be provided. 
+The installer comes with sane defaults, only requiring minimal configuration. Before the Rusk service can be started, the `CONSENSUS_KEYS` and `DUSK_CONSENSUS_KEYS_PASS` need to be provided. 
 
 The `CONSENSUS_KEYS` can be either moved to `/opt/dusk/conf/` from another system or generated on the node itself and moved there. 
 
@@ -56,29 +55,27 @@ Run the following command and it will prompt you to enter the password for the c
 /opt/dusk/bin/setup_consensus_pwd.sh
 ```
 
-### Start services
+### Start Rusk
 
-Everything should be configured now and the nodes ready to run. Use the following commands:
+Everything should be configured now and the node is ready to run. Use the following commands:
 ```sh
 service rusk start
-service dusk start
 ```
 
-Check the status of the services by running:
+Check the status of the Rusk service by running:
 ```sh
 service rusk status
-service dusk status
 ```
 
 ## Diagnostics
 
 Check if your node is syncing, processing and accepting new blocks:
 ```sh
-tail -F /var/log/dusk.log | grep "accept_block"
+tail -F /var/log/rusk.log | grep "accept_block"
 ```
 Or
 ```sh
-tail -F /var/log/dusk.log | grep "Accepted"
+tail -F /var/log/rusk.log | grep "Accepted"
 ```
 
 Check if your node is participating in consensus and trying to create blocks:
@@ -91,7 +88,7 @@ Or to check if it did so in the past:
  grep ExecuteStateTransition /var/log/rusk.log
 ```
 
-To check for errors in the Dusk and Rusk log:
+To check for errors in the Rusk logs:
 ```sh
-cat /var/log/{d,r}usk.err
+cat /var/log/rusk.err
 ```

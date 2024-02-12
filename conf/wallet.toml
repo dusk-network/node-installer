@@ -1,3 +1,0 @@
-state = "http://127.0.0.1:8080"
-prover = "http://127.0.0.1:8080"
-explorer = "https://explorer.dusk.network/transactions/transaction/?id="

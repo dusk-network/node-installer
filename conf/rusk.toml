@@ -3,12 +3,14 @@
 kadcast_test = false
 
 [chain]
+db_path = '/opt/dusk/rusk'
 
 [databroker]
 max_inv_entries = 100
 max_ongoing_requests = 1000
 
 [kadcast]
+network_id = 0x10
 public_address = '127.0.0.1:9000'
 listen_address = '127.0.0.1:9000' 
 bootstrapping_nodes = []
