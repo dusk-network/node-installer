@@ -1,6 +1,5 @@
 [Unit]
 Description=DUSK Rusk
-
 After=network.target
 After=create_dusk_info.service
 
@@ -14,7 +13,6 @@ User=dusk
 WorkingDirectory=/opt/dusk
 
 ExecStartPre=!/bin/bash -c '/opt/dusk/bin/rusk-recovery-state >> /var/log/rusk_recovery.log'
-ExecStartPre=!/bin/bash -c 'chown -R dusk $RUSK_PROFILE_PATH'
 ExecStartPre=!/bin/bash -c '/opt/dusk/bin/check_consensuskeys.sh'
 ExecStartPre=!/bin/bash -c '/opt/dusk/bin/detect_ips.sh > /opt/dusk/services/rusk.conf.default'
 
@@ -28,6 +26,9 @@ ExecStart=/opt/dusk/bin/rusk \
 
 StandardOutput=append:/var/log/rusk.log
 StandardError=append:/var/log/rusk.err
+
+Restart=always
+RestartSec=10
 
 [Install]
 WantedBy=multi-user.target
