@@ -2,13 +2,16 @@
 # log_type = 'coloured'
 kadcast_test = false
 
-[grpc]
-socket = '/tmp/rusk_listener'
-host = '127.0.0.1'
-port = '8585'
-ipc_method = 'tcp_ip'
+[chain]
+db_path = '/opt/dusk/rusk'
+consensus_keys_path = '/opt/dusk/conf/consensus.keys'
+
+[databroker]
+max_inv_entries = 100
+max_ongoing_requests = 1000
 
 [kadcast]
+kadcast_id = 0x10
 public_address = '127.0.0.1:9000'
 listen_address = '127.0.0.1:9000' 
 bootstrapping_nodes = []

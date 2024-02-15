@@ -1,6 +1,5 @@
 [Unit]
 Description=DUSK Rusk
-
 After=network.target
 After=create_dusk_info.service
 
@@ -8,26 +7,32 @@ After=create_dusk_info.service
 Type=simple
 
 Environment="RUST_BACKTRACE=full"
-Environment="RUSK_PROFILE_PATH=/opt/dusk/data"
+Environment="RUSK_PROFILE_PATH=/opt/dusk/rusk"
 
 User=dusk
 WorkingDirectory=/opt/dusk
 
-ExecStartPre=!/bin/bash -c '/opt/dusk/bin/rusk-recovery-state >> /var/log/rusk_recovery.log'
-ExecStartPre=!/bin/bash -c 'chown -R dusk $RUSK_PROFILE_PATH'
-ExecStartPre=!/bin/bash -c '/opt/dusk/bin/check_consensuskeys.sh'
+ExecStartPre=!/bin/bash -c '/opt/dusk/bin/rusk recovery-keys >> /var/log/rusk_recovery.log'
+ExecStartPre=!/bin/bash -c '/opt/dusk/bin/rusk recovery-state >> /var/log/rusk_recovery.log'
+ExecStartPre=!/bin/bash -c '/opt/dusk/bin/check_consensus_keys.sh'
 ExecStartPre=!/bin/bash -c '/opt/dusk/bin/detect_ips.sh > /opt/dusk/services/rusk.conf.default'
+ExecStartPre=!/bin/bash -c 'chown -R dusk /opt/dusk/rusk/state'
+
 
 EnvironmentFile=/opt/dusk/services/rusk.conf.default
 EnvironmentFile=/opt/dusk/services/rusk.conf.user
+EnvironmentFile=/opt/dusk/services/dusk.conf
 
 ExecStart=/opt/dusk/bin/rusk \
             --config /opt/dusk/conf/rusk.toml \
-            --kadcast_bootstrap 64.227.77.24:9000 \
-            --kadcast_bootstrap 161.35.67.69:9000
+            --kadcast-bootstrap bootstrap1.testnet.dusk.network:9000 \
+            --kadcast-bootstrap bootstrap2.testnet.dusk.network:9000
 
 StandardOutput=append:/var/log/rusk.log
 StandardError=append:/var/log/rusk.err
+
+Restart=always
+RestartSec=10
 
 [Install]
 WantedBy=multi-user.target

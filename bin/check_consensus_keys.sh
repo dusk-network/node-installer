@@ -1,6 +1,6 @@
 #!/bin/bash
 
-CONSENSUS_KEYS=`grep keysfile /opt/dusk/conf/dusk.toml | sed 's|.* "||g' | sed 's|"||g'`
+CONSENSUS_KEYS=`grep consensus_keys_path /opt/dusk/conf/rusk.toml | sed -n "s/^[^=]*= *'\([^']*\)'/\1/p"`
 if test -f "$CONSENSUS_KEYS"; then
     echo "Using CONSENSUS_KEYS in $CONSENSUS_KEYS"
 else 
