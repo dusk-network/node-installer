@@ -30,7 +30,7 @@ mkdir -p /opt/dusk/services
 mkdir -p /opt/dusk/installer
 
 VERIFIER_KEYS_URL="https://nodes.dusk.network/keys"
-INSTALLER_URL="https://github.com/dusk-network/itn-installer/tarball/update-installer"
+INSTALLER_URL="https://github.com/dusk-network/itn-installer/tarball/main"
 RUSK_URL=$(curl -s "https://api.github.com/repos/dusk-network/rusk/releases/latest" | jq -r  '.assets[].browser_download_url' | grep linux)
 WALLET_URL=$(curl -s "https://api.github.com/repos/dusk-network/wallet-cli/releases/latest" | jq -r  '.assets[].browser_download_url' | grep libssl3)
 
@@ -84,14 +84,20 @@ echo "Dusk node installed"
 echo "-----"
 echo "Prerequisites for launching:"
 echo "1. Provide CONSENSUS_KEYS file (default in /opt/dusk/conf/consensus.keys)"
+echo "Run the following commands:"
+echo "rusk-wallet restore"
+echo "rusk-wallet export -d /opt/dusk/conf -n consensus.keys"
+echo
 echo "2. Set DUSK_CONSENSUS_KEYS_PASS (use /opt/dusk/bin/setup_consensus_pwd.sh)"
+echo "Run the following command:"
+echo "./opt/dusk/bin/setup_consensus_pwd.sh"
 echo
 echo "-----"
 echo "To launch the node: "
-echo "service rusk start;"
+echo "service rusk start"
 echo
 echo "To run the Rusk wallet:"
-echo "rusk-wallet -n local;"
+echo "rusk-wallet -n local"
 echo 
 echo "To check the logs"
 echo "tail -F /var/log/rusk.{log,err}"
