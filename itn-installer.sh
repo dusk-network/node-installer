@@ -45,11 +45,11 @@ mv -n /opt/dusk/installer/services/* /opt/dusk/services/
 
 chmod +x /opt/dusk/bin/*
 
-echo "Downloading the latest Rusk binary..."
-curl -so /opt/dusk/installer/rusk.tar.gz -L "$RUSK_URL"
-mkdir -p /opt/dusk/installer/rusk
-tar xf /opt/dusk/installer/rusk.tar.gz --directory /opt/dusk/installer/rusk
-mv /opt/dusk/installer/rusk/rusk /opt/dusk/bin/
+#echo "Downloading the latest Rusk binary..."
+#curl -so /opt/dusk/installer/rusk.tar.gz -L "$RUSK_URL"
+#mkdir -p /opt/dusk/installer/rusk
+#tar xf /opt/dusk/installer/rusk.tar.gz --directory /opt/dusk/installer/rusk
+#mv /opt/dusk/installer/rusk/rusk /opt/dusk/bin/
 chmod +x /opt/dusk/bin/rusk
 ln -sf /opt/dusk/bin/rusk /usr/bin/rusk
 
