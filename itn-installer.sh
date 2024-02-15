@@ -64,7 +64,7 @@ ln -sf /opt/dusk/bin/rusk-wallet /usr/bin/rusk-wallet
 echo "Downloading verifier keys"
 curl -so /opt/dusk/installer/rusk-vd-keys.zip -L "$VERIFIER_KEYS_URL"
 unzip -d /opt/dusk/rusk/ -o /opt/dusk/installer/rusk-vd-keys.zip
-chown -R dusk:dusk /opt/dusk/rusk/
+chown -R dusk:dusk /opt/dusk/
 
 echo "Installing services"
 # Overwrite previous service definitions

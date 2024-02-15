@@ -4,6 +4,7 @@ kadcast_test = false
 
 [chain]
 db_path = '/opt/dusk/rusk'
+consensus_keys_path = '/opt/dusk/conf/consensus.keys'
 
 [databroker]
 max_inv_entries = 100
