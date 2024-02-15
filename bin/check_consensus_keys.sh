@@ -1,6 +1,6 @@
 #!/bin/bash
 
-CONSENSUS_KEYS=`/opt/dusk/rusk/consensus.keys`
+CONSENSUS_KEYS=`/opt/dusk/conf/consensus.keys`
 if test -f "$CONSENSUS_KEYS"; then
     echo "Using CONSENSUS_KEYS in $CONSENSUS_KEYS"
 else 
