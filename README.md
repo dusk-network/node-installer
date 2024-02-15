@@ -25,7 +25,7 @@ The log files can be found in `/var/log/rusk.{err,log}`.
 
 :information_source: To run the **latest release** of the ITN installer execute the following command:
 ```sh
-curl --proto '=https' --tlsv1.2 -sSfL https://github.com/dusk-network/itn-installer/releases/download/v0.0.5/itn-installer.sh | sudo sh
+curl --proto '=https' --tlsv1.2 -sSfL https://github.com/dusk-network/itn-installer/releases/download/v0.1.0/itn-installer.sh | sudo sh
 ```
 
 :warning: **CAUTION** To run the **not release yet** unstable version of the ITN installer execute the following command:
