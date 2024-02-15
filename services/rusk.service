@@ -23,8 +23,8 @@ EnvironmentFile=/opt/dusk/services/dusk.conf
 
 ExecStart=/opt/dusk/bin/rusk \
             --config /opt/dusk/conf/rusk.toml \
-            --kadcast_bootstrap bootstrap1.testnet.dusk.network:9000 \
-            --kadcast_bootstrap bootstrap2.testnet.dusk.network:9000
+            --kadcast-bootstrap bootstrap1.testnet.dusk.network:9000 \
+            --kadcast-bootstrap bootstrap2.testnet.dusk.network:9000
 
 StandardOutput=append:/var/log/rusk.log
 StandardError=append:/var/log/rusk.err
