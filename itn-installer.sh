@@ -20,10 +20,6 @@ check_installed jq jq
 check_installed route net-tools
 check_installed logrotate logrotate
 
-VERIFIER_KEYS_URL="https://nodes.dusk.network/keys"
-RUSK_URL=$(curl -s "https://api.github.com/repos/dusk-network/rusk/releases/latest" | jq -r  '.assets[].browser_download_url' | grep linux)
-WALLET_URL=$(curl -s "https://api.github.com/repos/dusk-network/wallet-cli/releases/latest" | jq -r  '.assets[].browser_download_url' | grep libssl3)
-
 echo "Creating rusk service user"
 id -u dusk >/dev/null 2>&1 || useradd -r dusk
 
@@ -32,6 +28,22 @@ mkdir -p /opt/dusk/conf
 mkdir -p /opt/dusk/rusk
 mkdir -p /opt/dusk/services
 mkdir -p /opt/dusk/installer
+
+VERIFIER_KEYS_URL="https://nodes.dusk.network/keys"
+INSTALLER_URL="https://github.com/dusk-network/itn-installer/tarball/update-installer"
+RUSK_URL=$(curl -s "https://api.github.com/repos/dusk-network/rusk/releases/latest" | jq -r  '.assets[].browser_download_url' | grep linux)
+WALLET_URL=$(curl -s "https://api.github.com/repos/dusk-network/wallet-cli/releases/latest" | jq -r  '.assets[].browser_download_url' | grep libssl3)
+
+echo "Downloading installer package for additional scripts and configurations"
+curl -so /opt/dusk/installer/installer.tar.gz -L "$INSTALLER_URL"
+tar xf /opt/dusk/installer/installer.tar.gz --strip-components 1 --directory /opt/dusk/installer
+
+# Handle scripts, configs, and service definitions
+mv -f /opt/dusk/installer/bin/* /opt/dusk/bin/
+mv -n /opt/dusk/installer/conf/* /opt/dusk/conf/
+mv -n /opt/dusk/installer/services/* /opt/dusk/services/
+
+chmod +x /opt/dusk/bin/*
 
 echo "Downloading the latest Rusk binary..."
 curl -so /opt/dusk/installer/rusk.tar.gz -L "$RUSK_URL"
@@ -48,8 +60,6 @@ tar xf /opt/dusk/installer/wallet.tar.gz --strip-components 1 --directory /opt/d
 mv /opt/dusk/installer/wallet/rusk-wallet /opt/dusk/bin/
 chmod +x /opt/dusk/bin/rusk-wallet
 ln -sf /opt/dusk/bin/rusk-wallet /usr/bin/rusk-wallet
-
-chmod +x /opt/dusk/bin/*
 
 echo "Downloading verifier keys"
 curl -so /opt/dusk/installer/rusk-vd-keys.zip -L "$VERIFIER_KEYS_URL"
@@ -87,5 +97,6 @@ echo "To check the logs"
 echo "tail -F /var/log/rusk.{log,err}"
 
 rm -f /opt/dusk/installer/rusk.tar.gz
+rm -f /opt/dusk/installer/installer.tar.gz
 rm -f /opt/dusk/installer/wallet.tar.gz
 rm -rf /opt/dusk/installer
