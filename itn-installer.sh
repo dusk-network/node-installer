@@ -50,7 +50,7 @@ chmod +x /opt/dusk/bin/*
 #mkdir -p /opt/dusk/installer/rusk
 #tar xf /opt/dusk/installer/rusk.tar.gz --directory /opt/dusk/installer/rusk
 #mv /opt/dusk/installer/rusk/rusk /opt/dusk/bin/
-chmod +x /opt/dusk/bin/rusk
+#chmod +x /opt/dusk/bin/rusk
 ln -sf /opt/dusk/bin/rusk /usr/bin/rusk
 
 echo "Downloading the latest Rusk wallet..."
@@ -78,7 +78,8 @@ systemctl enable rusk
 systemctl daemon-reload
 
 echo "Setup local firewall"
-ufw allow 9000:9005/udp
+ufw allow 8080/tcp
+ufw allow 9000/udp
 
 echo "Dusk node installed"
 echo "-----"
@@ -102,7 +103,4 @@ echo
 echo "To check the logs"
 echo "tail -F /var/log/rusk.{log,err}"
 
-rm -f /opt/dusk/installer/rusk.tar.gz
-rm -f /opt/dusk/installer/installer.tar.gz
-rm -f /opt/dusk/installer/wallet.tar.gz
 rm -rf /opt/dusk/installer
