@@ -12,6 +12,8 @@ check_installed() {
 
 echo "Stopping previous services"
 service rusk stop || true;
+rm -rf /opt/dusk/installer || true
+rm -rf /opt/dusk/installer/installer.tar.gz || true
 
 echo "Checking prerequisites"
 check_installed unzip unzip
@@ -28,6 +30,7 @@ mkdir -p /opt/dusk/conf
 mkdir -p /opt/dusk/rusk
 mkdir -p /opt/dusk/services
 mkdir -p /opt/dusk/installer
+mkdir -p /root/.dusk/rusk-wallet
 
 VERIFIER_KEYS_URL="https://nodes.dusk.network/keys"
 INSTALLER_URL="https://github.com/dusk-network/itn-installer/tarball/main"
@@ -60,6 +63,7 @@ tar xf /opt/dusk/installer/wallet.tar.gz --strip-components 1 --directory /opt/d
 mv /opt/dusk/installer/wallet/rusk-wallet /opt/dusk/bin/
 chmod +x /opt/dusk/bin/rusk-wallet
 ln -sf /opt/dusk/bin/rusk-wallet /usr/bin/rusk-wallet
+mv /opt/dusk/installer/conf/wallet.toml /root/.dusk/rusk-wallet/config.toml
 
 echo "Downloading verifier keys"
 curl -so /opt/dusk/installer/rusk-vd-keys.zip -L "$VERIFIER_KEYS_URL"
