@@ -21,6 +21,7 @@ check_installed curl curl
 check_installed jq jq
 check_installed route net-tools
 check_installed logrotate logrotate
+check_installed dig dnsutils
 
 echo "Creating rusk service user"
 id -u dusk >/dev/null 2>&1 || useradd -r dusk
