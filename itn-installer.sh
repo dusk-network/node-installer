@@ -63,7 +63,7 @@ tar xf /opt/dusk/installer/wallet.tar.gz --strip-components 1 --directory /opt/d
 mv /opt/dusk/installer/wallet/rusk-wallet /opt/dusk/bin/
 chmod +x /opt/dusk/bin/rusk-wallet
 ln -sf /opt/dusk/bin/rusk-wallet /usr/bin/rusk-wallet
-mv /opt/dusk/installer/conf/wallet.toml /root/.dusk/rusk-wallet/config.toml
+mv /opt/dusk/conf/wallet.toml /root/.dusk/rusk-wallet/config.toml
 
 echo "Downloading verifier keys"
 curl -so /opt/dusk/installer/rusk-vd-keys.zip -L "$VERIFIER_KEYS_URL"
