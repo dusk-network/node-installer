@@ -101,6 +101,6 @@ echo "To run the Rusk wallet:"
 echo "rusk-wallet -n local"
 echo 
 echo "To check the logs"
-echo "tail -F /var/log/rusk.{log,err}"
+echo "tail -F /var/log/rusk.log"
 
 rm -rf /opt/dusk/installer
