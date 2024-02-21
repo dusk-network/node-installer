@@ -76,6 +76,7 @@ mv -f /opt/dusk/services/rusk.service /etc/systemd/system/rusk.service
 
 # Configure logrotate with 644 permissions otherwise configuration is ignored
 mv -f /opt/dusk/services/logrotate.conf /etc/logrotate.d/dusk.conf
+chown root:root /etc/logrotate.d/dusk.conf
 chmod 644 /etc/logrotate.d/dusk.conf
 
 systemctl enable rusk
