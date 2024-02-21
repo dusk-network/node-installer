@@ -11,7 +11,7 @@ max_inv_entries = 100
 max_ongoing_requests = 1000
 
 [kadcast]
-kadcast_id = 0x10
+kadcast_id = 0x11
 public_address = '127.0.0.1:9000'
 listen_address = '127.0.0.1:9000' 
 bootstrapping_nodes = []
