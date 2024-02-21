@@ -43,7 +43,7 @@ tar xf /opt/dusk/installer/installer.tar.gz --strip-components 1 --directory /op
 
 # Handle scripts, configs, and service definitions
 mv -f /opt/dusk/installer/bin/* /opt/dusk/bin/
-mv -n /opt/dusk/installer/conf/* /opt/dusk/conf/
+mv /opt/dusk/installer/conf/* /opt/dusk/conf/
 mv -n /opt/dusk/installer/services/* /opt/dusk/services/
 
 chmod +x /opt/dusk/bin/*
