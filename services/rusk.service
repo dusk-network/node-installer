@@ -1,7 +1,6 @@
 [Unit]
 Description=DUSK Rusk
 After=network.target
-After=create_dusk_info.service
 
 [Service]
 Type=simple

@@ -64,7 +64,7 @@ tar xf /opt/dusk/installer/wallet.tar.gz --strip-components 1 --directory /opt/d
 mv /opt/dusk/installer/wallet/rusk-wallet /opt/dusk/bin/
 chmod +x /opt/dusk/bin/rusk-wallet
 ln -sf /opt/dusk/bin/rusk-wallet /usr/bin/rusk-wallet
-mv /opt/dusk/conf/wallet.toml /root/.dusk/rusk-wallet/config.toml
+mv -f /opt/dusk/conf/wallet.toml /root/.dusk/rusk-wallet/config.toml
 
 echo "Downloading verifier keys"
 curl -so /opt/dusk/installer/rusk-vd-keys.zip -L "$VERIFIER_KEYS_URL"
@@ -103,17 +103,17 @@ echo "rusk-wallet export -d /opt/dusk/conf -n consensus.keys"
 echo
 echo "2. Set DUSK_CONSENSUS_KEYS_PASS (use /opt/dusk/bin/setup_consensus_pwd.sh)"
 echo "Run the following command:"
-echo "./opt/dusk/bin/setup_consensus_pwd.sh"
+echo "sh /opt/dusk/bin/setup_consensus_pwd.sh"
 echo
 echo "-----"
 echo "To launch the node: "
 echo "service rusk start"
 echo
 echo "To run the Rusk wallet:"
-echo "rusk-wallet -n local"
+echo "rusk-wallet"
 echo 
 echo "To check the logs"
-echo "tail -F /var/log/rusk.{log,err}"
+echo "tail -F /var/log/rusk.log"
 
 rm -f /opt/dusk/installer/rusk.tar.gz
 rm -f /opt/dusk/installer/installer.tar.gz
