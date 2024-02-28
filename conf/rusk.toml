@@ -12,8 +12,8 @@ max_ongoing_requests = 1000
 
 [kadcast]
 kadcast_id = 0x20
-public_address = '127.0.0.1:9000'
-listen_address = '127.0.0.1:9000' 
+public_address = 'N/A'
+listen_address = 'N/A' 
 bootstrapping_nodes = []
 auto_propagate = false
 channel_size = 1000

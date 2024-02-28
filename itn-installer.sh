@@ -33,7 +33,6 @@ mkdir -p /opt/dusk/installer
 mkdir -p /root/.dusk/rusk-wallet
 
 VERIFIER_KEYS_URL="https://nodes.dusk.network/keys"
-LAST_STATE_URL="https://nodes.dusk.network/state/86920"
 INSTALLER_URL="https://github.com/dusk-network/itn-installer/tarball/main"
 RUSK_URL=$(curl -s "https://api.github.com/repos/dusk-network/rusk/releases/latest" | jq -r  '.assets[].browser_download_url' | grep linux)
 WALLET_URL=$(curl -s "https://api.github.com/repos/dusk-network/wallet-cli/releases/latest" | jq -r  '.assets[].browser_download_url' | grep libssl3)
@@ -69,13 +68,6 @@ mv -f /opt/dusk/conf/wallet.toml /root/.dusk/rusk-wallet/config.toml
 echo "Downloading verifier keys"
 curl -so /opt/dusk/installer/rusk-vd-keys.zip -L "$VERIFIER_KEYS_URL"
 unzip -d /opt/dusk/rusk/ -o /opt/dusk/installer/rusk-vd-keys.zip
-chown -R dusk:dusk /opt/dusk/
-
-echo "Downloading state"
-rm -rf /opt/dusk/rusk/state
-rm -rf /opt/dusk/rusk/chain.db
-curl -so  /opt/dusk/installer/86920.tar.gz -L "$LAST_STATE_URL"
-tar -xvf /opt/dusk/installer/86920.tar.gz -C /opt/dusk/rusk/
 chown -R dusk:dusk /opt/dusk/
 
 echo "Installing services"
