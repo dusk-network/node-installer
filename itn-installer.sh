@@ -33,7 +33,6 @@ mkdir -p /opt/dusk/installer
 mkdir -p /root/.dusk/rusk-wallet
 
 VERIFIER_KEYS_URL="https://nodes.dusk.network/keys"
-LAST_STATE_URL="https://nodes.dusk.network/state/86920"
 INSTALLER_URL="https://github.com/dusk-network/itn-installer/tarball/main"
 RUSK_URL=$(curl -s "https://api.github.com/repos/dusk-network/rusk/releases/latest" | jq -r  '.assets[].browser_download_url' | grep linux)
 WALLET_URL=$(curl -s "https://api.github.com/repos/dusk-network/wallet-cli/releases/latest" | jq -r  '.assets[].browser_download_url' | grep libssl3)
@@ -47,35 +46,23 @@ mv -f /opt/dusk/installer/bin/* /opt/dusk/bin/
 mv /opt/dusk/installer/conf/* /opt/dusk/conf/
 mv -n /opt/dusk/installer/services/* /opt/dusk/services/
 
-chmod +x /opt/dusk/bin/*
-
-#echo "Downloading the latest Rusk binary..."
-#curl -so /opt/dusk/installer/rusk.tar.gz -L "$RUSK_URL"
-#mkdir -p /opt/dusk/installer/rusk
-#tar xf /opt/dusk/installer/rusk.tar.gz --directory /opt/dusk/installer/rusk
-#mv /opt/dusk/installer/rusk/rusk /opt/dusk/bin/
-chmod +x /opt/dusk/bin/rusk
-ln -sf /opt/dusk/bin/rusk /usr/bin/rusk
-
+# Download, unpack and install wallet-cli
 echo "Downloading the latest Rusk wallet..."
 curl -so /opt/dusk/installer/wallet.tar.gz -L "$WALLET_URL"
 mkdir -p /opt/dusk/installer/wallet
 tar xf /opt/dusk/installer/wallet.tar.gz --strip-components 1 --directory /opt/dusk/installer/wallet
 mv /opt/dusk/installer/wallet/rusk-wallet /opt/dusk/bin/
-chmod +x /opt/dusk/bin/rusk-wallet
+mv -f /opt/dusk/conf/wallet.toml /root/.dusk/rusk-wallet/config.toml
+
+# Make bin folder scripts and bins executable, symlink to make available system-wide
+chmod +x /opt/dusk/bin/*
+ln -sf /opt/dusk/bin/rusk /usr/bin/rusk
+ln -sf /opt/dusk/bin/ruskquery /usr/bin/ruskquery
 ln -sf /opt/dusk/bin/rusk-wallet /usr/bin/rusk-wallet
-mv /opt/dusk/conf/wallet.toml /root/.dusk/rusk-wallet/config.toml
 
 echo "Downloading verifier keys"
 curl -so /opt/dusk/installer/rusk-vd-keys.zip -L "$VERIFIER_KEYS_URL"
 unzip -d /opt/dusk/rusk/ -o /opt/dusk/installer/rusk-vd-keys.zip
-chown -R dusk:dusk /opt/dusk/
-
-echo "Downloading state"
-rm -rf /opt/dusk/rusk/state
-rm -rf /opt/dusk/rusk/chain.db
-curl -so  /opt/dusk/installer/86920.tar.gz -L "$LAST_STATE_URL"
-tar -xvf /opt/dusk/installer/86920.tar.gz -C /opt/dusk/rusk/
 chown -R dusk:dusk /opt/dusk/
 
 echo "Installing services"
@@ -103,17 +90,20 @@ echo "rusk-wallet export -d /opt/dusk/conf -n consensus.keys"
 echo
 echo "2. Set DUSK_CONSENSUS_KEYS_PASS (use /opt/dusk/bin/setup_consensus_pwd.sh)"
 echo "Run the following command:"
-echo "./opt/dusk/bin/setup_consensus_pwd.sh"
+echo "sh /opt/dusk/bin/setup_consensus_pwd.sh"
 echo
 echo "-----"
 echo "To launch the node: "
 echo "service rusk start"
 echo
 echo "To run the Rusk wallet:"
-echo "rusk-wallet -n local"
+echo "rusk-wallet"
 echo 
-echo "To check the logs"
-echo "tail -F /var/log/rusk.{log,err}"
+echo "To check the logs:"
+echo "tail -F /var/log/rusk.log"
+echo
+echo "To query the the node for the latest block height:"
+echo "ruskquery block-height"
 
 rm -f /opt/dusk/installer/rusk.tar.gz
 rm -f /opt/dusk/installer/installer.tar.gz
