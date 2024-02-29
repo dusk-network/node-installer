@@ -46,25 +46,19 @@ mv -f /opt/dusk/installer/bin/* /opt/dusk/bin/
 mv /opt/dusk/installer/conf/* /opt/dusk/conf/
 mv -n /opt/dusk/installer/services/* /opt/dusk/services/
 
-chmod +x /opt/dusk/bin/*
-
-#echo "Downloading the latest Rusk binary..."
-#curl -so /opt/dusk/installer/rusk.tar.gz -L "$RUSK_URL"
-#mkdir -p /opt/dusk/installer/rusk
-#tar xf /opt/dusk/installer/rusk.tar.gz --directory /opt/dusk/installer/rusk
-#mv /opt/dusk/installer/rusk/rusk /opt/dusk/bin/
-chmod +x /opt/dusk/bin/rusk
-ln -sf /opt/dusk/bin/rusk /usr/bin/rusk
-ln -sf /opt/dusk/bin/ruskquery /usr/bin/ruskquery
-
+# Download, unpack and install wallet-cli
 echo "Downloading the latest Rusk wallet..."
 curl -so /opt/dusk/installer/wallet.tar.gz -L "$WALLET_URL"
 mkdir -p /opt/dusk/installer/wallet
 tar xf /opt/dusk/installer/wallet.tar.gz --strip-components 1 --directory /opt/dusk/installer/wallet
 mv /opt/dusk/installer/wallet/rusk-wallet /opt/dusk/bin/
-chmod +x /opt/dusk/bin/rusk-wallet
-ln -sf /opt/dusk/bin/rusk-wallet /usr/bin/rusk-wallet
 mv -f /opt/dusk/conf/wallet.toml /root/.dusk/rusk-wallet/config.toml
+
+# Make bin folder scripts and bins executable, symlink to make available system-wide
+chmod +x /opt/dusk/bin/*
+ln -sf /opt/dusk/bin/rusk /usr/bin/rusk
+ln -sf /opt/dusk/bin/ruskquery /usr/bin/ruskquery
+ln -sf /opt/dusk/bin/rusk-wallet /usr/bin/rusk-wallet
 
 echo "Downloading verifier keys"
 curl -so /opt/dusk/installer/rusk-vd-keys.zip -L "$VERIFIER_KEYS_URL"
