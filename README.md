@@ -73,3 +73,8 @@ Check if your node is syncing, processing and accepting new blocks:
 ```sh
 tail -F /var/log/rusk.log | grep "block accepted"
 ```
+
+To check the latest block height:
+```sh
+ruskquery block-height
+```

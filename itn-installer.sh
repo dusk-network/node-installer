@@ -55,6 +55,7 @@ chmod +x /opt/dusk/bin/*
 #mv /opt/dusk/installer/rusk/rusk /opt/dusk/bin/
 chmod +x /opt/dusk/bin/rusk
 ln -sf /opt/dusk/bin/rusk /usr/bin/rusk
+ln -sf /opt/dusk/bin/ruskquery /usr/bin/ruskquery
 
 echo "Downloading the latest Rusk wallet..."
 curl -so /opt/dusk/installer/wallet.tar.gz -L "$WALLET_URL"
@@ -104,8 +105,11 @@ echo
 echo "To run the Rusk wallet:"
 echo "rusk-wallet"
 echo 
-echo "To check the logs"
+echo "To check the logs:"
 echo "tail -F /var/log/rusk.log"
+echo
+echo "To query the the node for the latest block height:"
+echo "ruskquery block-height"
 
 rm -f /opt/dusk/installer/rusk.tar.gz
 rm -f /opt/dusk/installer/installer.tar.gz
