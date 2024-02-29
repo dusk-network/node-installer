@@ -1,7 +1,6 @@
 [Unit]
 Description=DUSK Rusk
 After=network.target
-After=create_dusk_info.service
 
 [Service]
 Type=simple
@@ -29,7 +28,7 @@ ExecStart=/opt/dusk/bin/rusk \
             --kadcast-bootstrap bootstrap2.testnet.dusk.network:9000
 
 StandardOutput=append:/var/log/rusk.log
-StandardError=append:/var/log/rusk.err
+StandardError=append:/var/log/rusk.log
 
 Restart=always
 RestartSec=10

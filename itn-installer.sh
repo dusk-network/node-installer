@@ -12,6 +12,8 @@ check_installed() {
 
 echo "Stopping previous services"
 service rusk stop || true;
+rm -rf /opt/dusk/installer || true
+rm -rf /opt/dusk/installer/installer.tar.gz || true
 
 echo "Checking prerequisites"
 check_installed unzip unzip
@@ -28,6 +30,7 @@ mkdir -p /opt/dusk/conf
 mkdir -p /opt/dusk/rusk
 mkdir -p /opt/dusk/services
 mkdir -p /opt/dusk/installer
+mkdir -p /root/.dusk/rusk-wallet
 
 VERIFIER_KEYS_URL="https://nodes.dusk.network/keys"
 INSTALLER_URL="https://github.com/dusk-network/itn-installer/tarball/main"
@@ -40,25 +43,21 @@ tar xf /opt/dusk/installer/installer.tar.gz --strip-components 1 --directory /op
 
 # Handle scripts, configs, and service definitions
 mv -f /opt/dusk/installer/bin/* /opt/dusk/bin/
-mv -n /opt/dusk/installer/conf/* /opt/dusk/conf/
+mv /opt/dusk/installer/conf/* /opt/dusk/conf/
 mv -n /opt/dusk/installer/services/* /opt/dusk/services/
 
-chmod +x /opt/dusk/bin/*
-
-#echo "Downloading the latest Rusk binary..."
-#curl -so /opt/dusk/installer/rusk.tar.gz -L "$RUSK_URL"
-#mkdir -p /opt/dusk/installer/rusk
-#tar xf /opt/dusk/installer/rusk.tar.gz --directory /opt/dusk/installer/rusk
-#mv /opt/dusk/installer/rusk/rusk /opt/dusk/bin/
-#chmod +x /opt/dusk/bin/rusk
-ln -sf /opt/dusk/bin/rusk /usr/bin/rusk
-
+# Download, unpack and install wallet-cli
 echo "Downloading the latest Rusk wallet..."
 curl -so /opt/dusk/installer/wallet.tar.gz -L "$WALLET_URL"
 mkdir -p /opt/dusk/installer/wallet
 tar xf /opt/dusk/installer/wallet.tar.gz --strip-components 1 --directory /opt/dusk/installer/wallet
 mv /opt/dusk/installer/wallet/rusk-wallet /opt/dusk/bin/
-chmod +x /opt/dusk/bin/rusk-wallet
+mv -f /opt/dusk/conf/wallet.toml /root/.dusk/rusk-wallet/config.toml
+
+# Make bin folder scripts and bins executable, symlink to make available system-wide
+chmod +x /opt/dusk/bin/*
+ln -sf /opt/dusk/bin/rusk /usr/bin/rusk
+ln -sf /opt/dusk/bin/ruskquery /usr/bin/ruskquery
 ln -sf /opt/dusk/bin/rusk-wallet /usr/bin/rusk-wallet
 
 echo "Downloading verifier keys"
@@ -72,6 +71,7 @@ mv -f /opt/dusk/services/rusk.service /etc/systemd/system/rusk.service
 
 # Configure logrotate with 644 permissions otherwise configuration is ignored
 mv -f /opt/dusk/services/logrotate.conf /etc/logrotate.d/dusk.conf
+chown root:root /etc/logrotate.d/dusk.conf
 chmod 644 /etc/logrotate.d/dusk.conf
 
 systemctl enable rusk
@@ -91,16 +91,19 @@ echo "rusk-wallet export -d /opt/dusk/conf -n consensus.keys"
 echo
 echo "2. Set DUSK_CONSENSUS_KEYS_PASS (use /opt/dusk/bin/setup_consensus_pwd.sh)"
 echo "Run the following command:"
-echo "./opt/dusk/bin/setup_consensus_pwd.sh"
+echo "sh /opt/dusk/bin/setup_consensus_pwd.sh"
 echo
 echo "-----"
 echo "To launch the node: "
 echo "service rusk start"
 echo
 echo "To run the Rusk wallet:"
-echo "rusk-wallet -n local"
+echo "rusk-wallet"
 echo 
-echo "To check the logs"
+echo "To check the logs:"
 echo "tail -F /var/log/rusk.log"
+echo
+echo "To query the the node for the latest block height:"
+echo "ruskquery block-height"
 
 rm -rf /opt/dusk/installer

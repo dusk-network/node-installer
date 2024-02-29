@@ -1,0 +1,43 @@
+#!/bin/bash
+
+# Keep /02/Chain for now
+API_ENDPOINT="http://127.0.0.1:8080/02/Chain"
+RUSK_VERSION="0.7.0"
+CONTENT_TYPE="application/json"
+
+show_help() {
+    echo "Dusk Query Tool"
+    echo "Usage: $0 [command]"
+    echo ""
+    echo "Commands:"
+    echo "  block-height    Query the current block height"
+    echo ""
+    echo "Options:"
+    echo "  -h, --help      Display this help message and exit"
+    echo ""
+    echo "Example:"
+    echo "  $0 block-height    # Queries the current block height"
+}
+
+query_block_height() {
+    curl -s --location --request POST "$API_ENDPOINT" \
+    --header "Rusk-Version: $RUSK_VERSION" \
+    --header "Content-Type: $CONTENT_TYPE" \
+    --data-raw '{
+        "topic": "gql",
+        "data": "query { block(height: -1) { header { height } } }"
+    }' | jq '.block.header.height'
+}
+
+# Case switch in case we introduce more shortcuts
+case "$1" in
+    block-height)
+        query_block_height
+        ;;
+    -h|--help)
+        show_help
+        ;;
+    *)
+        show_help
+        ;;
+esac

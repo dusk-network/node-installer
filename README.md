@@ -1,6 +1,6 @@
 # ITN Installer
 
-This repository contains an easy to use installer to run a Dusk Network node for our ITN program.
+This repository contains an easy to use installer to run a Dusk node for our ITN program. For more information on how to participate, see the [node running guide](https://docs.dusk.network/itn/node-running-guide/) on our wiki.
 
 ## Prerequisites
 
@@ -12,20 +12,20 @@ This installer is specifically built for Ubuntu 22.04 x64. It might work on olde
 ## Packages
 
 The installer comes with the following packages:
-- Rusk service
-- Rusk wallet CLI
+- [Rusk](https://github.com/dusk-network/rusk) service
+- [Rusk wallet CLI](https://github.com/dusk-network/wallet-cli)
 
 ## Folder layout 
 
 The configuration files, binaries, services and scripts can be found in `/opt/dusk/`. 
 
-The log files can be found in `/var/log/rusk.{err,log}`.
+The log files can be found in `/var/log/rusk.log` and `/var/log/rusk-recovery.log`.
 
 ## Installation
 
 :information_source: To run the **latest release** of the ITN installer execute the following command:
 ```sh
-curl --proto '=https' --tlsv1.2 -sSfL https://github.com/dusk-network/itn-installer/releases/download/v0.1.0/itn-installer.sh | sudo sh
+curl --proto '=https' --tlsv1.2 -sSfL https://github.com/dusk-network/itn-installer/releases/download/v0.1.5/itn-installer.sh | sudo sh
 ```
 
 :warning: **CAUTION** To run the **not release yet** unstable version of the ITN installer execute the following command:
@@ -52,7 +52,7 @@ rusk-wallet export -d /opt/dusk/conf -n consensus.keys
 
 Run the following command and it will prompt you to enter the password for the consensus keys file:
 ```sh
-/opt/dusk/bin/setup_consensus_pwd.sh
+sh /opt/dusk/bin/setup_consensus_pwd.sh
 ```
 
 ### Start Rusk
@@ -71,20 +71,10 @@ service rusk status
 
 Check if your node is syncing, processing and accepting new blocks:
 ```sh
-tail -F /var/log/rusk.log | grep " block accepted"
+tail -F /var/log/rusk.log | grep "block accepted"
 ```
 
-Check if your node is participating in consensus and trying to create blocks:
+To check the latest block height:
 ```sh
-tail -F /var/log/rusk.log | grep "execute_state_transition"
-```
-
-Or to check if it did so in the past:
-```sh
- grep execute_state_transition /var/log/rusk.log
-```
-
-To check for errors in the Rusk service:
-```sh
-cat /var/log/rusk.err
+ruskquery block-height
 ```

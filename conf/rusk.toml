@@ -11,9 +11,9 @@ max_inv_entries = 100
 max_ongoing_requests = 1000
 
 [kadcast]
-kadcast_id = 0x10
-public_address = '127.0.0.1:9000'
-listen_address = '127.0.0.1:9000' 
+kadcast_id = 0x20
+public_address = 'N/A'
+listen_address = 'N/A' 
 bootstrapping_nodes = []
 auto_propagate = false
 channel_size = 1000
@@ -32,7 +32,7 @@ udp_send_retry_count = 3
 blocklist_refresh_interval = '10s'
 
 [kadcast.fec.encoder]
-min_repair_packets_per_block = 5
+min_repair_packets_per_block = 2
 mtu = 1300
 fec_redundancy = 0.15
 
