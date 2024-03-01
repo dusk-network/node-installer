@@ -104,6 +104,10 @@ echo
 echo "To check the logs:"
 echo "tail -F /var/log/rusk.log"
 echo
+echo "The installer also adds a small Rusk querying utility called ruskquery."
+echo "To see what you can query with it:"
+echo "ruskquery"
+echo
 echo "To query the the node for the latest block height:"
 echo "ruskquery block-height"
 

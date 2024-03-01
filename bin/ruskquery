@@ -12,6 +12,7 @@ show_help() {
     echo "Commands:"
     echo "  block-height    Query the current block height"
     echo "  peers           Query the current connected peers"
+    echo "  info            Query for general network information"
     echo ""
     echo "Options:"
     echo "  -h, --help      Display this help message and exit"
@@ -40,6 +41,15 @@ query_connected_peers() {
     }' | jq '. | length'
 }
 
+query_info() {
+    curl -s --location --request POST "$API_ENDPOINT" \
+    --header "Rusk-Version: $RUSK_VERSION" \
+    --header "Content-Type: $CONTENT_TYPE" \
+    --data-raw '{
+        "topic": "info",
+        "data": ""
+    }' | jq '.'
+}
 
 # Case switch in case we introduce more shortcuts
 case "$1" in
@@ -48,6 +58,9 @@ case "$1" in
         ;;
     peers)
         query_connected_peers
+        ;;
+    info)
+        query_info
         ;;
     -h|--help)
         show_help
