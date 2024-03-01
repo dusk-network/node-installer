@@ -11,6 +11,7 @@ show_help() {
     echo ""
     echo "Commands:"
     echo "  block-height    Query the current block height"
+    echo "  peers           Query the current connected peers"
     echo ""
     echo "Options:"
     echo "  -h, --help      Display this help message and exit"
@@ -29,10 +30,24 @@ query_block_height() {
     }' | jq '.block.header.height'
 }
 
+query_connected_peers() {
+    curl -s --location --request POST "$API_ENDPOINT" \
+    --header "Rusk-Version: $RUSK_VERSION" \
+    --header "Content-Type: $CONTENT_TYPE" \
+    --data-raw '{
+        "topic": "alive_nodes",
+        "data": " 1000"
+    }' | jq '. | length'
+}
+
+
 # Case switch in case we introduce more shortcuts
 case "$1" in
     block-height)
         query_block_height
+        ;;
+    peers)
+        query_connected_peers
         ;;
     -h|--help)
         show_help
