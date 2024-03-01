@@ -78,7 +78,8 @@ systemctl enable rusk
 systemctl daemon-reload
 
 echo "Setup local firewall"
-ufw allow 9000:9005/udp
+ufw allow 8080/tcp
+ufw allow 9000/udp
 
 echo "Dusk node installed"
 echo "-----"
@@ -105,7 +106,4 @@ echo
 echo "To query the the node for the latest block height:"
 echo "ruskquery block-height"
 
-rm -f /opt/dusk/installer/rusk.tar.gz
-rm -f /opt/dusk/installer/installer.tar.gz
-rm -f /opt/dusk/installer/wallet.tar.gz
 rm -rf /opt/dusk/installer
