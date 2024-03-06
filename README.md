@@ -80,7 +80,7 @@ To significantly reduce the time required to sync your node, you can use the `/o
 
 2. Execute the fast sync command:
    ```sh
-   /opt/dusk/bin/download_state
+   /opt/dusk/bin/download_state.sh
    ```
    Follow the prompts to confirm the operation.
 
