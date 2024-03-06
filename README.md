@@ -67,6 +67,30 @@ Check the status of the Rusk service by running:
 service rusk status
 ```
 
+## Fast Syncing with Archival State Download
+
+To significantly reduce the time required to sync your node, you can use the `/opt/dusk/bin/download_state` command. This command stops your node and replaces its current state with the latest published state from one of Dusk's archival nodes. 
+
+### Using the Fast Sync Command
+
+1. Stop your node (if it's running):
+   ```sh
+   service rusk stop
+   ```
+
+2. Execute the fast sync command:
+   ```sh
+   /opt/dusk/bin/download_state
+   ```
+   Follow the prompts to confirm the operation.
+
+3. Restart your node:
+   ```sh
+   service rusk restart
+   ```
+
+This process will ensure your node is up-to-date with the latest blockchain state, allowing you to sync faster and get back to participating in the network in less time.
+
 ## Diagnostics
 
 Check if your node is syncing, processing and accepting new blocks:
