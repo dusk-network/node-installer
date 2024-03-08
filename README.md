@@ -78,9 +78,9 @@ To significantly reduce the time required to sync your node, you can use the `/o
    service rusk stop
    ```
 
-2. Execute the fast sync command:
+2. Execute the fast sync command. If you pass a block height it will attempt to sync up with that height, otherwise it will syncup with the default one.
    ```sh
-   /opt/dusk/bin/download_state.sh
+   /opt/dusk/bin/download_state.sh [BLOCK-HEIGHT]
    ```
    Follow the prompts to confirm the operation.
 
