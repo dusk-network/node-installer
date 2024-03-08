@@ -97,6 +97,9 @@ To significantly reduce the time required to sync your node, you can use the `/o
 
 This process will ensure your node is up-to-date with the latest blockchain state, allowing you to sync faster and get back to participating in the network in less time.
 
+> [!NOTE]
+> If you are experiencing errors in downloading the state, it might be due to some remnants of previous state syncing. Try to clean up with `sudo rm /tmp/state.tar.gz`
+
 ## Diagnostics
 
 Check if your node is syncing, processing and accepting new blocks:
