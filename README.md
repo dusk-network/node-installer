@@ -80,12 +80,12 @@ To significantly reduce the time required to sync your node, you can use the `/o
 
 2. Execute the fast sync command.
    ```sh
-   /opt/dusk/bin/download_state.sh 
+   sudo /opt/dusk/bin/download_state.sh 
    ```
    
    If you want to sync up with a specific state instead of the default one, you need to pass the block height of the state you want to syncup with.
    ```sh
-   /opt/dusk/bin/download_state.sh 369876
+   sudo /opt/dusk/bin/download_state.sh 369876
    ```
 
    Follow the prompts to confirm the operation.
