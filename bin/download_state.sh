@@ -21,8 +21,9 @@ display_warning() {
   esac
 }
 
+# Function to display all published states
 list_states() {
-  echo "Available states:"
+  echo "Available published states:"
   for state in "${AVAILABLE_STATES[@]}"; do
     echo "- $state"
   done
@@ -34,14 +35,12 @@ if [ $# -eq 0 ]; then
   # No argument provided, use the latest state
   state_number=$LATEST_STATE
 elif [ "$1" = "--list" ]; then
-  # User requested to list all possible states
   list_states
 else
-  # User provided a specific state
+  # User requests a specific state
   state_number=$1
   if ! [[ " ${AVAILABLE_STATES[*]} " =~ " ${state_number} " ]]; then
     echo "Error: State $state_number is not available."
-    echo "The following states are available:"
     list_states
     exit 1
   fi

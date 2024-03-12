@@ -69,7 +69,12 @@ service rusk status
 
 ## Fast Syncing with Archival State Download
 
-To significantly reduce the time required to sync your node, you can use the `/opt/dusk/bin/download_state` command. This command stops your node and replaces its current state with the latest published state from one of Dusk's archival nodes. 
+To significantly reduce the time required to sync your node to the latest published state, you can use the `download_state` command. This command stops your node and replaces its current state with the latest published state from one of Dusk's archival nodes. 
+
+To see the available published states, run:
+```sh
+download_state --list
+```
 
 ### Using the Fast Sync Command
 
