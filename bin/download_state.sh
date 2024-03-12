@@ -1,9 +1,7 @@
 #!/bin/bash
-
 set -e
 
-AVAILABLE_STATES=(409123 408251 407159 404345 379502)
-LATEST_STATE=${AVAILABLE_STATES[0]}
+STATE_LIST_URL="https://nodes.dusk.network/state/list"
 
 # Function to display a warning message
 display_warning() {
@@ -23,27 +21,42 @@ display_warning() {
 
 # Function to display all published states
 list_states() {
-  echo "Available published states:"
-  for state in "${AVAILABLE_STATES[@]}"; do
-    echo "- $state"
-  done
+  echo "Fetching available states..."
+  if ! curl -f -L -s "$STATE_LIST_URL"; then
+    echo "Error: Failed to fetch the list of states."
+    exit 1
+  fi
   exit 0
 }
 
-# Check if an argument is provided, otherwise use the fallback value (348211)
-if [ $# -eq 0 ]; then
-  # No argument provided, use the latest state
-  state_number=$LATEST_STATE
-elif [ "$1" = "--list" ]; then
-  list_states
-else
-  # User requests a specific state
-  state_number=$1
-  if ! [[ " ${AVAILABLE_STATES[*]} " =~ " ${state_number} " ]]; then
-    echo "Error: State $state_number is not available."
+# Function to check if a specific state exists
+state_exists() {
+  local state=$1
+  if curl -f -L -s "$STATE_LIST_URL" | grep -q "^$state$"; then
+    return 0 # State exists
+  else
+    echo "State does not exist"
     list_states
-    exit 1
+    return 1 # State does not exist
   fi
+}
+
+# Function to get the latest state
+get_latest_state() {
+  curl -f -L -s "$STATE_LIST_URL" | tail -n 1
+}
+
+# Check if an argument is provided, otherwise use the fallback value (348211)
+if [ "$1" = "--list" ]; then
+  # List all possible states
+  list_states
+elif [ -n "$1" ]; then
+  # User provided a specific state, check if it exists
+  state_exists "$1"
+  state_number=$1
+else
+  # No argument provided, use the latest state
+  state_number=$(get_latest_state)
 fi
 
 # Display warning and get user confirmation
