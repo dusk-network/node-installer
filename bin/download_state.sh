@@ -26,19 +26,22 @@ list_states() {
     echo "Error: Failed to fetch the list of states."
     exit 1
   fi
-  exit 0
 }
 
 # Function to check if a specific state exists
 state_exists() {
   local state=$1
-  if curl -f -L -s "$STATE_LIST_URL" | grep -q "^$state$"; then
-    return 0 # State exists
-  else
-    echo "State does not exist"
-    list_states
-    return 1 # State does not exist
-  fi
+  while : ; do
+    if curl -f -L -s "$STATE_LIST_URL" | grep -q "^$state$"; then
+      return 0 # State exists
+    else
+      echo "State does not exist. Please enter a state from the list below:"
+      list_states
+      read -p "Enter a valid state number: " state
+      # Update the state_number variable in the global scope
+      state_number=$state
+    fi
+  done
 }
 
 # Function to get the latest state
@@ -50,10 +53,10 @@ get_latest_state() {
 if [ "$1" = "--list" ]; then
   # List all possible states
   list_states
+  exit 0
 elif [ -n "$1" ]; then
   # User provided a specific state, check if it exists
   state_exists "$1"
-  state_number=$1
 else
   # No argument provided, use the latest state
   state_number=$(get_latest_state)
