@@ -56,8 +56,8 @@ if [ "$1" = "--list" ]; then
   exit 0
 elif [ -n "$1" ]; then
   # User provided a specific state, check if it exists
-  state_exists "$1"
   state_number=$1
+  state_exists "$1"
 else
   # No argument provided, use the latest state
   state_number=$(get_latest_state)
