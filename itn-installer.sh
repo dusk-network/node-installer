@@ -59,7 +59,7 @@ mv -f /opt/dusk/conf/wallet.toml /root/.dusk/rusk-wallet/config.toml
 chmod +x /opt/dusk/bin/*
 ln -sf /opt/dusk/bin/rusk /usr/bin/rusk
 ln -sf /opt/dusk/bin/ruskquery /usr/bin/ruskquery
-ln -sf /opt/dusk/bin/download_state /usr/bin/download_state
+ln -sf /opt/dusk/bin/download_state.sh /usr/bin/download_state
 ln -sf /opt/dusk/bin/rusk-wallet /usr/bin/rusk-wallet
 
 echo "Downloading verifier keys"
