@@ -6,7 +6,7 @@ STATE_LIST_URL="https://nodes.dusk.network/state/list"
 # Function to display a warning message
 display_warning() {
   echo "WARNING: This operation will STOP your node and REPLACE the current state with a new one."
-  read -p "Are you sure you want to proceed? (Y/n): " choice
+  read -p "Are you sure you want to proceed? (y/N): " choice
 
   case "$choice" in
     Y )
