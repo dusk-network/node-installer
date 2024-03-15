@@ -4,6 +4,7 @@
 API_ENDPOINT="http://127.0.0.1:8080/02/Chain"
 RUSK_VERSION="0.7.0"
 CONTENT_TYPE="application/json"
+INSTALLER_VERSION="v0.1.8"
 
 show_help() {
     echo "Dusk Query Tool"
@@ -13,7 +14,7 @@ show_help() {
     echo "  block-height    Query the current block height"
     echo "  peers           Query the current connected peers"
     echo "  info            Query for general network information"
-    echo "  version         Query for the installer version"
+    echo "  version         Query for the installer version and check for latest version"
     echo ""
     echo "Options:"
     echo "  -h, --help      Display this help message and exit"
@@ -53,7 +54,17 @@ query_info() {
 }
 
 query_installer_version() {
-    echo "Installer version 0.1.8"
+    # Fetch the latest release version from GitHub
+    local latest_version=$(curl -s "https://api.github.com/repos/dusk-network/itn-installer/releases/latest" | jq -r '.tag_name')
+
+    # Compare versions
+    if [ "$latest_version" = "$INSTALLER_VERSION" ]; then
+        echo "You are using the latest installer version: $INSTALLER_VERSION."
+    else
+        echo "A new installer version is available: $latest_version."
+        echo "You are currently on version: $INSTALLER_VERSION."
+        echo "To upgrade to the latest version, visit: https://docs.dusk.network/itn/upgrade-node/"
+    fi
 }
 
 # Case switch in case we introduce more shortcuts
