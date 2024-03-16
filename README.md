@@ -85,12 +85,12 @@ download_state --list
 
 2. Execute the fast sync command.
    ```sh
-   sudo /opt/dusk/bin/download_state.sh 
+   download_state
    ```
    
    If you want to sync up with a specific state instead of the default one, you need to pass the block height of the state you want to syncup with.
    ```sh
-   sudo /opt/dusk/bin/download_state.sh 369876
+   download_state 369876
    ```
 
    Follow the prompts to confirm the operation.
