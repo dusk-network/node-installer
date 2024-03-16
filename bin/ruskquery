@@ -4,7 +4,7 @@
 API_ENDPOINT="http://127.0.0.1:8080/02/Chain"
 RUSK_VERSION="0.7.0"
 CONTENT_TYPE="application/json"
-INSTALLER_VERSION="v0.1.8"
+INSTALLER_VERSION="v0.1.9"
 
 show_help() {
     echo "Dusk Query Tool"
