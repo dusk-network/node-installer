@@ -34,7 +34,7 @@ mkdir -p /opt/dusk/installer
 mkdir -p /root/.dusk/rusk-wallet
 
 VERIFIER_KEYS_URL="https://nodes.dusk.network/keys"
-INSTALLER_URL="https://github.com/dusk-network/itn-installer/archive/refs/tags/v0.1.9.tar.gz"
+INSTALLER_URL="https://github.com/dusk-network/itn-installer/tarball/main"
 RUSK_URL=$(curl -s "https://api.github.com/repos/dusk-network/rusk/releases/latest" | jq -r  '.assets[].browser_download_url' | grep linux)
 WALLET_URL=$(curl -s "https://api.github.com/repos/dusk-network/wallet-cli/releases/latest" | jq -r  '.assets[].browser_download_url' | grep libssl3)
 
