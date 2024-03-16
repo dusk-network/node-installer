@@ -67,6 +67,15 @@ Check the status of the Rusk service by running:
 service rusk status
 ```
 
+## Check the installer version
+
+To check your installer version, run:
+```sh
+ruskquery version
+```
+
+If you're running an outdated version of the installer, it will warn you and ask you to upgrade.
+
 ## Fast Syncing with Archival State Download
 
 To significantly reduce the time required to sync your node to the latest published state, you can use the `download_state` command. This command stops your node and replaces its current state with the latest published state from one of Dusk's archival nodes. 

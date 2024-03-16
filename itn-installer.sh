@@ -111,5 +111,8 @@ echo "ruskquery"
 echo
 echo "To query the the node for the latest block height:"
 echo "ruskquery block-height"
+echo
+echo "To check if your ITN installer is up to date:"
+echo "ruskquery version"
 
 rm -rf /opt/dusk/installer
