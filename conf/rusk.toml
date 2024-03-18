@@ -12,7 +12,7 @@ max_inv_entries = 100
 max_ongoing_requests = 1000
 
 [kadcast]
-kadcast_id = 0x20
+kadcast_id = 0x25
 public_address = 'N/A'
 listen_address = 'N/A' 
 bootstrapping_nodes = ['bootstrap1.testnet.dusk.network:9000', 'bootstrap2.testnet.dusk.network:9000', '161.35.230.6:9000', '167.71.208.74:9000', '128.199.62.50:9000', '134.122.113.239:9000', '165.227.67.186:9000', '157.230.41.115:9000', '206.189.44.83:9000', '24.199.119.91:9000']

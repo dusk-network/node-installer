@@ -5,6 +5,7 @@ After=network.target
 [Service]
 Type=simple
 
+Environment="RUSK_CONSENSUS_SPIN_TIME=1710774000"
 Environment="RUST_BACKTRACE=full"
 Environment="RUSK_PROFILE_PATH=/opt/dusk/rusk"
 
