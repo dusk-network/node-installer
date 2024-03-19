@@ -9,7 +9,7 @@ display_warning() {
   read -p "Are you sure you want to proceed? (Y/n): " choice
 
   case "$choice" in
-    Y )
+    [yY] )
       return 0  # User confirmed, proceed
       ;;
     * )
