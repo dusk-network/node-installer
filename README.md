@@ -1,4 +1,4 @@
-# ITN Installer
+# Node Installer
 
 This repository contains an easy to use installer to run a Dusk node for our ITN program. For more information on how to participate, see the [node running guide](https://docs.dusk.network/itn/node-running-guide/) on our wiki.
 
@@ -23,14 +23,14 @@ The log files can be found in `/var/log/rusk.log` and `/var/log/rusk-recovery.lo
 
 ## Installation
 
-:information_source: To run the **latest release** of the ITN installer execute the following command:
+:information_source: To run the **latest release** of the Node Installer execute the following command:
 ```sh
-curl --proto '=https' --tlsv1.2 -sSfL https://github.com/dusk-network/itn-installer/releases/download/v0.1.9/itn-installer.sh | sudo sh
+curl --proto '=https' --tlsv1.2 -sSfL https://github.com/dusk-network/node-installer/releases/download/v0.1.9/node-installer.sh | sudo sh
 ```
 
-:warning: **CAUTION** To run the **not release yet** unstable version of the ITN installer execute the following command:
+:warning: **CAUTION** To run the **not release yet** unstable version of the Node Installer execute the following command:
 ```sh
-curl --proto '=https' --tlsv1.2 -sSfL https://raw.githubusercontent.com/dusk-network/itn-installer/main/itn-installer.sh | sudo sh
+curl --proto '=https' --tlsv1.2 -sSfL https://raw.githubusercontent.com/dusk-network/node-installer/main/node-installer.sh | sudo sh
 ```
 
 ## Configuration
