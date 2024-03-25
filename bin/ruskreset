@@ -1,5 +1,19 @@
 #!/bin/bash
 
+# Ask for confirmation to remove all
+echo "WARNING: This operation will DELETE your Rusk state, wallet cache and logs."
+read -p "Are you sure you want to proceed? (Y/n): " choice
+
+case "$choice" in
+    Y )
+        echo "User confirmed, proceeding..."
+        ;;
+    * )
+        echo "Operation aborted."
+        exit 1
+    ;;
+esac
+
 echo "Stopping Rusk service..."
 service rusk stop
 echo "Rusk service stopped successfully."
@@ -10,5 +24,8 @@ rm -rf /opt/dusk/rusk/chain.db
 
 echo "Removing wallet cache..."
 rm -rf ~/.dusk/rusk-wallet/cache
+
+echo "Removing logs..."
+rm -rf /var/log/rusk*.log
 
 echo "Reset completed successfully."
