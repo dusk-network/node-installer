@@ -25,7 +25,7 @@ The log files can be found in `/var/log/rusk.log` and `/var/log/rusk-recovery.lo
 
 :information_source: To run the **latest release** of the Node Installer execute the following command:
 ```sh
-curl --proto '=https' --tlsv1.2 -sSfL https://github.com/dusk-network/node-installer/releases/download/v0.1.9/node-installer.sh | sudo sh
+curl --proto '=https' --tlsv1.2 -sSfL https://github.com/dusk-network/node-installer/releases/download/v0.2.0/node-installer.sh | sudo sh
 ```
 
 :warning: **CAUTION** To run the **not release yet** unstable version of the Node Installer execute the following command:
