@@ -55,6 +55,13 @@ Run the following command and it will prompt you to enter the password for the c
 sh /opt/dusk/bin/setup_consensus_pwd.sh
 ```
 
+### Reset Rusk state
+
+To remove old Rusk state and the old wallet cache, simply run:
+```sh
+ruskreset
+```
+
 ### Start Rusk
 
 Everything should be configured now and the node is ready to run. Use the following commands:

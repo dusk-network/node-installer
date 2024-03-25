@@ -31,7 +31,7 @@ mkdir -p /opt/dusk/conf
 mkdir -p /opt/dusk/rusk
 mkdir -p /opt/dusk/services
 mkdir -p /opt/dusk/installer
-mkdir -p /root/.dusk/rusk-wallet
+mkdir -p ~/.dusk/rusk-wallet
 
 VERIFIER_KEYS_URL="https://nodes.dusk.network/keys"
 INSTALLER_URL="https://github.com/dusk-network/itn-installer/tarball/main"
@@ -53,12 +53,13 @@ curl -so /opt/dusk/installer/wallet.tar.gz -L "$WALLET_URL"
 mkdir -p /opt/dusk/installer/wallet
 tar xf /opt/dusk/installer/wallet.tar.gz --strip-components 1 --directory /opt/dusk/installer/wallet
 mv /opt/dusk/installer/wallet/rusk-wallet /opt/dusk/bin/
-mv -f /opt/dusk/conf/wallet.toml /root/.dusk/rusk-wallet/config.toml
+mv -f /opt/dusk/conf/wallet.toml ~/.dusk/rusk-wallet/config.toml
 
 # Make bin folder scripts and bins executable, symlink to make available system-wide
 chmod +x /opt/dusk/bin/*
 ln -sf /opt/dusk/bin/rusk /usr/bin/rusk
 ln -sf /opt/dusk/bin/ruskquery /usr/bin/ruskquery
+ln -sf /opt/dusk/bin/ruskreset /usr/bin/ruskreset
 ln -sf /opt/dusk/bin/download_state.sh /usr/bin/download_state
 ln -sf /opt/dusk/bin/rusk-wallet /usr/bin/rusk-wallet
 
@@ -114,5 +115,8 @@ echo "ruskquery block-height"
 echo
 echo "To check if your ITN installer is up to date:"
 echo "ruskquery version"
+echo
+echo "To reset your Rusk state and wallet cache:"
+echo "ruskreset"
 
 rm -rf /opt/dusk/installer
