@@ -3,6 +3,7 @@
 kadcast_test = false
 
 [chain]
+generation_timeout = '5s'
 db_path = '/opt/dusk/rusk'
 consensus_keys_path = '/opt/dusk/conf/consensus.keys'
 migration_height = 438000
@@ -12,7 +13,7 @@ max_inv_entries = 100
 max_ongoing_requests = 1000
 
 [kadcast]
-kadcast_id = 0x25
+kadcast_id = 0x30
 public_address = 'N/A'
 listen_address = 'N/A'
 bootstrapping_nodes = [

@@ -63,7 +63,7 @@ query_installer_version() {
     else
         echo "A new installer version is available: $latest_version."
         echo "You are currently on version: $INSTALLER_VERSION."
-        echo "To upgrade to the latest version, visit: https://docs.dusk.network/itn/upgrade-node/"
+        echo "To upgrade to the latest version, visit: https://docs.dusk.network/nocturne/upgrade-node/"
     fi
 }
 

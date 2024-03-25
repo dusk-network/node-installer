@@ -113,7 +113,7 @@ echo
 echo "To query the the node for the latest block height:"
 echo "ruskquery block-height"
 echo
-echo "To check if your ITN installer is up to date:"
+echo "To check if your node installer is up to date:"
 echo "ruskquery version"
 echo
 echo "To reset your Rusk state and wallet cache:"

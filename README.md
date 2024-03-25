@@ -1,6 +1,6 @@
 # Node Installer
 
-This repository contains an easy to use installer to run a Dusk node for our ITN program. For more information on how to participate, see the [node running guide](https://docs.dusk.network/itn/node-running-guide/) on our wiki.
+This repository contains an easy to use installer to run a Dusk node for our Nocturne testnet. For more information on how to participate, see the [node running guide](https://docs.dusk.network/nocturne/node-running-guide/) on our wiki.
 
 ## Prerequisites
 
