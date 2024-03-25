@@ -4,7 +4,7 @@
 API_ENDPOINT="http://127.0.0.1:8080/02/Chain"
 RUSK_VERSION="0.7.0"
 CONTENT_TYPE="application/json"
-INSTALLER_VERSION="v0.1.9"
+INSTALLER_VERSION="v0.2.0"
 
 show_help() {
     echo "Dusk Query Tool"
@@ -55,7 +55,7 @@ query_info() {
 
 query_installer_version() {
     # Fetch the latest release version from GitHub
-    local latest_version=$(curl -s "https://api.github.com/repos/dusk-network/itn-installer/releases/latest" | jq -r '.tag_name')
+    local latest_version=$(curl -s "https://api.github.com/repos/dusk-network/node-installer/releases/latest" | jq -r '.tag_name')
 
     # Compare versions
     if [ "$latest_version" = "$INSTALLER_VERSION" ]; then
@@ -63,7 +63,7 @@ query_installer_version() {
     else
         echo "A new installer version is available: $latest_version."
         echo "You are currently on version: $INSTALLER_VERSION."
-        echo "To upgrade to the latest version, visit: https://docs.dusk.network/itn/upgrade-node/"
+        echo "To upgrade to the latest version, visit: https://docs.dusk.network/nocturne/upgrade-node/"
     fi
 }
 

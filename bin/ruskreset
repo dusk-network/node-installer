@@ -26,6 +26,6 @@ echo "Removing wallet cache..."
 rm -rf ~/.dusk/rusk-wallet/cache
 
 echo "Removing logs..."
-rm -rf /var/log/rusk*.log
+rm -rf /var/log/rusk*
 
 echo "Reset completed successfully."

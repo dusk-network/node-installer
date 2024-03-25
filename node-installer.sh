@@ -34,7 +34,7 @@ mkdir -p /opt/dusk/installer
 mkdir -p ~/.dusk/rusk-wallet
 
 VERIFIER_KEYS_URL="https://nodes.dusk.network/keys"
-INSTALLER_URL="https://github.com/dusk-network/itn-installer/tarball/main"
+INSTALLER_URL="https://github.com/dusk-network/node-installer/tarball/main"
 RUSK_URL=$(curl -s "https://api.github.com/repos/dusk-network/rusk/releases/latest" | jq -r  '.assets[].browser_download_url' | grep linux)
 WALLET_URL=$(curl -s "https://api.github.com/repos/dusk-network/wallet-cli/releases/latest" | jq -r  '.assets[].browser_download_url' | grep libssl3)
 
@@ -113,7 +113,7 @@ echo
 echo "To query the the node for the latest block height:"
 echo "ruskquery block-height"
 echo
-echo "To check if your ITN installer is up to date:"
+echo "To check if your node installer is up to date:"
 echo "ruskquery version"
 echo
 echo "To reset your Rusk state and wallet cache:"
