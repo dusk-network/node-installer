@@ -9,6 +9,6 @@ rm -rf /opt/dusk/rusk/state
 rm -rf /opt/dusk/rusk/chain.db
 
 echo "Removing wallet cache..."
-rm -rf $HOME/.dusk/rusk-wallet/cache
+rm -rf ~/.dusk/rusk-wallet/cache
 
 echo "Reset completed successfully."
