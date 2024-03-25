@@ -59,6 +59,7 @@ mv -f /opt/dusk/conf/wallet.toml /root/.dusk/rusk-wallet/config.toml
 chmod +x /opt/dusk/bin/*
 ln -sf /opt/dusk/bin/rusk /usr/bin/rusk
 ln -sf /opt/dusk/bin/ruskquery /usr/bin/ruskquery
+ln -sf /opt/dusk/bin/ruskreset /usr/bin/ruskreset
 ln -sf /opt/dusk/bin/download_state.sh /usr/bin/download_state
 ln -sf /opt/dusk/bin/rusk-wallet /usr/bin/rusk-wallet
 
@@ -114,5 +115,8 @@ echo "ruskquery block-height"
 echo
 echo "To check if your ITN installer is up to date:"
 echo "ruskquery version"
+echo
+echo "To reset your Rusk state and wallet cache:"
+echo "ruskreset"
 
 rm -rf /opt/dusk/installer

@@ -1,0 +1,14 @@
+#!/bin/bash
+
+echo "Stopping Rusk service..."
+service rusk stop
+echo "Rusk service stopped successfully."
+
+echo "Removing Rusk state and chain.db..."
+rm -rf /opt/dusk/rusk/state
+rm -rf /opt/dusk/rusk/chain.db
+
+echo "Removing wallet cache..."
+rm -rf $HOME/.dusk/rusk-wallet/cache
+
+echo "Reset completed successfully."
