@@ -1,12 +1,36 @@
 #!/bin/sh
 
-# Check for supported distro and arch
-# TODO: Make it more portable 
-os_check=$(grep -Ei 'debian|ubuntu' /etc/*release)
-arch_check=$(uname -m)
+# Retrieve OS & distro
+os=$(uname -s)
+distro="unknown"
 
-if [ -z "$os_check" ] || [ "$arch_check" != "x86_64" ]; then
-    echo "Unsupported OS or architecture. This installer only supports Debian/Ubuntu-based systems with x86_64 architecture."
+get_linux_distro() {
+    if [ -f /etc/os-release ]; then 
+        # systemd users should have os-release available
+        . /etc/os-release
+        distro=$(echo "$NAME" | tr '[:upper:]' '[:lower:]')
+    elif type lsb_release >/dev/null 2>&1; then
+        distro=$(lsb_release -si | tr '[:upper:]' '[:lower:]')
+    else
+        distro="unknown"
+    fi
+}
+
+if [ "$os" = "Linux" ]; then
+    distro=$(get_linux_distro)
+fi
+
+# Retrieve architecture
+case "$(uname -m)" in
+    x86_64*)    arch=x86_64;;
+    arm*)       arch=ARM;;
+    aarch64*)   arch=ARM64;;
+    *)          arch="unknown:$(uname -m)"
+esac
+
+# Check for Debian or Ubuntu on x86_64 architecture
+if [ "$distro" != "debian" ] && [ "$distro" != "ubuntu" ] || [ "$arch" != "x86_64" ]; then
+    echo "Unsupported OS or architecture. This installer only supports Debian/Ubuntu-based systems with the x86_64 architecture."
     exit 1
 fi
 
