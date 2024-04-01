@@ -1,4 +1,15 @@
 #!/bin/sh
+
+# Check for supported distro and arch
+# TODO: Make it more portable 
+os_check=$(grep -Ei 'debian|ubuntu' /etc/*release)
+arch_check=$(uname -m)
+
+if [ -z "$os_check" ] || [ "$arch_check" != "x86_64" ]; then
+    echo "Unsupported OS or architecture. This installer only supports Debian/Ubuntu-based systems with x86_64 architecture."
+    exit 1
+fi
+
 check_installed() {
     binary_name=$1
     package_name=$2
