@@ -40,8 +40,23 @@ check_installed() {
     which $binary_name >/dev/null 2>&1
     if [ $? -eq 1 ]; then
         echo "$binary_name missing"
-        echo "Installing $package_name"  
-        sudo NEEDRESTART_MODE=a apt install $package_name -y
+        echo "Installing $package_name"
+
+        case "$distro" in
+            debian|ubuntu)
+                sudo NEEDRESTART_MODE=a apt install $package_name -y
+                ;;
+            # arch|manjaro)
+            #   sudo pacman -S "$package_name" --noconfirm
+            #   ;;
+            *)
+                # This path shouldn't happen
+                echo "Unsupported distro: $distro"
+                exit 1
+                ;;
+        esac
+    else
+        echo "$binary_name is already installed."
     fi
 }
 
