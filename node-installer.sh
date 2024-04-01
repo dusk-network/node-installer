@@ -34,6 +34,19 @@ if [ "$distro" != "debian" ] && [ "$distro" != "ubuntu" ] || [ "$arch" != "x86_6
     exit 1
 fi
 
+update_pkg_database() {
+    echo "Updating package database..."
+    case "$distro" in
+        debian|ubuntu)
+            sudo apt update
+            ;;
+    *)
+        echo "Unsupported distribution for package database updates: $distro"
+        exit 1
+        ;;
+    esac
+}
+
 check_installed() {
     binary_name=$1
     package_name=$2
@@ -50,7 +63,7 @@ check_installed() {
             #   sudo pacman -S "$package_name" --noconfirm
             #   ;;
             *)
-                # This path shouldn't happen
+                # This path shouldn't happen on Linux OSes
                 echo "Unsupported distro: $distro"
                 exit 1
                 ;;
@@ -66,6 +79,7 @@ rm -rf /opt/dusk/installer || true
 rm -rf /opt/dusk/installer/installer.tar.gz || true
 
 echo "Checking prerequisites"
+update_pkg_database
 check_installed unzip unzip
 check_installed curl curl
 check_installed jq jq
