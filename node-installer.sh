@@ -1,12 +1,75 @@
 #!/bin/sh
+
+# Retrieve OS & distro
+os=$(uname -s)
+distro="unknown"
+
+get_linux_distro() {
+    if [ -f /etc/os-release ]; then 
+        # systemd users should have os-release available
+        . /etc/os-release
+        distro=$(echo "$NAME" | tr '[:upper:]' '[:lower:]')
+    elif type lsb_release >/dev/null 2>&1; then
+        distro=$(lsb_release -si | tr '[:upper:]' '[:lower:]')
+    else
+        distro="unknown"
+    fi
+}
+
+if [ "$os" = "Linux" ]; then
+    distro=$(get_linux_distro)
+fi
+
+# Retrieve architecture
+case "$(uname -m)" in
+    x86_64*)    arch=x86_64;;
+    arm*)       arch=ARM;;
+    aarch64*)   arch=ARM64;;
+    *)          arch="unknown:$(uname -m)"
+esac
+
+# Check for Debian or Ubuntu on x86_64 architecture
+if [ "$distro" != "debian" ] && [ "$distro" != "ubuntu" ] || [ "$arch" != "x86_64" ]; then
+    echo "Unsupported OS or architecture. This installer only supports Debian/Ubuntu-based systems with the x86_64 architecture."
+    exit 1
+fi
+
+update_pkg_database() {
+    echo "Updating package database..."
+    case "$distro" in
+        debian|ubuntu)
+            sudo apt update
+            ;;
+    *)
+        echo "Unsupported distribution for package database updates: $distro"
+        exit 1
+        ;;
+    esac
+}
+
 check_installed() {
     binary_name=$1
     package_name=$2
     which $binary_name >/dev/null 2>&1
     if [ $? -eq 1 ]; then
         echo "$binary_name missing"
-        echo "Installing $package_name"  
-        sudo NEEDRESTART_MODE=a apt install $package_name -y
+        echo "Installing $package_name"
+
+        case "$distro" in
+            debian|ubuntu)
+                sudo NEEDRESTART_MODE=a apt install $package_name -y
+                ;;
+            # arch|manjaro)
+            #   sudo pacman -S "$package_name" --noconfirm
+            #   ;;
+            *)
+                # This path shouldn't happen on Linux OSes
+                echo "Unsupported distro: $distro"
+                exit 1
+                ;;
+        esac
+    else
+        echo "$binary_name is already installed."
     fi
 }
 
@@ -16,6 +79,7 @@ rm -rf /opt/dusk/installer || true
 rm -rf /opt/dusk/installer/installer.tar.gz || true
 
 echo "Checking prerequisites"
+update_pkg_database
 check_installed unzip unzip
 check_installed curl curl
 check_installed jq jq
