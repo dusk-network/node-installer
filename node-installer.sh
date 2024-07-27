@@ -84,6 +84,7 @@ check_installed unzip unzip
 check_installed curl curl
 check_installed ipcalc ipcalc
 check_installed jq jq
+check_installed route net-tools
 check_installed logrotate logrotate
 check_installed dig dnsutils
 
