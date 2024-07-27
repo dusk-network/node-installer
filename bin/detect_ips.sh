@@ -57,7 +57,7 @@ else
             (( ( ip & mask ) == ( gw & mask ) )) &&
                 int2ip $ip myIp && int2ip $mask netMask
         }
-    done < <(ip -4 -br addr)
+    done < <(ip -4 -c=never -br addr)
 fi
 
 echo "KADCAST_PUBLIC_ADDRESS=$PUBLIC_IP:9000"
