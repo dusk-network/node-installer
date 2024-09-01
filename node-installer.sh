@@ -17,7 +17,7 @@ get_linux_distro() {
 }
 
 if [ "$os" = "Linux" ]; then
-    distro=$(get_linux_distro)
+    get_linux_distro
 fi
 
 # Retrieve architecture
@@ -73,6 +73,20 @@ check_installed() {
     fi
 }
 
+# Fetch all Rusk tags once and store them in a variable
+ALL_TAGS=$(curl -s "https://api.github.com/repos/dusk-network/rusk/tags" | jq -r '.[].name')
+
+# Grab the latest version tag for a given tag pattern
+get_latest_tag() {
+    local tag_pattern=$1
+
+    # We sort on version, and grab the tail (highest version). If we grab the head,
+    # we might run into consistency issues
+    echo "$ALL_TAGS" \
+        | grep -E "^${tag_pattern}-[0-9]+\.[0-9]+\.[0-9]+$" \
+        | sort -V | tail -n 1
+}
+
 echo "Stopping previous services"
 service rusk stop || true;
 rm -rf /opt/dusk/installer || true
@@ -99,8 +113,10 @@ mkdir -p ~/.dusk/rusk-wallet
 
 VERIFIER_KEYS_URL="https://nodes.dusk.network/keys"
 INSTALLER_URL="https://github.com/dusk-network/node-installer/tarball/main"
-RUSK_URL=$(curl -s "https://api.github.com/repos/dusk-network/rusk/releases/latest" | jq -r  '.assets[].browser_download_url' | grep linux)
-WALLET_URL=$(curl -s "https://api.github.com/repos/dusk-network/wallet-cli/releases/latest" | jq -r  '.assets[].browser_download_url' | grep libssl3)
+# RUSK_TAG=$(get_latest_tag "rusk")
+# RUSK_URL=$(curl -s "https://api.github.com/repos/dusk-network/rusk/releases/tags/${RUSK_TAG}" | jq -r  '.assets[].browser_download_url' | grep linux)
+WALLET_TAG=$(get_latest_tag "rusk-wallet")
+WALLET_URL=$(curl -s "https://api.github.com/repos/dusk-network/wallet-cli/releases/tags/${WALLET_TAG}" | jq -r  '.assets[].browser_download_url' | grep libssl3)
 
 echo "Downloading installer package for additional scripts and configurations"
 curl -so /opt/dusk/installer/installer.tar.gz -L "$INSTALLER_URL"
