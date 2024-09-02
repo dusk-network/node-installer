@@ -100,6 +100,7 @@ check_installed jq jq
 check_installed route net-tools
 check_installed logrotate logrotate
 check_installed dig dnsutils
+check_installed ufw ufw
 
 echo "Creating rusk service user"
 id -u dusk >/dev/null 2>&1 || useradd -r dusk
@@ -161,8 +162,16 @@ systemctl enable rusk
 systemctl daemon-reload
 
 echo "Setup local firewall"
-ufw allow 8080/tcp
-ufw allow 9000/udp
+ufw allow ssh # SSH
+ufw allow 8080/tcp # HTTP listener
+ufw allow 9000/udp # Kadcast
+
+if ! ufw status | grep -q "Status: active"; then
+    echo "Enabling UFW"
+    ufw --force enable
+else
+    echo "UFW is already enabled"
+fi
 
 echo "Dusk node installed"
 echo "-----"
