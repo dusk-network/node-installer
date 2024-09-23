@@ -46,17 +46,25 @@ query_info() {
     --header "Content-Type: $CONTENT_TYPE" | jq '.'
 }
 
+version_gt() {
+    # Compares two versions $1 and $2
+    # Returns 0 if $1 is greater than $2, otherwise returns 1
+    test "$(printf '%s\n' "$@" | sort -V | head -n 1)" != "$1"
+}
+
 query_installer_version() {
     # Fetch the latest release version from GitHub
     local latest_version=$(curl -s "https://api.github.com/repos/dusk-network/node-installer/releases/latest" | jq -r '.tag_name')
 
     # Compare versions
-    if [ "$latest_version" = "$INSTALLER_VERSION" ]; then
+    if [ "${latest_version#v}" = "${INSTALLER_VERSION#v}" ]; then
         echo "You are using the latest installer version: $INSTALLER_VERSION."
-    else
+    elif version_gt "${latest_version#v}" "${INSTALLER_VERSION#v}"; then
         echo "A new installer version is available: $latest_version."
         echo "You are currently on version: $INSTALLER_VERSION."
         echo "To upgrade to the latest version, visit: https://docs.dusk.network/nocturne/upgrade-node/"
+    else
+        echo "You are using a newer installer version ($INSTALLER_VERSION) than the latest public release ($latest_version)."
     fi
 }
 
