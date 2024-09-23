@@ -87,6 +87,44 @@ get_latest_tag() {
         | sort -V | tail -n 1
 }
 
+# Configure your local installation based on the selected network
+configure_network() {
+    local network=$1
+    local kadcast_id
+    local bootstrapping_nodes
+    local spin_time
+
+    case "$network" in
+        mainnet)
+            kadcast_id="0x1"
+            bootstrapping_nodes="['mainnet-node:9000']"
+            spin_time="1729000000"
+            ;;
+        testnet)
+            kadcast_id="0x2"
+            bootstrapping_nodes="['testnet-node:9000']"
+            spin_time="1727793000"
+            ;;
+        devnet)
+            kadcast_id="0x3"
+            bootstrapping_nodes="['devnet-node:9000']"
+            spin_time="1727200000"
+            ;;
+        *)
+            echo "Unknown network: $network. Defaulting to testnet."
+            configure_kadcast "testnet"
+            return
+            ;;
+    esac
+
+    # Update the rusk.toml file with kadcast_id and bootstrapping_nodes
+    sed -i "s/^kadcast_id =.*/kadcast_id = $kadcast_id/" /opt/dusk/conf/rusk.toml
+    sed -i "s/^bootstrapping_nodes =.*/bootstrapping_nodes = $bootstrapping_nodes/" /opt/dusk/conf/rusk.toml
+
+    # Update the rusk.service file with RUSK_CONSENSUS_SPIN_TIME
+    sed -i "s/^Environment=\"RUSK_CONSENSUS_SPIN_TIME=.*/Environment=\"RUSK_CONSENSUS_SPIN_TIME=$spin_time\"/" /etc/systemd/system/rusk.service
+}
+
 echo "Stopping previous services"
 service rusk stop || true;
 rm -rf /opt/dusk/installer || true
@@ -158,6 +196,12 @@ mv -f /opt/dusk/services/logrotate.conf /etc/logrotate.d/dusk.conf
 chown root:root /etc/logrotate.d/dusk.conf
 chmod 644 /etc/logrotate.d/dusk.conf
 
+# Select network (default to testnet if no argument passed)
+NETWORK="${1:-testnet}"
+echo "Selected network: $NETWORK"
+configure_network "$NETWORK"
+
+# Enable the Rusk service
 systemctl enable rusk
 systemctl daemon-reload
 
