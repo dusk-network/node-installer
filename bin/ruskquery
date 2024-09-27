@@ -12,9 +12,9 @@ show_help() {
     echo ""
     echo "Commands:"
     echo "  block-height    Query the current block height"
-    echo "  peers           Query for the current number of connected peers"
+    echo "  peers           Query the current number of connected peers"
     echo "  info            Query for general network information"
-    echo "  version         Query for the installer version and check for latest version"
+    echo "  version         Query the installer version and check for latest version"
     echo ""
     echo "Options:"
     echo "  -h, --help      Display this help message and exit"
@@ -34,10 +34,16 @@ query_block_height() {
 }
 
 query_connected_peers() {
-    curl -s --location --request POST "$API_ENDPOINT/on/network/peers" \
+    peers_count=$(curl -s --location --request POST "$API_ENDPOINT/on/network/peers" \
     --header "Rusk-Version: $RUSK_VERSION" \
     --header "Content-Type: $CONTENT_TYPE" \
-    --data-raw '100' | jq '. | length'
+    --data-raw '100' | jq '. | length')
+
+    if [ "$peers_count" -gt 99 ]; then
+        echo "+99"
+    else
+        echo "$peers_count"
+    fi
 }
 
 query_info() {
