@@ -1,10 +1,10 @@
 #!/bin/bash
 
 # Keep /02/Chain for now
-API_ENDPOINT="http://127.0.0.1:8080/02/Chain"
-RUSK_VERSION="0.7.0"
+API_ENDPOINT="http://127.0.0.1:8080"
+RUSK_VERSION="0.8.0"
 CONTENT_TYPE="application/json"
-INSTALLER_VERSION="v0.2.0"
+INSTALLER_VERSION="v0.3.0"
 
 show_help() {
     echo "Dusk Query Tool"
@@ -12,9 +12,9 @@ show_help() {
     echo ""
     echo "Commands:"
     echo "  block-height    Query the current block height"
-    echo "  peers           Query the current connected peers"
+    echo "  peers           Query the current number of connected peers"
     echo "  info            Query for general network information"
-    echo "  version         Query for the installer version and check for latest version"
+    echo "  version         Query the installer version and check for latest version"
     echo ""
     echo "Options:"
     echo "  -h, --help      Display this help message and exit"
@@ -24,7 +24,7 @@ show_help() {
 }
 
 query_block_height() {
-    curl -s --location --request POST "$API_ENDPOINT" \
+    curl -s --location --request POST "$API_ENDPOINT/on/graphql/query" \
     --header "Rusk-Version: $RUSK_VERSION" \
     --header "Content-Type: $CONTENT_TYPE" \
     --data-raw '{
@@ -34,23 +34,28 @@ query_block_height() {
 }
 
 query_connected_peers() {
-    curl -s --location --request POST "$API_ENDPOINT" \
+    peers_count=$(curl -s --location --request POST "$API_ENDPOINT/on/network/peers" \
     --header "Rusk-Version: $RUSK_VERSION" \
     --header "Content-Type: $CONTENT_TYPE" \
-    --data-raw '{
-        "topic": "alive_nodes",
-        "data": " 1000"
-    }' | jq '. | length'
+    --data-raw '100' | jq '. | length')
+
+    if [ "$peers_count" -gt 99 ]; then
+        echo "+99"
+    else
+        echo "$peers_count"
+    fi
 }
 
 query_info() {
-    curl -s --location --request POST "$API_ENDPOINT" \
+    curl -s --location --request POST "$API_ENDPOINT/on/node/info" \
     --header "Rusk-Version: $RUSK_VERSION" \
-    --header "Content-Type: $CONTENT_TYPE" \
-    --data-raw '{
-        "topic": "info",
-        "data": ""
-    }' | jq '.'
+    --header "Content-Type: $CONTENT_TYPE" | jq '.'
+}
+
+version_gt() {
+    # Compares two versions $1 and $2
+    # Returns 0 if $1 is greater than $2, otherwise returns 1
+    test "$(printf '%s\n' "$@" | sort -V | head -n 1)" != "$1"
 }
 
 query_installer_version() {
@@ -58,12 +63,14 @@ query_installer_version() {
     local latest_version=$(curl -s "https://api.github.com/repos/dusk-network/node-installer/releases/latest" | jq -r '.tag_name')
 
     # Compare versions
-    if [ "$latest_version" = "$INSTALLER_VERSION" ]; then
+    if [ "${latest_version#v}" = "${INSTALLER_VERSION#v}" ]; then
         echo "You are using the latest installer version: $INSTALLER_VERSION."
-    else
+    elif version_gt "${latest_version#v}" "${INSTALLER_VERSION#v}"; then
         echo "A new installer version is available: $latest_version."
         echo "You are currently on version: $INSTALLER_VERSION."
         echo "To upgrade to the latest version, visit: https://docs.dusk.network/nocturne/upgrade-node/"
+    else
+        echo "You are using a newer installer version ($INSTALLER_VERSION) than the latest public release ($latest_version)."
     fi
 }
 
