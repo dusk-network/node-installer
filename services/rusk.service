@@ -5,7 +5,6 @@ After=network.target
 [Service]
 Type=simple
 
-Environment="RUSK_CONSENSUS_SPIN_TIME=1710774000"
 Environment="RUST_BACKTRACE=full"
 Environment="RUSK_PROFILE_PATH=/opt/dusk/rusk"
 
@@ -17,7 +16,6 @@ ExecStartPre=!/bin/bash -c '/opt/dusk/bin/rusk recovery-state >> /var/log/rusk_r
 ExecStartPre=!/bin/bash -c '/opt/dusk/bin/check_consensus_keys.sh'
 ExecStartPre=!/bin/bash -c '/opt/dusk/bin/detect_ips.sh > /opt/dusk/services/rusk.conf.default'
 ExecStartPre=!/bin/bash -c 'chown -R dusk /opt/dusk/rusk/state'
-
 
 EnvironmentFile=/opt/dusk/services/rusk.conf.default
 EnvironmentFile=/opt/dusk/services/rusk.conf.user

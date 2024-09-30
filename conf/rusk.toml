@@ -3,6 +3,7 @@
 kadcast_test = false
 
 [chain]
+genesis_timestamp = ''
 generation_timeout = '5s'
 db_path = '/opt/dusk/rusk'
 consensus_keys_path = '/opt/dusk/conf/consensus.keys'
@@ -13,22 +14,10 @@ max_inv_entries = 100
 max_ongoing_requests = 1000
 
 [kadcast]
-kadcast_id = 0x30
+kadcast_id = 0x0
 public_address = 'N/A'
 listen_address = 'N/A'
-bootstrapping_nodes = [
-    '161.35.202.116:9000',
-    '164.92.111.253:9000',
-    '152.42.208.88:9000',
-    '165.232.86.130:9000',
-    '164.92.161.230:9000',
-    '157.245.241.121:9000',
-    '134.209.33.94:9000',
-    '64.23.220.141:9000',
-    '178.128.51.187:9000',
-    '161.35.95.128:9000',
-    '164.90.173.236:9000',
-]
+bootstrapping_nodes = []
 auto_propagate = false
 channel_size = 1000
 recursive_discovery = true
