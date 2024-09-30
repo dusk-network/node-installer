@@ -98,17 +98,17 @@ configure_network() {
         mainnet)
             kadcast_id="0x1"
             bootstrapping_nodes="['mainnet-node:9000']"
-            genesis_timestamp="2024-10-15T12:30:00Z"
+            genesis_timestamp="'2024-10-15T12:30:00Z'"
             ;;
         testnet)
             kadcast_id="0x2"
             bootstrapping_nodes="['testnet-node:9000']"
-            genesis_timestamp="2024-10-01T14:30:00Z"
+            genesis_timestamp="'2024-10-01T19:00:00Z'"
             ;;
         devnet)
             kadcast_id="0x3"
             bootstrapping_nodes="['devnet-node:9000']"
-            genesis_timestamp="2024-10-01T12:30:00Z"
+            genesis_timestamp="'2024-10-01T12:30:00Z'"
             ;;
         *)
             echo "Unknown network: $network. Defaulting to testnet."
