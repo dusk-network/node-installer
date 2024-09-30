@@ -92,23 +92,23 @@ configure_network() {
     local network=$1
     local kadcast_id
     local bootstrapping_nodes
-    local spin_time
+    local genesis_timestamp
 
     case "$network" in
         mainnet)
             kadcast_id="0x1"
             bootstrapping_nodes="['mainnet-node:9000']"
-            spin_time="1729000000"
+            genesis_timestamp="2024-10-15T12:30:00Z"
             ;;
         testnet)
             kadcast_id="0x2"
             bootstrapping_nodes="['testnet-node:9000']"
-            spin_time="1727793000"
+            genesis_timestamp="2024-10-01T14:30:00Z"
             ;;
         devnet)
             kadcast_id="0x3"
             bootstrapping_nodes="['devnet-node:9000']"
-            spin_time="1727200000"
+            genesis_timestamp="2024-10-01T12:30:00Z"
             ;;
         *)
             echo "Unknown network: $network. Defaulting to testnet."
@@ -117,12 +117,10 @@ configure_network() {
             ;;
     esac
 
-    # Update the rusk.toml file with kadcast_id and bootstrapping_nodes
+    # Update the rusk.toml file with kadcast_id, bootstrapping_nodes & genesis_timestamp
     sed -i "s/^kadcast_id =.*/kadcast_id = $kadcast_id/" /opt/dusk/conf/rusk.toml
     sed -i "s/^bootstrapping_nodes =.*/bootstrapping_nodes = $bootstrapping_nodes/" /opt/dusk/conf/rusk.toml
-
-    # Update the rusk.service file with RUSK_CONSENSUS_SPIN_TIME
-    sed -i "s/^Environment=\"RUSK_CONSENSUS_SPIN_TIME=.*/Environment=\"RUSK_CONSENSUS_SPIN_TIME=$spin_time\"/" /etc/systemd/system/rusk.service
+    sed -i "s/^genesis_timestamp =.*/genesis_timestamp = $genesis_timestamp/" /opt/dusk/conf/rusk.toml
 }
 
 echo "Stopping previous services"

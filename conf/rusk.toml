@@ -3,6 +3,7 @@
 kadcast_test = false
 
 [chain]
+genesis_timestamp = ''
 generation_timeout = '5s'
 db_path = '/opt/dusk/rusk'
 consensus_keys_path = '/opt/dusk/conf/consensus.keys'
