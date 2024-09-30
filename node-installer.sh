@@ -152,8 +152,8 @@ VERIFIER_KEYS_URL="https://nodes.dusk.network/keys"
 INSTALLER_URL="https://github.com/dusk-network/node-installer/tarball/main"
 # RUSK_TAG=$(get_latest_tag "rusk")
 # RUSK_URL=$(curl -s "https://api.github.com/repos/dusk-network/rusk/releases/tags/${RUSK_TAG}" | jq -r  '.assets[].browser_download_url' | grep linux)
-WALLET_TAG=$(get_latest_tag "rusk-wallet")
-WALLET_URL=$(curl -s "https://api.github.com/repos/dusk-network/wallet-cli/releases/tags/${WALLET_TAG}" | jq -r  '.assets[].browser_download_url' | grep libssl3)
+# WALLET_TAG=$(get_latest_tag "rusk-wallet")
+# WALLET_URL=$(curl -s "https://api.github.com/repos/dusk-network/wallet-cli/releases/tags/${WALLET_TAG}" | jq -r  '.assets[].browser_download_url' | grep libssl3)
 
 echo "Downloading installer package for additional scripts and configurations"
 curl -so /opt/dusk/installer/installer.tar.gz -L "$INSTALLER_URL"
@@ -165,11 +165,11 @@ mv /opt/dusk/installer/conf/* /opt/dusk/conf/
 mv -n /opt/dusk/installer/services/* /opt/dusk/services/
 
 # Download, unpack and install wallet-cli
-echo "Downloading the latest Rusk wallet..."
-curl -so /opt/dusk/installer/wallet.tar.gz -L "$WALLET_URL"
-mkdir -p /opt/dusk/installer/wallet
-tar xf /opt/dusk/installer/wallet.tar.gz --strip-components 1 --directory /opt/dusk/installer/wallet
-mv /opt/dusk/installer/wallet/rusk-wallet /opt/dusk/bin/
+# echo "Downloading the latest Rusk wallet..."
+# curl -so /opt/dusk/installer/wallet.tar.gz -L "$WALLET_URL"
+# mkdir -p /opt/dusk/installer/wallet
+# tar xf /opt/dusk/installer/wallet.tar.gz --strip-components 1 --directory /opt/dusk/installer/wallet
+# mv /opt/dusk/installer/wallet/rusk-wallet /opt/dusk/bin/
 mv -f /opt/dusk/conf/wallet.toml ~/.dusk/rusk-wallet/config.toml
 
 # Make bin folder scripts and bins executable, symlink to make available system-wide
