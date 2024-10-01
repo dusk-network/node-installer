@@ -102,7 +102,7 @@ configure_network() {
             ;;
         testnet)
             kadcast_id="0x2"
-            bootstrapping_nodes="['']"
+            bootstrapping_nodes="['68.183.13.32:9000','165.227.149.253:9000','137.184.39.26:9000']"
             genesis_timestamp="'2024-10-01T20:00:00Z'"
             ;;
         devnet)
