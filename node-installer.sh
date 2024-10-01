@@ -102,12 +102,12 @@ configure_network() {
             ;;
         testnet)
             kadcast_id="0x2"
-            bootstrapping_nodes="['testnet-node:9000']"
-            genesis_timestamp="'2024-10-01T19:00:00Z'"
+            bootstrapping_nodes="['68.183.13.32:9000','165.227.149.253:9000','137.184.39.26:9000']"
+            genesis_timestamp="'2024-10-01T20:00:00Z'"
             ;;
         devnet)
             kadcast_id="0x3"
-            bootstrapping_nodes="['devnet-node:9000']"
+            bootstrapping_nodes="['']"
             genesis_timestamp="'2024-10-01T12:30:00Z'"
             ;;
         *)
@@ -201,6 +201,8 @@ case "$NETWORK" in
         ;;
 esac
 
+rm -rf /opt/dusk/rusk/circuits || true
+rm -rf /opt/dusk/rusk/keys || true
 
 curl -so /opt/dusk/installer/rusk-vd-keys.zip -L "$VERIFIER_KEYS_URL"
 
