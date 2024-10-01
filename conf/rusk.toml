@@ -7,7 +7,6 @@ genesis_timestamp = ''
 generation_timeout = '5s'
 db_path = '/opt/dusk/rusk'
 consensus_keys_path = '/opt/dusk/conf/consensus.keys'
-migration_height = 438000
 
 [databroker]
 max_inv_entries = 100

@@ -25,12 +25,12 @@ The log files can be found in `/var/log/rusk.log` and `/var/log/rusk-recovery.lo
 
 :information_source: To run the **latest release** of the Node Installer execute the following command:
 ```sh
-curl --proto '=https' --tlsv1.2 -sSfL https://github.com/dusk-network/node-installer/releases/download/v0.2.0/node-installer.sh | sudo sh
+curl --proto '=https' --tlsv1.2 -sSfL https://github.com/dusk-network/node-installer/releases/download/v0.3.0/node-installer.sh | sudo sh
 ```
 
 By default, the installer runs the node for our Nocturne testnet. If you'd like to run a node for the Lunare devnet or mainnet, you can pass `devnet` or `mainnet` as an option during installation:
 ```sh
-curl --proto '=https' --tlsv1.2 -sSfL https://github.com/dusk-network/node-installer/releases/download/v0.2.0/node-installer.sh | sudo sh -s devnet
+curl --proto '=https' --tlsv1.2 -sSfL https://github.com/dusk-network/node-installer/releases/download/v0.3.0/node-installer.sh | sudo sh -s devnet
 ```
 
 :warning: **CAUTION** To run the **not release yet** unstable version of the Node Installer execute the following command:
