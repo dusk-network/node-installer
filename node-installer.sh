@@ -98,21 +98,21 @@ configure_network() {
         mainnet)
             kadcast_id="0x1"
             bootstrapping_nodes="['mainnet-node:9000']"
-            genesis_timestamp="2024-10-15T12:30:00Z"
+            genesis_timestamp="'2024-10-15T12:30:00Z'"
             ;;
         testnet)
             kadcast_id="0x2"
             bootstrapping_nodes="['testnet-node:9000']"
-            genesis_timestamp="2024-10-01T14:30:00Z"
+            genesis_timestamp="'2024-10-01T19:00:00Z'"
             ;;
         devnet)
             kadcast_id="0x3"
             bootstrapping_nodes="['devnet-node:9000']"
-            genesis_timestamp="2024-10-01T12:30:00Z"
+            genesis_timestamp="'2024-10-01T12:30:00Z'"
             ;;
         *)
             echo "Unknown network: $network. Defaulting to testnet."
-            configure_kadcast "testnet"
+            configure_network "testnet"
             return
             ;;
     esac
@@ -148,7 +148,6 @@ mkdir -p /opt/dusk/services
 mkdir -p /opt/dusk/installer
 mkdir -p ~/.dusk/rusk-wallet
 
-VERIFIER_KEYS_URL="https://nodes.dusk.network/keys"
 INSTALLER_URL="https://github.com/dusk-network/node-installer/tarball/main"
 # RUSK_TAG=$(get_latest_tag "rusk")
 # RUSK_URL=$(curl -s "https://api.github.com/repos/dusk-network/rusk/releases/tags/${RUSK_TAG}" | jq -r  '.assets[].browser_download_url' | grep linux)
@@ -181,7 +180,30 @@ ln -sf /opt/dusk/bin/download_state.sh /usr/bin/download_state
 ln -sf /opt/dusk/bin/rusk-wallet /usr/bin/rusk-wallet
 
 echo "Downloading verifier keys"
+# Select network (default to testnet if no argument passed)
+NETWORK="${1:-testnet}"
+echo "Selected network: $NETWORK"
+VERIFIER_KEYS_URL="https://testnet.nodes.dusk.network/keys"
+
+case "$NETWORK" in
+    mainnet)
+        VERIFIER_KEYS_URL="https://nodes.dusk.network/keys"
+        ;;
+    testnet)
+        VERIFIER_KEYS_URL="https://testnet.nodes.dusk.network/keys"
+        ;;
+    devnet)
+        VERIFIER_KEYS_URL="https://devnet.nodes.dusk.network/keys"
+        ;;
+    *)
+        echo "Unknown network: $network. Defaulting to testnet."
+        return
+        ;;
+esac
+
+
 curl -so /opt/dusk/installer/rusk-vd-keys.zip -L "$VERIFIER_KEYS_URL"
+
 unzip -d /opt/dusk/rusk/ -o /opt/dusk/installer/rusk-vd-keys.zip
 chown -R dusk:dusk /opt/dusk/
 
@@ -194,9 +216,6 @@ mv -f /opt/dusk/services/logrotate.conf /etc/logrotate.d/dusk.conf
 chown root:root /etc/logrotate.d/dusk.conf
 chmod 644 /etc/logrotate.d/dusk.conf
 
-# Select network (default to testnet if no argument passed)
-NETWORK="${1:-testnet}"
-echo "Selected network: $NETWORK"
 configure_network "$NETWORK"
 
 # Enable the Rusk service
