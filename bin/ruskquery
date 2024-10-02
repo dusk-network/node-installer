@@ -27,10 +27,7 @@ query_block_height() {
     curl -s --location --request POST "$API_ENDPOINT/on/graphql/query" \
     --header "Rusk-Version: $RUSK_VERSION" \
     --header "Content-Type: $CONTENT_TYPE" \
-    --data-raw '{
-        "topic": "gql",
-        "data": "query { block(height: -1) { header { height } } }"
-    }' | jq '.block.header.height'
+    --data-raw 'query { block(height: -1) { header { height } } }"' | jq '.block.header.height'
 }
 
 query_connected_peers() {
