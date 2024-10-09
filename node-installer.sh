@@ -148,7 +148,7 @@ mkdir -p /opt/dusk/services
 mkdir -p /opt/dusk/installer
 mkdir -p ~/.dusk/rusk-wallet
 
-INSTALLER_URL="https://github.com/dusk-network/node-installer/tarball/main"
+INSTALLER_URL="https://github.com/dusk-network/node-installer/archive/refs/tags/v0.3.1.tar.gz"
 # RUSK_TAG=$(get_latest_tag "rusk")
 # RUSK_URL=$(curl -s "https://api.github.com/repos/dusk-network/rusk/releases/tags/${RUSK_TAG}" | jq -r  '.assets[].browser_download_url' | grep linux)
 # WALLET_TAG=$(get_latest_tag "rusk-wallet")
