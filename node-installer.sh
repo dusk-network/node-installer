@@ -8,7 +8,7 @@ get_linux_distro() {
     if [ -f /etc/os-release ]; then 
         # systemd users should have os-release available
         . /etc/os-release
-        distro=$(echo "$NAME" | tr '[:upper:]' '[:lower:]')
+        distro=$(echo "$NAME" | cut -d' ' -f1 | tr '[:upper:]' '[:lower:]')
     elif type lsb_release >/dev/null 2>&1; then
         distro=$(lsb_release -si | tr '[:upper:]' '[:lower:]')
     else
