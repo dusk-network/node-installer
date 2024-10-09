@@ -38,7 +38,7 @@ update_pkg_database() {
     echo "Updating package database..."
     case "$distro" in
         debian|ubuntu)
-            sudo apt update
+            apt update
             ;;
     *)
         echo "Unsupported distribution for package database updates: $distro"
@@ -57,10 +57,10 @@ check_installed() {
 
         case "$distro" in
             debian|ubuntu)
-                sudo NEEDRESTART_MODE=a apt install $package_name -y
+                NEEDRESTART_MODE=a apt install $package_name -y
                 ;;
             # arch|manjaro)
-            #   sudo pacman -S "$package_name" --noconfirm
+            #   pacman -S "$package_name" --noconfirm
             #   ;;
             *)
                 # This path shouldn't happen on Linux OSes
