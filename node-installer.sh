@@ -209,6 +209,10 @@ curl -so /opt/dusk/installer/rusk-vd-keys.zip -L "$VERIFIER_KEYS_URL"
 unzip -d /opt/dusk/rusk/ -o /opt/dusk/installer/rusk-vd-keys.zip
 chown -R dusk:dusk /opt/dusk/
 
+# Set system parameters
+mv -f /opt/dusk/conf/dusk.conf /etc/sysctl.d/dusk.conf
+sysctl -p /etc/sysctl.d/dusk.conf
+
 echo "Installing services"
 # Overwrite previous service definitions
 mv -f /opt/dusk/services/rusk.service /etc/systemd/system/rusk.service
