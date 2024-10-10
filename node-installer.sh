@@ -102,8 +102,8 @@ configure_network() {
             ;;
         testnet)
             kadcast_id="0x2"
-            bootstrapping_nodes="['68.183.13.32:9000','165.227.149.253:9000','137.184.39.26:9000']"
-            genesis_timestamp="'2024-10-01T20:00:00Z'"
+            bootstrapping_nodes="['165.22.193.63:9000','167.172.175.19:9000']"
+            genesis_timestamp="'2024-10-11T08:00:00Z'"
             ;;
         devnet)
             kadcast_id="0x3"
@@ -208,6 +208,10 @@ curl -so /opt/dusk/installer/rusk-vd-keys.zip -L "$VERIFIER_KEYS_URL"
 
 unzip -d /opt/dusk/rusk/ -o /opt/dusk/installer/rusk-vd-keys.zip
 chown -R dusk:dusk /opt/dusk/
+
+# Set system parameters
+mv -f /opt/dusk/conf/dusk.conf /etc/sysctl.d/dusk.conf
+sysctl -p /etc/sysctl.d/dusk.conf
 
 echo "Installing services"
 # Overwrite previous service definitions
