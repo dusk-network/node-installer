@@ -21,6 +21,7 @@ echo "Rusk service stopped successfully."
 echo "Removing Rusk state and chain.db..."
 rm -rf /opt/dusk/rusk/state
 rm -rf /opt/dusk/rusk/chain.db
+rm -rf /opt/dusk/rusk/archive
 
 echo "Removing wallet cache..."
 rm -rf ~/.dusk/rusk-wallet/cache
