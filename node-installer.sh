@@ -5,7 +5,7 @@ os=$(uname -s)
 distro="unknown"
 
 get_linux_distro() {
-    if [ -f /etc/os-release ]; then 
+    if [ -f /etc/os-release ]; then
         # systemd users should have os-release available
         . /etc/os-release
         distro=$(echo "$NAME" | cut -d' ' -f1 | tr '[:upper:]' '[:lower:]')
@@ -31,6 +31,13 @@ esac
 # Check for Debian or Ubuntu on x86_64 architecture
 if [ "$distro" != "debian" ] && [ "$distro" != "ubuntu" ] || [ "$arch" != "x86_64" ]; then
     echo "Unsupported OS or architecture. This installer only supports Debian/Ubuntu-based systems with the x86_64 architecture."
+    exit 1
+fi
+
+# Check for OpenSSL 3 or higher
+if ! command -v openssl >/dev/null 2>&1 || [ "$(openssl version | awk '{print $2}' | cut -d. -f1)" -lt 3 ]; then
+    echo "The required OpenSSL version is not available. Please install OpenSSL 3 or higher"
+    echo "You likely need to upgrade your OS or install a newer OS"
     exit 1
 fi
 
@@ -258,7 +265,7 @@ echo "service rusk start"
 echo
 echo "To run the Rusk wallet:"
 echo "rusk-wallet"
-echo 
+echo
 echo "To check the logs:"
 echo "tail -F /var/log/rusk.log"
 echo
