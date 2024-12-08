@@ -1,5 +1,38 @@
 #!/bin/sh
 
+declare -A VERSIONS
+# Define versions per network, per component
+VERSIONS=(
+    ["mainnet_rusk"]="v0.8.0"
+    ["mainnet_rusk_wallet"]="v0.8.0"
+    ["testnet_rusk"]="v0.8.0"
+    ["testnet_rusk_wallet"]="v0.8.0"
+    ["devnet_rusk"]="v0.8.0"
+    ["devnet_rusk_wallet"]="v0.8.0"
+)
+
+# Installs a given component for a given network
+install_component() {
+    local network="$1"
+    local component="$2"
+    local key="${network}_${component}"
+    local version="${VERSIONS[$key]}"
+
+    if [[ -z "$version" ]]; then
+        echo "Error: Version not found for $key"
+        exit 1
+    fi
+
+    # Construct download URL, add regex to replace `_` with `-` in component variable
+    local url="https://github.com/dusk-network/rusk/releases/download/${version}/${component//_/-}-linux.tar.gz"
+
+    echo "Installing $component version $version for $network"
+    echo "Downloading from $url"
+
+    curl -so /opt/dusk/installer/${component}.tar.gz -L "$url" || { echo "Failed to download $component"; exit 1; }
+    tar xf /opt/dusk/installer/${component}.tar.gz --strip-components 1 --directory /opt/dusk/bin/
+}
+
 # Retrieve OS & distro
 os=$(uname -s)
 distro="unknown"
@@ -80,20 +113,6 @@ check_installed() {
     fi
 }
 
-# Fetch all Rusk tags once and store them in a variable
-ALL_TAGS=$(curl -s "https://api.github.com/repos/dusk-network/rusk/tags" | jq -r '.[].name')
-
-# Grab the latest version tag for a given tag pattern
-get_latest_tag() {
-    local tag_pattern=$1
-
-    # We sort on version, and grab the tail (highest version). If we grab the head,
-    # we might run into consistency issues
-    echo "$ALL_TAGS" \
-        | grep -E "^${tag_pattern}-[0-9]+\.[0-9]+\.[0-9]+$" \
-        | sort -V | tail -n 1
-}
-
 # Configure your local installation based on the selected network
 configure_network() {
     local network=$1
@@ -156,10 +175,9 @@ mkdir -p /opt/dusk/installer
 mkdir -p ~/.dusk/rusk-wallet
 
 INSTALLER_URL="https://github.com/dusk-network/node-installer/tarball/main"
-# RUSK_TAG=$(get_latest_tag "rusk")
-# RUSK_URL=$(curl -s "https://api.github.com/repos/dusk-network/rusk/releases/tags/${RUSK_TAG}" | jq -r  '.assets[].browser_download_url' | grep linux)
-# WALLET_TAG=$(get_latest_tag "rusk-wallet")
-# WALLET_URL=$(curl -s "https://api.github.com/repos/dusk-network/wallet-cli/releases/tags/${WALLET_TAG}" | jq -r  '.assets[].browser_download_url' | grep libssl3)
+# Install components
+install_component "$NETWORK" "rusk"
+install_component "$NETWORK" "rusk_wallet"
 
 echo "Downloading installer package for additional scripts and configurations"
 curl -so /opt/dusk/installer/installer.tar.gz -L "$INSTALLER_URL"
