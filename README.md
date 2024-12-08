@@ -1,14 +1,14 @@
 # Node Installer
 
-This repository contains an easy to use installer to run a Dusk node for our Nocturne testnet and our Lunare devnet. For more information on how to participate, see the [node running guide](https://docs.dusk.network/operator/nocturne/node-running-guide) on our wiki.
+This repository contains an easy-to-use installer for running a Dusk node on the Nocturne testnet and the Lunare devnet. For more information on how to participate, see the [node running guide](https://docs.dusk.network/operator/guides/01-nocturne-node/) on our wiki.
 
 ## Prerequisites
 
-- Ubuntu 22.04 LTS x64
-- OpenSSL 3
-- VPS
+- Operating System: Ubuntu 22.04/24.04 LTS x64
+- Dependencies: OpenSSL 3
+- Environment: Any compatible Linux environment (VPS, local, cloud instance)
 
-This installer is specifically built for Ubuntu 22.04 x64. It might work on older or newer versions.
+The installer officially supports Ubuntu 22.04 and 24.04 LTS x64. While it has also been tested successfully on Ubuntu 24.10, official support is limited to the LTS versions listed. Compatibility with other versions may vary.
 
 ## Packages
 
