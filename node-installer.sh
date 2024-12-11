@@ -102,8 +102,8 @@ configure_network() {
             ;;
         testnet)
             kadcast_id="0x2"
-            bootstrapping_nodes="['188.166.70.129:9000','139.59.146.237:9000']"
-            genesis_timestamp="'2024-10-22T08:00:00Z'"
+            bootstrapping_nodes="['104.248.194.214:9000','164.92.247.97:9000','146.190.56.220:9000']"
+            genesis_timestamp="'2024-12-12T09:00:00Z'"
             ;;
         devnet)
             kadcast_id="0x3"
@@ -148,7 +148,7 @@ mkdir -p /opt/dusk/services
 mkdir -p /opt/dusk/installer
 mkdir -p ~/.dusk/rusk-wallet
 
-INSTALLER_URL="https://github.com/dusk-network/node-installer/tarball/main"
+INSTALLER_URL="https://github.com/dusk-network/node-installer/archive/refs/tags/v0.4.0.tar.gz"
 # RUSK_TAG=$(get_latest_tag "rusk")
 # RUSK_URL=$(curl -s "https://api.github.com/repos/dusk-network/rusk/releases/tags/${RUSK_TAG}" | jq -r  '.assets[].browser_download_url' | grep linux)
 # WALLET_TAG=$(get_latest_tag "rusk-wallet")

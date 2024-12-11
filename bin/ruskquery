@@ -1,10 +1,9 @@
 #!/bin/bash
 
-# Keep /02/Chain for now
 API_ENDPOINT="http://127.0.0.1:8080"
 RUSK_VERSION="0.8.0"
 CONTENT_TYPE="application/json"
-INSTALLER_VERSION="v0.3.5"
+INSTALLER_VERSION="v0.4.0"
 
 show_help() {
     echo "Dusk Query Tool"
