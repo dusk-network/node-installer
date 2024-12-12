@@ -25,11 +25,11 @@
 
 ## 📋 Prerequisites
 
-- Operating System: Ubuntu 22.04/24.04 LTS x64
-- Dependencies: OpenSSL 3
+- Operating System: Ubuntu 24.04 LTS x64
+- Dependencies: OpenSSL 3, GLibc 2.38+
 - Environment: Any compatible Linux environment (VPS, local, cloud instance)
 
-The installer officially supports Ubuntu 22.04 and 24.04 LTS x64. While it has also been tested successfully on Ubuntu 24.10, official support is limited to the LTS versions listed. Compatibility with other versions may vary.
+The installer officially supports 24.04 LTS x64. While it has also been tested successfully on Ubuntu 24.10, official support is limited to the LTS version listed above. Compatibility with other versions may vary.
 
 ## 📦 Packages
 
