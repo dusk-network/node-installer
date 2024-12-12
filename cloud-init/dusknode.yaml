@@ -1,0 +1,49 @@
+#cloud-config
+# written for:
+# - Ubuntu 24.04 LTS
+users:
+  - name: dusk
+    gecos: Dusk Node User
+    groups: users, admin
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    shell: /bin/bash
+    lock_passwd: true # Lock the password to prevent login
+    ssh_authorized_keys:
+      - <YOUR_SSH_PUBLIC_KEY> # Add your SSH public key here
+disable_root: true
+ssh_pwauth: false
+ssh_deletekeys: true
+packages:
+  - fail2ban
+  - ufw
+  #- unattended-upgrades
+package_update: true
+package_upgrade: true
+package_reboot_if_required: true
+runcmd:
+  - printf "[sshd]\nenabled = true\nbanaction = iptables-multiport" > /etc/fail2ban/jail.local
+  - systemctl enable fail2ban
+  - ufw allow ssh comment "ssh" # SSH
+  - ufw allow 8080/tcp comment "Node HTTP listener" # HTTP listener
+  - ufw allow 9000/udp comment "Kadcast" # Kadcast P2P
+  - ufw --force enable
+  - curl --proto '=https' --tlsv1.2 -sSfL https://github.com/dusk-network/node-installer/releases/latest/download/node-installer.sh | sudo sh # Download latest Dusk node installer release and run it
+  - echo "Cloud-init has finished" > /home/dusk/setup.log
+  - chown dusk:dusk /home/dusk/setup.log
+  - chmod 600 /home/dusk/setup.log
+  - sshd -t >> /home/dusk/setup.log # Test the SSH configuration & log the output
+  - echo "SSH service has been restarted" >> /home/dusk/setup.log
+  - ufw status >> /home/dusk/setup.log # Check the status of the firewall & log the output
+  - echo "Firewall status has been checked" >> /home/dusk/setup.log
+  - fail2ban-client status sshd >> /home/dusk/setup.log # Check the status of the fail2ban service & log the output
+  - echo "Fail2ban status has been checked" >> /home/dusk/setup.log
+  - ruskquery version >> /home/dusk/setup.log # Check the version of the dusk node & log the output
+  - echo "Dusk node version has been checked" >> /home/dusk/setup.log
+  - echo "Cloud-init has finished" >> /home/dusk/setup.log
+  - touch /tmp/cloud-init-finished
+power_state: # Reboot the system to apply updates and changes
+  delay: now
+  mode: reboot
+  message: Rebooting the system to apply updates and changes
+  timeout: 2
+  condition: test -f /tmp/cloud-init-finished
