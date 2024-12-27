@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 declare -A VERSIONS
 # Define versions per network, per component
