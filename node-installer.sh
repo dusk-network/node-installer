@@ -121,22 +121,26 @@ configure_network() {
     local kadcast_id
     local bootstrapping_nodes
     local genesis_timestamp
+    local base_state
 
     case "$network" in
         mainnet)
-            kadcast_id="0x1"
-            bootstrapping_nodes="[]"
+            kadcast_id="0x40"
+            bootstrapping_nodes="['134.122.56.74', '104.248.139.145', '146.190.140.211']"
             genesis_timestamp="'2024-12-29T12:00:00Z'"
+            base_state="https://nodes.dusk.network/genesis-state"
             ;;
         testnet)
             kadcast_id="0x2"
             bootstrapping_nodes="['134.122.62.88:9000','165.232.64.16:9000','137.184.118.43:9000']"
             genesis_timestamp="'2024-12-23T17:00:00Z'"
+            base_state="https://testnet.nodes.dusk.network/genesis-state"
             ;;
         devnet)
             kadcast_id="0x3"
             bootstrapping_nodes="['128.199.32.54', '159.223.29.22', '143.198.225.158']"
             genesis_timestamp="'2024-12-23T12:00:00Z'"
+            base_state="https://devnet.nodes.dusk.network/genesis-state"
             ;;
         *)
             echo "Unknown network: $network. Defaulting to testnet."
@@ -144,6 +148,11 @@ configure_network() {
             return
             ;;
     esac
+
+    # Create genesis.toml
+    cat > /opt/dusk/conf/genesis.toml <<EOF
+base_state = "$base_state"
+EOF
 
     # Update the rusk.toml file with kadcast_id, bootstrapping_nodes & genesis_timestamp
     sed -i "s/^kadcast_id =.*/kadcast_id = $kadcast_id/" /opt/dusk/conf/rusk.toml
@@ -229,9 +238,11 @@ rm -rf /opt/dusk/rusk/circuits || true
 rm -rf /opt/dusk/rusk/keys || true
 
 curl -so /opt/dusk/installer/rusk-vd-keys.zip -L "$VERIFIER_KEYS_URL"
-
 unzip -d /opt/dusk/rusk/ -o /opt/dusk/installer/rusk-vd-keys.zip
+
 chown -R dusk:dusk /opt/dusk/
+
+configure_network "$NETWORK"
 
 # Set system parameters
 mv -f /opt/dusk/conf/dusk.conf /etc/sysctl.d/dusk.conf
@@ -245,8 +256,6 @@ mv -f /opt/dusk/services/rusk.service /etc/systemd/system/rusk.service
 mv -f /opt/dusk/services/logrotate.conf /etc/logrotate.d/dusk.conf
 chown root:root /etc/logrotate.d/dusk.conf
 chmod 644 /etc/logrotate.d/dusk.conf
-
-configure_network "$NETWORK"
 
 # Enable the Rusk service
 systemctl enable rusk
