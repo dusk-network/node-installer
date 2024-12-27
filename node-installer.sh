@@ -3,13 +3,25 @@
 declare -A VERSIONS
 # Define versions per network, per component
 VERSIONS=(
-    ["mainnet_rusk"]="1.0.0-rc.0"
-    ["mainnet_rusk_wallet"]="0.8.0"
-    ["testnet_rusk"]="1.0.0-rc.0"
-    ["testnet_rusk_wallet"]="0.8.0"
-    ["devnet_rusk"]="1.0.0-rc.0"
-    ["devnet_rusk_wallet"]="0.8.0"
+    ["mainnet-rusk"]="1.0.0-rc.0"
+    ["mainnet-rusk-wallet"]="0.1.0-rc.0"
+    ["testnet-rusk"]="1.0.0-rc.0"
+    ["testnet-rusk-wallet"]="0.1.0-rc.0"
+    ["devnet-rusk"]="1.0.0-rc.0"
+    ["devnet-rusk-wallet"]="0.1.0-rc.0"
 )
+
+# Select network (default to testnet if no argument passed)
+NETWORK="${1:-testnet}"
+case "$NETWORK" in
+    mainnet|testnet|devnet)
+        echo "Selected network: $NETWORK"
+        ;;
+    *)
+        echo "Error: Unknown network $NETWORK. Use 'mainnet', 'testnet', or 'devnet'."
+        exit 1
+        ;;
+esac
 
 # Feature flag ("default" if not set, "archive" also possible)
 FEATURE="${FEATURE:-default}"
@@ -49,7 +61,7 @@ echo "Detected supported distro: $distro ($arch)"
 install_component() {
     local network="$1"
     local component="$2"
-    local key="${network}_${component}"
+    local key="${network}-${component}"
     local version="${VERSIONS[$key]}"
 
     if [[ -z "$version" ]]; then
@@ -64,13 +76,16 @@ install_component() {
     fi
 
     # Construct the download URL
-    local url="https://github.com/dusk-network/rusk/releases/download/${component//_/-}-${version}/${component//_/-}-${version}-linux-${arch}${feature_suffix}.tar.gz"
+    local url="https://github.com/dusk-network/rusk/releases/download/${component}-${version}/${component}-${version}-linux-${arch}${feature_suffix}.tar.gz"
 
     echo "Installing $component version $version for $network ($arch${feature_suffix})"
     echo "Downloading from $url"
 
+    local component_dir="/opt/dusk/installer/${component}"
+    mkdir -p "$component_dir"
+
     curl -so /opt/dusk/installer/${component}.tar.gz -L "$url" || { echo "Failed to download $component"; exit 1; }
-    tar xf /opt/dusk/installer/${component}.tar.gz --strip-components 1 --directory /opt/dusk/bin/
+    tar xf /opt/dusk/installer/${component}.tar.gz --strip-components 1 --directory "$component_dir"
 }
 
 # Check for OpenSSL 3 or higher
@@ -160,9 +175,6 @@ mkdir -p /opt/dusk/installer
 mkdir -p ~/.dusk/rusk-wallet
 
 INSTALLER_URL="https://github.com/dusk-network/node-installer/tarball/main"
-# Install components
-install_component "$NETWORK" "rusk"
-install_component "$NETWORK" "rusk_wallet"
 
 echo "Downloading installer package for additional scripts and configurations"
 curl -so /opt/dusk/installer/installer.tar.gz -L "$INSTALLER_URL"
@@ -173,12 +185,13 @@ mv -f /opt/dusk/installer/bin/* /opt/dusk/bin/
 mv /opt/dusk/installer/conf/* /opt/dusk/conf/
 mv -n /opt/dusk/installer/services/* /opt/dusk/services/
 
-# Download, unpack and install wallet-cli
-# echo "Downloading the latest Rusk wallet..."
-# curl -so /opt/dusk/installer/wallet.tar.gz -L "$WALLET_URL"
-# mkdir -p /opt/dusk/installer/wallet
-# tar xf /opt/dusk/installer/wallet.tar.gz --strip-components 1 --directory /opt/dusk/installer/wallet
-# mv /opt/dusk/installer/wallet/rusk-wallet /opt/dusk/bin/
+# Download, unpack and install Rusk
+install_component "$NETWORK" "rusk"
+mv /opt/dusk/installer/rusk/rusk /opt/dusk/bin/
+
+# Download, unpack and install Rusk wallet
+install_component "$NETWORK" "rusk-wallet"
+mv /opt/dusk/installer/rusk-wallet/rusk-wallet /opt/dusk/bin/
 mv -f /opt/dusk/conf/wallet.toml ~/.dusk/rusk-wallet/config.toml
 
 # Make bin folder scripts and bins executable, symlink to make available system-wide
@@ -190,8 +203,7 @@ ln -sf /opt/dusk/bin/download_state.sh /usr/bin/download_state
 ln -sf /opt/dusk/bin/rusk-wallet /usr/bin/rusk-wallet
 
 echo "Downloading verifier keys"
-# Select network (default to testnet if no argument passed)
-NETWORK="${1:-testnet}"
+
 echo "Selected network: $NETWORK"
 VERIFIER_KEYS_URL="https://testnet.nodes.dusk.network/keys"
 
