@@ -9,6 +9,8 @@ genesis_timestamp = ''
 generation_timeout = '3s'
 db_path = '/opt/dusk/rusk'
 consensus_keys_path = '/opt/dusk/conf/consensus.keys'
+min_gas_limit = 150_000
+block_gas_limit = 3000000000
 
 [databroker]
 max_inv_entries = 100
@@ -17,8 +19,8 @@ max_ongoing_requests = 1000
 [mempool]
 max_queue_size = 5000
 max_mempool_txn_count = 10000
-idle_interval = '30m'
-mempool_expiry = '1h'
+idle_interval = '5m'
+mempool_expiry = '30m'
 mempool_download_redundancy = 5
 
 [kadcast]

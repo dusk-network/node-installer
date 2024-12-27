@@ -4,7 +4,7 @@
 </h1>
 
 <p align="center">
-  Official <img height="11" src="assets/dusk_circular_light.svg#gh-dark-mode-only"><img height="11" src="assets/dusk_circular_dark.svg#gh-light-mode-only"><a href="https://dusk.network/"> Dusk</a> Node installer, an easy-to-use installer for running a Dusk node on the Nocturne testnet and the Lunare devnet.
+  Official <img height="11" src="assets/dusk_circular_light.svg#gh-dark-mode-only"><img height="11" src="assets/dusk_circular_dark.svg#gh-light-mode-only"><a href="https://dusk.network/"> Dusk</a> Node installer, an easy-to-use installer for running a Dusk node on the Dusk mainnet, Nocturne testnet and the Lunare devnet.
 </p>
 
 <p align=center>
@@ -21,7 +21,7 @@
 <img alt="Static Badge" src="https://img.shields.io/badge/read%20the%20docs-E2DFE9?style=flat-square&logo=data%3Aimage%2Fsvg%2Bxml%3Bbase64%2CPHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI%2BCjxwYXRoIGZpbGwtcnVsZT0iZXZlbm9kZCIgY2xpcC1ydWxlPSJldmVub2RkIiBkPSJNODEuMjk4IDEuNzM3OEM4OC4yMjI5IDAuNDM3NzI0IDk1LjQyMjcgLTAuMTYyMzEyIDEwMi43OTggMC4wMzc3QzE1NC45OTYgMS40Mzc3OSAxOTcuODQ1IDQzLjc0MDQgMTk5LjkyIDk1LjkxODZDMjAyLjE3IDE1Mi45OTcgMTU2LjU3MSAyMDAgOTkuOTk3NiAyMDBDOTMuNjIyNyAyMDAgODcuMzcyOSAxOTkuNCA4MS4zMjMgMTk4LjI1QzM1LjAyNDIgMTg5LjQ5OSAwIDE0OC44MjIgMCA5OS45OTM5QzAgNTEuMTY1OCAzNC45OTkyIDEwLjQ4ODMgODEuMjk4IDEuNzM3OFpNMTAyLjc3MyAxNzYuNjc0QzEwMS43MjMgMTc4LjAyNCAxMDIuODIyIDE3OS45NzQgMTA0LjUyMiAxNzkuODc0QzE0Ni42MjEgMTc3LjUyNCAxNzkuOTk2IDE0Mi42NzEgMTc5Ljk5NiA5OS45OTM5QzE3OS45OTYgNTcuMzE2MiAxNDYuNTk2IDIyLjQ2NDEgMTA0LjQ5NyAyMC4xMTM5QzEwMi43OTggMjAuMDEzOSAxMDEuNzIzIDIxLjk2NDEgMTAyLjc3MyAyMy4zMTQxQzExOS4yNDcgNDQuNDY1NCAxMjkuMDQ3IDcxLjA5MjEgMTI5LjA0NyA5OS45OTM5QzEyOS4wNDcgMTI4Ljg5NiAxMTkuMjIyIDE1NS40OTcgMTAyLjc3MyAxNzYuNjc0WiIgZmlsbD0iIzEwMTAxMCIvPgo8L3N2Zz4K"></a>
 </p>
 
-> For more information on how to participate, see the [node running guide](https://docs.dusk.network/operator/guides/01-nocturne-node/) on our wiki.
+> For more information checkout the [node operator documentation](https://docs.dusk.network/operator/overview/) on our docs.
 
 ## 📋 Prerequisites
 
@@ -47,17 +47,26 @@ The log files can be found in `/var/log/rusk.log` and `/var/log/rusk-recovery.lo
 
 :information_source: To run the **latest release** of the Node Installer execute the following command:
 ```sh
-curl --proto '=https' --tlsv1.2 -sSfL https://github.com/dusk-network/node-installer/releases/download/v0.4.0/node-installer.sh | sudo sh
-```
-
-By default, the installer runs the node for our Nocturne testnet. If you'd like to run a node for the Lunare devnet or mainnet, you can pass `devnet` or `mainnet` as an option during installation:
-```sh
-curl --proto '=https' --tlsv1.2 -sSfL https://github.com/dusk-network/node-installer/releases/download/v0.4.0/node-installer.sh | sudo sh -s devnet
+curl --proto '=https' --tlsv1.2 -sSfL https://github.com/dusk-network/node-installer/releases/download/v0.5.0/node-installer.sh | sudo bash
 ```
 
 :warning: **CAUTION** To run the **not release yet** unstable version of the Node Installer execute the following command:
 ```sh
-curl --proto '=https' --tlsv1.2 -sSfL https://raw.githubusercontent.com/dusk-network/node-installer/main/node-installer.sh | sudo sh
+curl --proto '=https' --tlsv1.2 -sSfL https://raw.githubusercontent.com/dusk-network/node-installer/main/node-installer.sh | sudo bash
+```
+
+### Networks
+
+By default, the installer runs the node for our mainnet. If you'd like to run a node for the Nocturne testnet or Lunare devnet, you can pass `testnet` or `devnet` as an option during installation:
+```sh
+curl --proto '=https' --tlsv1.2 -sSfL https://github.com/dusk-network/node-installer/releases/download/v0.5.0/node-installer.sh | sudo bash -s testnet
+```
+
+### Features
+
+It is possible to run an archive node through the installer. By default, the installer will download a Provisioner node with proving capabilities. By setting a `FEATURE` variable to `archive`, it's possible to download an archive node binary:
+```sh
+curl --proto '=https' --tlsv1.2 -sSfL https://github.com/dusk-network/node-installer/releases/download/v0.5.0/node-installer.sh | FEATURE="archive" sudo bash
 ```
 
 ## ⚙️ Configuration
@@ -68,9 +77,9 @@ The `CONSENSUS_KEYS` can be either moved to `/opt/dusk/conf/` from another syste
 
 ### 🔑 Set consensus keys
 
-To generate the provisioner keys locally, run `rusk-wallet` and either create a new wallet or use a recovery phrase with `rusk-wallet restore`. 
+To generate the consensus keys locally, run `rusk-wallet` and either create a new wallet or use a recovery phrase with `rusk-wallet restore`. 
 
-To generate and export the provisioner key-pair and put the `.keys` file in the right directory with the right name, copy the following command:
+To generate and export the consensus key-pair and put the `.keys` file in the right directory with the right name, copy the following command:
 ```sh
 rusk-wallet export -d /opt/dusk/conf -n consensus.keys
 ```
