@@ -185,7 +185,7 @@ mkdir -p /opt/dusk/services
 mkdir -p /opt/dusk/installer
 mkdir -p ~/.dusk/rusk-wallet
 
-INSTALLER_URL="https://github.com/dusk-network/node-installer/archive/refs/tags/v0.5.0.tar.gz"
+INSTALLER_URL="https://github.com/dusk-network/node-installer/tarball/main"
 
 echo "Downloading installer package for additional scripts and configurations"
 curl -so /opt/dusk/installer/installer.tar.gz -L "$INSTALLER_URL"
