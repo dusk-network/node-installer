@@ -11,8 +11,8 @@ VERSIONS=(
     ["devnet-rusk-wallet"]="0.1.0-rc.0"
 )
 
-# Select network (default to testnet if no argument passed)
-NETWORK="${1:-testnet}"
+# Select network (default to mainnet if no argument passed)
+NETWORK="${1:-mainnet}"
 case "$NETWORK" in
     mainnet|testnet|devnet)
         echo "Selected network: $NETWORK"
@@ -124,8 +124,8 @@ configure_network() {
 
     case "$network" in
         mainnet)
-            kadcast_id="0x40"
-            bootstrapping_nodes="['', '', '']"
+            kadcast_id="0x1"
+            bootstrapping_nodes="[]"
             genesis_timestamp="'2024-12-29T12:00:00Z'"
             ;;
         testnet)
@@ -220,7 +220,7 @@ case "$NETWORK" in
         VERIFIER_KEYS_URL="https://devnet.nodes.dusk.network/keys"
         ;;
     *)
-        echo "Unknown network: $network. Defaulting to testnet."
+        echo "Unknown network: $network. Defaulting to mainnet."
         return
         ;;
 esac
