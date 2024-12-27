@@ -126,7 +126,7 @@ configure_network() {
     case "$network" in
         mainnet)
             kadcast_id="0x40"
-            bootstrapping_nodes="['134.122.56.74', '104.248.139.145', '146.190.140.211']"
+            bootstrapping_nodes="['134.122.56.74:9000', '104.248.139.145:9000', '146.190.140.211:9000']"
             genesis_timestamp="'2024-12-29T12:00:00Z'"
             base_state="https://nodes.dusk.network/genesis-state"
             ;;
