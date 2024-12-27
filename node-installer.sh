@@ -75,8 +75,10 @@ install_component() {
         feature_suffix="-${FEATURE}"
     fi
 
+    # Removes any RC version from the URL
+    local sanitized_version="${version%-rc.*}" 
     # Construct the download URL
-    local url="https://github.com/dusk-network/rusk/releases/download/${component}-${version}/${component}-${version}-linux-${arch}${feature_suffix}.tar.gz"
+    local url="https://github.com/dusk-network/rusk/releases/download/${component}-${version}/${component}-${sanitized_version}-linux-${arch}${feature_suffix}.tar.gz"
 
     echo "Installing $component version $version for $network ($arch${feature_suffix})"
     echo "Downloading from $url"
