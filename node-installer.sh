@@ -192,7 +192,6 @@ check_installed jq jq
 check_installed route net-tools
 check_installed logrotate logrotate
 check_installed dig dnsutils
-check_installed ufw ufw
 
 # Ensure dusk group and user exist
 if ! id -u dusk >/dev/null 2>&1; then
@@ -280,8 +279,6 @@ configure_network "$NETWORK"
 # Set permissions for dusk user and group
 chown -R dusk:dusk /opt/dusk
 chmod -R 770 /opt/dusk
-chown -R dusk:dusk /var/log/rusk.log
-chmod -R 770 /var/log/rusk.log
 
 # Set system parameters
 mv -f /opt/dusk/conf/dusk.conf /etc/sysctl.d/dusk.conf
@@ -299,18 +296,6 @@ chmod 644 /etc/logrotate.d/dusk.conf
 # Enable the Rusk service
 systemctl enable rusk
 systemctl daemon-reload
-
-echo "Setup local firewall"
-ufw allow ssh # SSH
-ufw allow 8080/tcp # HTTP listener
-ufw allow 9000/udp # Kadcast
-
-if ! ufw status | grep -q "Status: active"; then
-    echo "Enabling UFW"
-    ufw --force enable
-else
-    echo "UFW is already enabled"
-fi
 
 echo "Dusk node installed"
 echo "-----"

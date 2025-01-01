@@ -87,6 +87,30 @@ Test SSH access to the new user account by connecting to the node with the new a
 ssh duskadmin@<your-server-ip>
 ```
 
+### Step 5: Firewall
+
+It's important to setup a firewall. A firewall controls incoming and outgoing traffic and ensures your system is protected.
+
+You can use common tools like `ufw`, `iptables`, or `firewalld`. At a minimum, the following ports should be open:
+- The port you use for SSH (default: `22`)
+- `9000/udp` for Kadcast (used for consensus messages)
+
+If you're running an archive node or want to expose the HTTP server, you can also open the corresponding TCP port (default: `8080`).
+
+#### Configure with `ufw`
+
+If you're using `ufw`, you can configure it with these commands:
+```ssh
+# Allow SSH (default port 22)
+sudo ufw allow ssh
+# Allow Kadcast UDP traffic
+sudo ufw allow 9000/udp
+# Enable the firewall
+sudo ufw enable
+```
+
+For non-default SSH ports or other firewall tools, adjust the commands accordingly.
+
 ## ⬇️ Installation
 
 :information_source: To run the **latest release** of the Node Installer execute the following command:
