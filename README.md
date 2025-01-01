@@ -47,7 +47,7 @@ The log files can be found in `/var/log/rusk.log` and `/var/log/rusk-recovery.lo
 
 :information_source: To run the **latest release** of the Node Installer execute the following command:
 ```sh
-curl --proto '=https' --tlsv1.2 -sSfL https://github.com/dusk-network/node-installer/releases/download/v0.5.1/node-installer.sh | sudo bash
+curl --proto '=https' --tlsv1.2 -sSfL https://github.com/dusk-network/node-installer/releases/latest/download/node-installer.sh | sudo bash
 ```
 
 :warning: **CAUTION** To run the **not release yet** unstable version of the Node Installer execute the following command:
@@ -59,14 +59,14 @@ curl --proto '=https' --tlsv1.2 -sSfL https://raw.githubusercontent.com/dusk-net
 
 By default, the installer runs the node for our mainnet. If you'd like to run a node for the Nocturne testnet or Lunare devnet, you can pass `testnet` or `devnet` as an option during installation:
 ```sh
-curl --proto '=https' --tlsv1.2 -sSfL https://github.com/dusk-network/node-installer/releases/download/v0.5.1/node-installer.sh | sudo bash -s testnet
+curl --proto '=https' --tlsv1.2 -sSfL https://github.com/dusk-network/node-installer/releases/latest/download/node-installer.sh | sudo bash -s testnet
 ```
 
 ### Features
 
 It is possible to run an archive node through the installer. By default, the installer will download a Provisioner node with proving capabilities. By setting a `FEATURE` variable to `archive`, it's possible to download an archive node binary:
 ```sh
-curl --proto '=https' --tlsv1.2 -sSfL https://github.com/dusk-network/node-installer/releases/download/v0.5.1/node-installer.sh | FEATURE="archive" sudo bash
+curl --proto '=https' --tlsv1.2 -sSfL https://github.com/dusk-network/node-installer/releases/latest/download/node-installer.sh | FEATURE="archive" sudo bash
 ```
 
 ## ⚙️ Configuration
