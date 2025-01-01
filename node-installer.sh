@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# Detect the user running the script
+CURRENT_USER=$(logname)
+CURRENT_HOME=$(eval echo ~"$CURRENT_USER")
+echo "Detected current user: $CURRENT_USER"
+echo "Home directory: $CURRENT_HOME"
+
 declare -A VERSIONS
 # Define versions per network, per component
 VERSIONS=(
@@ -164,11 +170,17 @@ EOF
     sed -i "s/^genesis_timestamp =.*/genesis_timestamp = $genesis_timestamp/" /opt/dusk/conf/rusk.toml
 
     # Update the wallet.toml with the appropriate prover URL for the given network
-    sed -i "s|^prover = .*|prover = \"$prover_url\"|" ~/.dusk/rusk-wallet/config.toml
+    sed -i "s|^prover = .*|prover = \"$prover_url\"|" $CURRENT_HOME/.dusk/rusk-wallet/config.toml
 }
 
 echo "Stopping previous services"
-service rusk stop || true;
+if systemctl is-active --quiet rusk; then
+    systemctl stop rusk
+    echo "Stopped rusk service."
+else
+    echo "Rusk service not running."
+fi
+
 rm -rf /opt/dusk/installer || true
 rm -rf /opt/dusk/installer/installer.tar.gz || true
 
@@ -182,15 +194,31 @@ check_installed logrotate logrotate
 check_installed dig dnsutils
 check_installed ufw ufw
 
-echo "Creating rusk service user"
-id -u dusk >/dev/null 2>&1 || useradd -r dusk
+# Ensure dusk group and user exist
+if ! id -u dusk >/dev/null 2>&1; then
+    echo "Creating dusk system user and group."
+    groupadd --system dusk
+    useradd --system --create-home --shell /usr/sbin/nologin --gid dusk dusk
+    echo "User 'dusk' and group 'dusk' created."
+else
+    echo "User 'dusk' and group 'dusk' already exist."
+fi
+
+# Add the current user to the dusk group for access
+echo "Adding current user to dusk group for access."
+if ! id -nG "$(logname)" | grep -qw "dusk"; then
+    usermod -aG dusk "$(logname)"
+    echo "User $(logname) has been added to the dusk group. Please log out and back in to apply changes."
+fi
 
 mkdir -p /opt/dusk/bin
 mkdir -p /opt/dusk/conf
 mkdir -p /opt/dusk/rusk
 mkdir -p /opt/dusk/services
 mkdir -p /opt/dusk/installer
-mkdir -p ~/.dusk/rusk-wallet
+mkdir -p $CURRENT_HOME/.dusk/rusk-wallet
+chown -R "$CURRENT_USER:dusk" "$CURRENT_HOME/.dusk"
+chmod -R 770 "$CURRENT_HOME/.dusk"
 
 INSTALLER_URL="https://github.com/dusk-network/node-installer/tarball/main"
 
@@ -210,7 +238,7 @@ mv /opt/dusk/installer/rusk/rusk /opt/dusk/bin/
 # Download, unpack and install Rusk wallet
 install_component "$NETWORK" "rusk-wallet"
 mv /opt/dusk/installer/rusk-wallet/rusk-wallet /opt/dusk/bin/
-mv -f /opt/dusk/conf/wallet.toml ~/.dusk/rusk-wallet/config.toml
+mv -f /opt/dusk/conf/wallet.toml $CURRENT_HOME/.dusk/rusk-wallet/config.toml
 
 # Make bin folder scripts and bins executable, symlink to make available system-wide
 chmod +x /opt/dusk/bin/*
@@ -247,9 +275,13 @@ rm -rf /opt/dusk/rusk/keys || true
 curl -so /opt/dusk/installer/rusk-vd-keys.zip -L "$VERIFIER_KEYS_URL"
 unzip -d /opt/dusk/rusk/ -o /opt/dusk/installer/rusk-vd-keys.zip
 
-chown -R dusk:dusk /opt/dusk/
-
 configure_network "$NETWORK"
+
+# Set permissions for dusk user and group
+chown -R dusk:dusk /opt/dusk
+chmod -R 770 /opt/dusk
+chown -R dusk:dusk /var/log/rusk.log
+chmod -R 770 /var/log/rusk.log
 
 # Set system parameters
 mv -f /opt/dusk/conf/dusk.conf /etc/sysctl.d/dusk.conf

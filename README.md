@@ -43,6 +43,50 @@ The configuration files, binaries, services and scripts can be found in `/opt/du
 
 The log files can be found in `/var/log/rusk.log` and `/var/log/rusk-recovery.log`.
 
+## 🔑 Pre-Installation Setup
+
+To securely manager your node, it's highly recommend to use a dedicated non-root user (e.g., `duskadmin`). Before running the Node Installer, ensure you have set up a dedicated user for managing your node and configured SSH access. This user should be part of the `dusk` group to access node files and configurations.
+
+### Step 1: Create a Dedicated Group & User
+
+Create a new non-root user (e.g., `duskadmin`), add them to the `dusk` group and set a password for the new user:
+```sh
+sudo groupadd --system dusk
+sudo useradd -m -G dusk -s /bin/bash duskadmin
+sudo passwd duskadmin
+```
+
+### Step 2: Set Up SSH Access
+
+Ensure the new user has access to your SSH keys for secure login. Add your public key directly to the new user's `authorized_keys` file:
+1. Edit or create the `authorized_keys` file for the new user:
+```sh
+mkdir -p /home/duskadmin/.ssh
+sudo nano /home/duskadmin/.ssh/authorized_keys
+```
+2. Paste your public SSH key (e.g., starting with `ssh-rsa` or `ssh-ed25519`)
+3. Save and set proper permissions:
+```sh
+sudo chmod 700 /home/duskadmin/.ssh
+sudo chmod 600 /home/duskadmin/.ssh/authorized_keys
+sudo chown -R duskadmin:dusk /home/duskadmin/.ssh
+```
+
+#### Step 3: Add `duskadmin` to the `sudo` Group
+
+If not already done, log in as `root` or a user with sufficient privileges and add `duskadmin` to the `sudo` group:
+```sh
+sudo usermod -aG sudo duskadmin
+```
+Log out from you node for the group changes to take effect.
+
+### Step 4: Verify Access
+
+Test SSH access to the new user account by connecting to the node with the new account:
+```sh
+ssh duskadmin@<your-server-ip>
+```
+
 ## ⬇️ Installation
 
 :information_source: To run the **latest release** of the Node Installer execute the following command:
