@@ -122,6 +122,7 @@ configure_network() {
     local bootstrapping_nodes
     local genesis_timestamp
     local base_state
+    local prover_url
 
     case "$network" in
         mainnet)
@@ -129,18 +130,21 @@ configure_network() {
             bootstrapping_nodes="['134.122.56.74:9000', '104.248.139.145:9000', '146.190.140.211:9000']"
             genesis_timestamp="'2024-12-29T12:00:00Z'"
             base_state="https://nodes.dusk.network/genesis-state"
+            prover_url="https://provers.dusk.network"
             ;;
         testnet)
             kadcast_id="0x2"
             bootstrapping_nodes="['134.122.62.88:9000','165.232.64.16:9000','137.184.118.43:9000']"
             genesis_timestamp="'2024-12-23T17:00:00Z'"
             base_state="https://testnet.nodes.dusk.network/genesis-state"
+            prover_url="https://testnet.provers.dusk.network"
             ;;
         devnet)
             kadcast_id="0x3"
             bootstrapping_nodes="['128.199.32.54', '159.223.29.22', '143.198.225.158']"
             genesis_timestamp="'2024-12-23T12:00:00Z'"
             base_state="https://devnet.nodes.dusk.network/genesis-state"
+            prover_url="https://devnet.provers.dusk.network"
             ;;
         *)
             echo "Unknown network: $network. Defaulting to testnet."
@@ -158,6 +162,9 @@ EOF
     sed -i "s/^kadcast_id =.*/kadcast_id = $kadcast_id/" /opt/dusk/conf/rusk.toml
     sed -i "s/^bootstrapping_nodes =.*/bootstrapping_nodes = $bootstrapping_nodes/" /opt/dusk/conf/rusk.toml
     sed -i "s/^genesis_timestamp =.*/genesis_timestamp = $genesis_timestamp/" /opt/dusk/conf/rusk.toml
+
+    # Update the wallet.toml with the appropriate prover URL for the given network
+    sed -i "s|^prover = .*|prover = \"$prover_url\"|" ~/.dusk/rusk-wallet/config.toml
 }
 
 echo "Stopping previous services"
