@@ -1,6 +1,6 @@
 #!/bin/bash
 
-API_ENDPOINT="http://127.0.0.1:8080"
+API_ENDPOINT="${API_ENDPOINT:-http://127.0.0.1:8080}"
 RUSK_VERSION="1.0.0-rc.0"
 CONTENT_TYPE="application/json"
 INSTALLER_VERSION="v0.5.1"
