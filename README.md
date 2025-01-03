@@ -43,11 +43,79 @@ The configuration files, binaries, services and scripts can be found in `/opt/du
 
 The log files can be found in `/var/log/rusk.log` and `/var/log/rusk-recovery.log`.
 
+## 🔑 Pre-Installation Setup
+
+To securely manage your node, it's highly recommended to use a dedicated non-root user (e.g., `duskadmin`). Before running the Node Installer, ensure you have set up a dedicated user for managing your node and configured SSH access. This user should be part of the `dusk` group to access node files and configurations.
+
+### Step 1: Create a Dedicated Group & User
+
+Create a new non-root user (e.g., `duskadmin`), add them to the `dusk` group and set a password for the new user:
+```sh
+sudo groupadd --system dusk
+sudo useradd -m -G dusk -s /bin/bash duskadmin
+sudo passwd duskadmin
+```
+
+### Step 2: Set Up SSH Access
+
+Ensure the new user has access to your SSH keys for secure login. Add your public key directly to the new user's `authorized_keys` file:
+1. Edit or create the `authorized_keys` file for the new user:
+```sh
+mkdir -p /home/duskadmin/.ssh
+sudo nano /home/duskadmin/.ssh/authorized_keys
+```
+2. Paste your public SSH key (e.g., starting with `ssh-rsa` or `ssh-ed25519`)
+3. Save and set proper permissions:
+```sh
+sudo chmod 700 /home/duskadmin/.ssh
+sudo chmod 600 /home/duskadmin/.ssh/authorized_keys
+sudo chown -R duskadmin:dusk /home/duskadmin/.ssh
+```
+
+### Step 3: Add `duskadmin` to the `sudo` Group
+
+If not already done, log in as `root` or a user with sufficient privileges and add `duskadmin` to the `sudo` group:
+```sh
+sudo usermod -aG sudo duskadmin
+```
+Log out from you node for the group changes to take effect.
+
+### Step 4: Verify Access
+
+Test SSH access to the new user account by connecting to the node with the new account:
+```sh
+ssh duskadmin@<your-server-ip>
+```
+
+### Step 5: Firewall
+
+It's important to setup a firewall. A firewall controls incoming and outgoing traffic and ensures your system is protected.
+
+You can use common tools like `ufw`, `iptables`, or `firewalld`. At a minimum, the following ports should be open:
+- The port you use for SSH (default: `22`)
+- `9000/udp` for Kadcast (used for consensus messages)
+
+If you're running an archive node or want to expose the HTTP server, you can also open the corresponding TCP port (default: `8080`).
+
+#### Configure with `ufw`
+
+If you're using `ufw`, you can configure it with these commands:
+```ssh
+# Allow SSH (default port 22)
+sudo ufw limit ssh
+# Allow Kadcast UDP traffic
+sudo ufw allow 9000/udp
+# Enable the firewall
+sudo ufw enable
+```
+
+For non-default SSH ports or other firewall tools, adjust the commands accordingly.
+
 ## ⬇️ Installation
 
 :information_source: To run the **latest release** of the Node Installer execute the following command:
 ```sh
-curl --proto '=https' --tlsv1.2 -sSfL https://github.com/dusk-network/node-installer/releases/download/v0.5.1/node-installer.sh | sudo bash
+curl --proto '=https' --tlsv1.2 -sSfL https://github.com/dusk-network/node-installer/releases/latest/download/node-installer.sh | sudo bash
 ```
 
 :warning: **CAUTION** To run the **not release yet** unstable version of the Node Installer execute the following command:
@@ -59,14 +127,14 @@ curl --proto '=https' --tlsv1.2 -sSfL https://raw.githubusercontent.com/dusk-net
 
 By default, the installer runs the node for our mainnet. If you'd like to run a node for the Nocturne testnet or Lunare devnet, you can pass `testnet` or `devnet` as an option during installation:
 ```sh
-curl --proto '=https' --tlsv1.2 -sSfL https://github.com/dusk-network/node-installer/releases/download/v0.5.1/node-installer.sh | sudo bash -s testnet
+curl --proto '=https' --tlsv1.2 -sSfL https://github.com/dusk-network/node-installer/releases/latest/download/node-installer.sh | sudo bash -s testnet
 ```
 
 ### Features
 
 It is possible to run an archive node through the installer. By default, the installer will download a Provisioner node with proving capabilities. By setting a `FEATURE` variable to `archive`, it's possible to download an archive node binary:
 ```sh
-curl --proto '=https' --tlsv1.2 -sSfL https://github.com/dusk-network/node-installer/releases/download/v0.5.1/node-installer.sh | FEATURE="archive" sudo bash
+curl --proto '=https' --tlsv1.2 -sSfL https://github.com/dusk-network/node-installer/releases/latest/download/node-installer.sh | FEATURE="archive" sudo bash
 ```
 
 ## ⚙️ Configuration
