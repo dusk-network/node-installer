@@ -1,9 +1,15 @@
 #!/bin/bash
 
-PUBLIC_IP=`dig +short myip.opendns.com @resolver1.opendns.com`
-## Fallback to a different dns provider
+# Fetch IPv4 WAN address using ifconfig.me, fallback to ipinfo.io
+PUBLIC_IP=$(curl -4 -s https://ifconfig.me)
 if [ -z "$PUBLIC_IP" ]; then
-    PUBLIC_IP=`dig -4 TXT +short o-o.myaddr.l.google.com @ns1.google.com | sed 's|"||g'`
+    PUBLIC_IP=$(curl -4 -s https://ipinfo.io/ip)
+fi
+
+# Validate IPv4 address
+if [[ -z "$PUBLIC_IP" || ! "$PUBLIC_IP" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+    echo "Error: Unable to retrieve a valid WAN IPv4 address"
+    exit 1
 fi
 
 runOnMac=false

@@ -23,8 +23,9 @@ rm -rf /opt/dusk/rusk/state
 rm -rf /opt/dusk/rusk/chain.db
 rm -rf /opt/dusk/rusk/archive
 
-echo "Removing wallet cache..."
-rm -rf ~/.dusk/rusk-wallet/cache
+CURRENT_HOME=$(eval echo ~"$(logname)")
+echo "Removing wallet cache from $CURRENT_HOME/.dusk/rusk-wallet/cache..."
+sudo rm -rf "$CURRENT_HOME/.dusk/rusk-wallet/cache"
 
 echo "Removing logs..."
 rm -rf /var/log/rusk*

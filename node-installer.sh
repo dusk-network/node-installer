@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# Detect the user running the script
+CURRENT_USER=$(logname)
+CURRENT_HOME=$(eval echo ~"$CURRENT_USER")
+echo "Detected current user: $CURRENT_USER"
+echo "Home directory: $CURRENT_HOME"
+
 declare -A VERSIONS
 # Define versions per network, per component
 VERSIONS=(
@@ -122,6 +128,7 @@ configure_network() {
     local bootstrapping_nodes
     local genesis_timestamp
     local base_state
+    local prover_url
 
     case "$network" in
         mainnet)
@@ -129,18 +136,21 @@ configure_network() {
             bootstrapping_nodes="['134.122.56.74:9000', '104.248.139.145:9000', '146.190.140.211:9000']"
             genesis_timestamp="'2024-12-29T12:00:00Z'"
             base_state="https://nodes.dusk.network/genesis-state"
+            prover_url="https://provers.dusk.network"
             ;;
         testnet)
             kadcast_id="0x2"
             bootstrapping_nodes="['134.122.62.88:9000','165.232.64.16:9000','137.184.118.43:9000']"
             genesis_timestamp="'2024-12-23T17:00:00Z'"
             base_state="https://testnet.nodes.dusk.network/genesis-state"
+            prover_url="https://testnet.provers.dusk.network"
             ;;
         devnet)
             kadcast_id="0x3"
             bootstrapping_nodes="['128.199.32.54', '159.223.29.22', '143.198.225.158']"
             genesis_timestamp="'2024-12-23T12:00:00Z'"
             base_state="https://devnet.nodes.dusk.network/genesis-state"
+            prover_url="https://devnet.provers.dusk.network"
             ;;
         *)
             echo "Unknown network: $network. Defaulting to testnet."
@@ -158,10 +168,19 @@ EOF
     sed -i "s/^kadcast_id =.*/kadcast_id = $kadcast_id/" /opt/dusk/conf/rusk.toml
     sed -i "s/^bootstrapping_nodes =.*/bootstrapping_nodes = $bootstrapping_nodes/" /opt/dusk/conf/rusk.toml
     sed -i "s/^genesis_timestamp =.*/genesis_timestamp = $genesis_timestamp/" /opt/dusk/conf/rusk.toml
+
+    # Update the wallet.toml with the appropriate prover URL for the given network
+    sed -i "s|^prover = .*|prover = \"$prover_url\"|" $CURRENT_HOME/.dusk/rusk-wallet/config.toml
 }
 
 echo "Stopping previous services"
-service rusk stop || true;
+if systemctl is-active --quiet rusk; then
+    systemctl stop rusk
+    echo "Stopped rusk service."
+else
+    echo "Rusk service not running."
+fi
+
 rm -rf /opt/dusk/installer || true
 rm -rf /opt/dusk/installer/installer.tar.gz || true
 
@@ -170,20 +189,33 @@ update_pkg_database
 check_installed unzip unzip
 check_installed curl curl
 check_installed jq jq
-check_installed route net-tools
 check_installed logrotate logrotate
-check_installed dig dnsutils
-check_installed ufw ufw
 
-echo "Creating rusk service user"
-id -u dusk >/dev/null 2>&1 || useradd -r dusk
+# Ensure dusk group and user exist
+if ! id -u dusk >/dev/null 2>&1; then
+    echo "Creating dusk system user and group."
+    groupadd --system dusk
+    useradd --system --create-home --shell /usr/sbin/nologin --gid dusk dusk
+    echo "User 'dusk' and group 'dusk' created."
+else
+    echo "User 'dusk' and group 'dusk' already exist."
+fi
+
+# Add the current user to the dusk group for access
+echo "Adding current user to dusk group for access."
+if ! id -nG "$CURRENT_USER" | grep -qw "dusk"; then
+    usermod -aG dusk "$CURRENT_USER"
+    echo "User $CURRENT_USER has been added to the dusk group. Please log out and back in to apply changes."
+fi
 
 mkdir -p /opt/dusk/bin
 mkdir -p /opt/dusk/conf
 mkdir -p /opt/dusk/rusk
 mkdir -p /opt/dusk/services
 mkdir -p /opt/dusk/installer
-mkdir -p ~/.dusk/rusk-wallet
+mkdir -p $CURRENT_HOME/.dusk/rusk-wallet
+chown -R "$CURRENT_USER:dusk" "$CURRENT_HOME/.dusk"
+chmod -R 770 "$CURRENT_HOME/.dusk"
 
 INSTALLER_URL="https://github.com/dusk-network/node-installer/tarball/main"
 
@@ -203,7 +235,7 @@ mv /opt/dusk/installer/rusk/rusk /opt/dusk/bin/
 # Download, unpack and install Rusk wallet
 install_component "$NETWORK" "rusk-wallet"
 mv /opt/dusk/installer/rusk-wallet/rusk-wallet /opt/dusk/bin/
-mv -f /opt/dusk/conf/wallet.toml ~/.dusk/rusk-wallet/config.toml
+mv -f /opt/dusk/conf/wallet.toml $CURRENT_HOME/.dusk/rusk-wallet/config.toml
 
 # Make bin folder scripts and bins executable, symlink to make available system-wide
 chmod +x /opt/dusk/bin/*
@@ -240,9 +272,11 @@ rm -rf /opt/dusk/rusk/keys || true
 curl -so /opt/dusk/installer/rusk-vd-keys.zip -L "$VERIFIER_KEYS_URL"
 unzip -d /opt/dusk/rusk/ -o /opt/dusk/installer/rusk-vd-keys.zip
 
-chown -R dusk:dusk /opt/dusk/
-
 configure_network "$NETWORK"
+
+# Set permissions for dusk user and group
+chown -R dusk:dusk /opt/dusk
+chmod -R 770 /opt/dusk
 
 # Set system parameters
 mv -f /opt/dusk/conf/dusk.conf /etc/sysctl.d/dusk.conf
@@ -260,18 +294,6 @@ chmod 644 /etc/logrotate.d/dusk.conf
 # Enable the Rusk service
 systemctl enable rusk
 systemctl daemon-reload
-
-echo "Setup local firewall"
-ufw allow ssh # SSH
-ufw allow 8080/tcp # HTTP listener
-ufw allow 9000/udp # Kadcast
-
-if ! ufw status | grep -q "Status: active"; then
-    echo "Enabling UFW"
-    ufw --force enable
-else
-    echo "UFW is already enabled"
-fi
 
 echo "Dusk node installed"
 echo "-----"
