@@ -188,8 +188,10 @@ echo "Checking prerequisites"
 update_pkg_database
 check_installed unzip unzip
 check_installed curl curl
+check_installed route net-tools
 check_installed jq jq
 check_installed logrotate logrotate
+check_installed dig dnsutils
 
 # Ensure dusk group and user exist
 if ! id -u dusk >/dev/null 2>&1; then
