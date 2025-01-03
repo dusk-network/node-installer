@@ -203,9 +203,9 @@ fi
 
 # Add the current user to the dusk group for access
 echo "Adding current user to dusk group for access."
-if ! id -nG "$(logname)" | grep -qw "dusk"; then
-    usermod -aG dusk "$(logname)"
-    echo "User $(logname) has been added to the dusk group. Please log out and back in to apply changes."
+if ! id -nG "$CURRENT_USER" | grep -qw "dusk"; then
+    usermod -aG dusk "$CURRENT_USER"
+    echo "User $CURRENT_USER has been added to the dusk group. Please log out and back in to apply changes."
 fi
 
 mkdir -p /opt/dusk/bin

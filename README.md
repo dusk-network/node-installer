@@ -45,7 +45,7 @@ The log files can be found in `/var/log/rusk.log` and `/var/log/rusk-recovery.lo
 
 ## 🔑 Pre-Installation Setup
 
-To securely manager your node, it's highly recommend to use a dedicated non-root user (e.g., `duskadmin`). Before running the Node Installer, ensure you have set up a dedicated user for managing your node and configured SSH access. This user should be part of the `dusk` group to access node files and configurations.
+To securely manage your node, it's highly recommended to use a dedicated non-root user (e.g., `duskadmin`). Before running the Node Installer, ensure you have set up a dedicated user for managing your node and configured SSH access. This user should be part of the `dusk` group to access node files and configurations.
 
 ### Step 1: Create a Dedicated Group & User
 
@@ -72,7 +72,7 @@ sudo chmod 600 /home/duskadmin/.ssh/authorized_keys
 sudo chown -R duskadmin:dusk /home/duskadmin/.ssh
 ```
 
-#### Step 3: Add `duskadmin` to the `sudo` Group
+### Step 3: Add `duskadmin` to the `sudo` Group
 
 If not already done, log in as `root` or a user with sufficient privileges and add `duskadmin` to the `sudo` group:
 ```sh
@@ -102,7 +102,7 @@ If you're running an archive node or want to expose the HTTP server, you can als
 If you're using `ufw`, you can configure it with these commands:
 ```ssh
 # Allow SSH (default port 22)
-sudo ufw allow ssh
+sudo ufw limit ssh
 # Allow Kadcast UDP traffic
 sudo ufw allow 9000/udp
 # Enable the firewall
