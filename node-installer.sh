@@ -132,7 +132,7 @@ configure_network() {
 
     case "$network" in
         mainnet)
-            kadcast_id="0x41"
+            kadcast_id="41"
             bootstrapping_nodes="['134.209.203.150:9000', '209.38.242.80:9000', '137.184.15.177:9000']"
             genesis_timestamp="'2025-01-04T12:00:00Z'"
             base_state="https://nodes.dusk.network/genesis-state-dryrun2"
