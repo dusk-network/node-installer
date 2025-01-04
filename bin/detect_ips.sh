@@ -21,7 +21,7 @@ while IFS=$' :\t\r\n' read a b c d; do
     [ "$a" = "0.0.0.0" ] && [ "$c" = "$a" ] && iFace=${d##* } gWay=$b
 done < <(/sbin/route -n 2>&1)
 ip2int $gWay gw
-local_ip="$($(which ip) -j -4 -br addr | jq ". | map(select(.ifname == \"$iFace\")) | .[].addr_info.[0].local" | cut -d'"' -f2)"
+local_ip="$($(which ip) -j -4 -br addr | jq -r ". | map(select(.ifname == \"$iFace\")) | .[].addr_info.[0].local")"
 ip2int $local_ip ip
 mask="$($(which ipcalc) -n -b $local_ip | grep Netmask | awk '{print $2}')"
 ip2int $mask mask
