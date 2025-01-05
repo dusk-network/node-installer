@@ -9,11 +9,11 @@ echo "Home directory: $CURRENT_HOME"
 declare -A VERSIONS
 # Define versions per network, per component
 VERSIONS=(
-    ["mainnet-rusk"]="1.0.0-rc.0"
+    ["mainnet-rusk"]="1.0.0"
     ["mainnet-rusk-wallet"]="0.1.0-rc.0"
-    ["testnet-rusk"]="1.0.0-rc.0"
+    ["testnet-rusk"]="1.0.0"
     ["testnet-rusk-wallet"]="0.1.0-rc.0"
-    ["devnet-rusk"]="1.0.0-rc.0"
+    ["devnet-rusk"]="1.0.0"
     ["devnet-rusk-wallet"]="0.1.0-rc.0"
 )
 
@@ -132,10 +132,10 @@ configure_network() {
 
     case "$network" in
         mainnet)
-            kadcast_id="41"
-            bootstrapping_nodes="['134.209.203.150:9000', '209.38.242.80:9000', '137.184.15.177:9000']"
-            genesis_timestamp="'2025-01-04T12:00:00Z'"
-            base_state="https://nodes.dusk.network/genesis-state-dryrun2"
+            kadcast_id="0x1"
+            bootstrapping_nodes="['165.232.91.113:9000', '64.226.105.70:9000', '137.184.232.115:9000']"
+            genesis_timestamp="'2025-01-07T12:00:00Z'"
+            base_state="https://nodes.dusk.network/genesis-state"
             prover_url="https://provers.dusk.network"
             ;;
         testnet)
