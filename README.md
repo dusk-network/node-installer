@@ -189,7 +189,7 @@ If you're running an outdated version of the installer, it will warn you and ask
 
 ## 🔄 Fast Syncing with Archival State Download
 
-To significantly reduce the time required to sync your node to the latest published state, you can use the `download_state` command. This command stops your node and replaces its current state with the latest published state from one of Dusk's archival nodes. 
+To significantly reduce the time required to sync your node to the latest published state, you can use the `download_state` command. This command stops your node and replaces its current state with the latest published state from one of Dusk's archival nodes. Currently this is only available for mainnet.
 
 To see the available published states, run:
 ```sh
@@ -224,15 +224,3 @@ This process will ensure your node is up-to-date with the latest blockchain stat
 
 > [!NOTE]
 > If you are experiencing errors in downloading the state, it might be due to some remnants of previous state syncing. Try to clean up with `sudo rm /tmp/state.tar.gz`
-
-## 🔍 Diagnostics
-
-Check if your node is syncing, processing and accepting new blocks:
-```sh
-tail -F /var/log/rusk.log | grep "block accepted"
-```
-
-To check the latest block height:
-```sh
-ruskquery block-height
-```

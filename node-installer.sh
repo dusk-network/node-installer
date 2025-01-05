@@ -244,8 +244,10 @@ chmod +x /opt/dusk/bin/*
 ln -sf /opt/dusk/bin/rusk /usr/bin/rusk
 ln -sf /opt/dusk/bin/ruskquery /usr/bin/ruskquery
 ln -sf /opt/dusk/bin/ruskreset /usr/bin/ruskreset
-ln -sf /opt/dusk/bin/download_state.sh /usr/bin/download_state
 ln -sf /opt/dusk/bin/rusk-wallet /usr/bin/rusk-wallet
+if [ "$NETWORK" == "mainnet" ]; then
+    ln -sf /opt/dusk/bin/download_state.sh /usr/bin/download_state
+fi
 
 echo "Downloading verifier keys"
 
