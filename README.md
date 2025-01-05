@@ -23,6 +23,32 @@
 
 > For more information checkout the [node operator documentation](https://docs.dusk.network/operator/overview/) on our docs.
 
+# 📃 Table of Contents
+
+- [Introduction](#introduction)
+- [Prerequisites](#-prerequisites)
+- [Packages](#-packages)
+- [Folder Layout](#-folder-layout)
+- [Pre-Installation Setup](#-pre-installation-setup)
+  - [Step 1: Create a Dedicated Group & User](#step-1-create-a-dedicated-group--user)
+  - [Step 2: Set Up SSH Access](#step-2-set-up-ssh-access)
+  - [Step 3: Add `duskadmin` to the `sudo` Group](#step-3-add-duskadmin-to-the-sudo-group)
+  - [Step 4: Verify Access](#step-4-verify-access)
+  - [Step 5: Firewall](#step-5-firewall)
+    - [Configure with `ufw`](#configure-with-ufw)
+- [Installation](#⬇️-installation)
+  - [Networks](#networks)
+  - [Features](#features)
+- [Configuration](#⚙️-configuration)
+  - [Set Consensus Keys](#-set-consensus-keys)
+  - [Set Consensus Password](#-set-consensus-password)
+  - [Reset Rusk State](#↻-reset-rusk-state)
+  - [Start Rusk](#▶️-start-rusk)
+- [Check the Installer Version](#-check-the-installer-version)
+- [Diagnostics](#-diagnostics)
+- [Fast Syncing with Archival State Download](#-fast-syncing-with-archival-state-download)
+  - [Using the Fast Sync Command](#using-the-fast-sync-command)
+
 ## 📋 Prerequisites
 
 - Operating System: Ubuntu 24.04 LTS x64
@@ -187,9 +213,21 @@ ruskquery version
 
 If you're running an outdated version of the installer, it will warn you and ask you to upgrade.
 
+## 🔍 Diagnostics
+
+Check if your node is syncing, processing and accepting new blocks:
+```sh
+tail -F /var/log/rusk.log | grep "block accepted"
+```
+
+To check the latest block height:
+```sh
+ruskquery block-height
+```
+
 ## 🔄 Fast Syncing with Archival State Download
 
-To significantly reduce the time required to sync your node to the latest published state, you can use the `download_state` command. This command stops your node and replaces its current state with the latest published state from one of Dusk's archival nodes. 
+To significantly reduce the time required to sync your node to the latest published state, you can use the `download_state` command. This command stops your node and replaces its current state with the latest published state from one of Dusk's archival nodes. Currently this is only available for mainnet.
 
 To see the available published states, run:
 ```sh
@@ -224,15 +262,3 @@ This process will ensure your node is up-to-date with the latest blockchain stat
 
 > [!NOTE]
 > If you are experiencing errors in downloading the state, it might be due to some remnants of previous state syncing. Try to clean up with `sudo rm /tmp/state.tar.gz`
-
-## 🔍 Diagnostics
-
-Check if your node is syncing, processing and accepting new blocks:
-```sh
-tail -F /var/log/rusk.log | grep "block accepted"
-```
-
-To check the latest block height:
-```sh
-ruskquery block-height
-```

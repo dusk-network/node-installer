@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-STATE_LIST_URL="https://testnet.nodes.dusk.network/state/list"
+STATE_LIST_URL="https://nodes.dusk.network/state/list"
 
 # Function to display a warning message
 display_warning() {
@@ -67,7 +67,7 @@ fi
 display_warning
 
 # Download the file
-STATE_URL="https://testnet.nodes.dusk.network/state/$state_number"
+STATE_URL="https://nodes.dusk.network/state/$state_number"
 echo "Downloading state $state_number from $STATE_URL..."
 
 if ! curl -f -so  /tmp/state.tar.gz -L "$STATE_URL"; then
