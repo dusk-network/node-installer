@@ -289,6 +289,7 @@ sysctl -p /etc/sysctl.d/dusk.conf
 echo "Installing services"
 # Overwrite previous service definitions
 mv -f /opt/dusk/services/rusk.service /etc/systemd/system/rusk.service
+chmod -x /etc/systemd/system/rusk.service
 
 # Configure logrotate with 644 permissions otherwise configuration is ignored
 mv -f /opt/dusk/services/logrotate.conf /etc/logrotate.d/dusk.conf
