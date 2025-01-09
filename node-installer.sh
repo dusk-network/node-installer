@@ -280,7 +280,7 @@ configure_network "$NETWORK"
 
 # Set permissions for dusk user and group
 chown -R dusk:dusk /opt/dusk
-chmod -R 770 /opt/dusk
+chmod -R 660 /opt/dusk
 
 # Set system parameters
 mv -f /opt/dusk/conf/dusk.conf /etc/sysctl.d/dusk.conf
@@ -289,7 +289,6 @@ sysctl -p /etc/sysctl.d/dusk.conf
 echo "Installing services"
 # Overwrite previous service definitions
 mv -f /opt/dusk/services/rusk.service /etc/systemd/system/rusk.service
-chmod -x /etc/systemd/system/rusk.service
 
 # Configure logrotate with 644 permissions otherwise configuration is ignored
 mv -f /opt/dusk/services/logrotate.conf /etc/logrotate.d/dusk.conf
