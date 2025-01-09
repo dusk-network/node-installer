@@ -240,7 +240,6 @@ mv /opt/dusk/installer/rusk-wallet/rusk-wallet /opt/dusk/bin/
 mv -f /opt/dusk/conf/wallet.toml $CURRENT_HOME/.dusk/rusk-wallet/config.toml
 
 # Make bin folder scripts and bins executable, symlink to make available system-wide
-chmod +x /opt/dusk/bin/*
 ln -sf /opt/dusk/bin/rusk /usr/bin/rusk
 ln -sf /opt/dusk/bin/ruskquery /usr/bin/ruskquery
 ln -sf /opt/dusk/bin/ruskreset /usr/bin/ruskreset
@@ -281,6 +280,7 @@ configure_network "$NETWORK"
 # Set permissions for dusk user and group
 chown -R dusk:dusk /opt/dusk
 chmod -R 660 /opt/dusk
+chmod +x /opt/dusk/bin/*
 
 # Set system parameters
 mv -f /opt/dusk/conf/dusk.conf /etc/sysctl.d/dusk.conf
