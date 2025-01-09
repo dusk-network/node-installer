@@ -126,7 +126,7 @@ If you're running an archive node or want to expose the HTTP server, you can als
 #### Configure with `ufw`
 
 If you're using `ufw`, you can configure it with these commands:
-```ssh
+```sh
 # Allow SSH (default port 22)
 sudo ufw limit ssh
 # Allow Kadcast UDP traffic
