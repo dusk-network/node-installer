@@ -17,8 +17,30 @@ VERSIONS=(
     ["devnet-rusk-wallet"]="0.1.0-rc.0"
 )
 
-# Select network (default to mainnet if no argument passed)
-NETWORK="${1:-mainnet}"
+# Default network and feature (Provisioner node)
+NETWORK="mainnet"
+FEATURE="default"
+
+# Parse command-line arguments to check for network or feature flags
+while [[ "$#" -gt 0 ]]; do
+    case "$1" in
+        --network)
+            NETWORK="$2"
+            shift 2
+            ;;
+        --feature)
+            FEATURE="$2"
+            shift 2
+            ;;
+        *)
+            echo "Unknown option: $1"
+            echo "Usage: $0 [--network mainnet|testnet|devnet] [--feature default|archive]"
+            exit 1
+            ;;
+    esac
+done
+
+# Validate passed network
 case "$NETWORK" in
     mainnet|testnet|devnet)
         echo "Selected network: $NETWORK"
@@ -29,8 +51,16 @@ case "$NETWORK" in
         ;;
 esac
 
-# Feature flag ("default" if not set, "archive" also possible)
-FEATURE="${FEATURE:-default}"
+# Validate passed feature
+case "$FEATURE" in
+    default|archive)
+        echo "Selected feature: $FEATURE"
+        ;;
+    *)
+        echo "Error: Unknown feature $FEATURE. Use 'default' (Provisioner node) or 'archive'."
+        exit 1
+        ;;
+esac
 
 # Retrieve architecture
 arch=""
