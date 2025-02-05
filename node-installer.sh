@@ -11,10 +11,8 @@ declare -A VERSIONS
 VERSIONS=(
     ["mainnet-rusk"]="1.0.0"
     ["mainnet-rusk-wallet"]="0.1.0-rc.0"
-    ["testnet-rusk"]="1.0.0"
+    ["testnet-rusk"]="1.1.0-rc.1"
     ["testnet-rusk-wallet"]="0.1.0-rc.0"
-    ["devnet-rusk"]="1.0.0"
-    ["devnet-rusk-wallet"]="0.1.0-rc.0"
 )
 
 # Default network and feature (Provisioner node)
@@ -34,7 +32,7 @@ while [[ "$#" -gt 0 ]]; do
             ;;
         *)
             echo "Unknown option: $1"
-            echo "Usage: $0 [--network mainnet|testnet|devnet] [--feature default|archive]"
+            echo "Usage: $0 [--network mainnet|testnet] [--feature default|archive]"
             exit 1
             ;;
     esac
@@ -42,11 +40,11 @@ done
 
 # Validate passed network
 case "$NETWORK" in
-    mainnet|testnet|devnet)
+    mainnet|testnet)
         echo "Selected network: $NETWORK"
         ;;
     *)
-        echo "Error: Unknown network $NETWORK. Use 'mainnet', 'testnet', or 'devnet'."
+        echo "Error: Unknown network $NETWORK. Use 'mainnet' or 'testnet'."
         exit 1
         ;;
 esac
@@ -107,14 +105,19 @@ install_component() {
 
     # Apply the FEATURE suffix only for Rusk
     local feature_suffix=""
+    local release_tag="${component}"
     if [[ "$component" == "rusk" ]]; then
         feature_suffix="-${FEATURE}"
+        # This is a temporary workaround to handle different tag name after 1.0.0
+        if [[ "$network" == "testnet" ]]; then
+            release_tag="dusk-rusk"
+        fi
     fi
 
     # Removes any RC version from the URL
     local sanitized_version="${version%-rc.*}" 
     # Construct the download URL
-    local url="https://github.com/dusk-network/rusk/releases/download/${component}-${version}/${component}-${sanitized_version}-linux-${arch}${feature_suffix}.tar.gz"
+    local url="https://github.com/dusk-network/rusk/releases/download/${release_tag}-${version}/${component}-${sanitized_version}-linux-${arch}${feature_suffix}.tar.gz"
 
     echo "Installing $component version $version for $network ($arch${feature_suffix})"
     echo "Downloading from $url"
@@ -154,50 +157,29 @@ check_installed() {
 # Configure your local installation based on the selected network
 configure_network() {
     local network=$1
-    local kadcast_id
-    local bootstrapping_nodes
-    local genesis_timestamp
-    local base_state
     local prover_url
 
     case "$network" in
         mainnet)
-            kadcast_id="0x1"
-            bootstrapping_nodes="['165.232.91.113:9000', '64.226.105.70:9000', '137.184.232.115:9000']"
-            genesis_timestamp="'2025-01-07T12:00:00Z'"
-            base_state="https://nodes.dusk.network/genesis-state"
+            mv /opt/dusk/conf/mainnet.genesis /opt/dusk/conf/genesis.toml
+            mv /opt/dusk/conf/mainnet.toml /opt/dusk/conf/rusk.toml
+            rm /opt/dusk/conf/testnet.genesis
+            rm /opt/dusk/conf/testnet.toml
             prover_url="https://provers.dusk.network"
             ;;
         testnet)
-            kadcast_id="0x2"
-            bootstrapping_nodes="['134.122.62.88:9000','165.232.64.16:9000','137.184.118.43:9000']"
-            genesis_timestamp="'2024-12-23T17:00:00Z'"
-            base_state="https://testnet.nodes.dusk.network/genesis-state"
+            mv /opt/dusk/conf/testnet.genesis /opt/dusk/conf/genesis.toml
+            mv /opt/dusk/conf/testnet.toml /opt/dusk/conf/rusk.toml
+            rm /opt/dusk/conf/mainnet.genesis
+            rm /opt/dusk/conf/mainnet.toml
             prover_url="https://testnet.provers.dusk.network"
             ;;
-        devnet)
-            kadcast_id="0x3"
-            bootstrapping_nodes="['128.199.32.54', '159.223.29.22', '143.198.225.158']"
-            genesis_timestamp="'2024-12-23T12:00:00Z'"
-            base_state="https://devnet.nodes.dusk.network/genesis-state"
-            prover_url="https://devnet.provers.dusk.network"
-            ;;
         *)
-            echo "Unknown network: $network. Defaulting to testnet."
-            configure_network "testnet"
+            echo "Unknown network: $network. Defaulting to mainnet."
+            configure_network "mainnet"
             return
             ;;
     esac
-
-    # Create genesis.toml
-    cat > /opt/dusk/conf/genesis.toml <<EOF
-base_state = "$base_state"
-EOF
-
-    # Update the rusk.toml file with kadcast_id, bootstrapping_nodes & genesis_timestamp
-    sed -i "s/^kadcast_id =.*/kadcast_id = $kadcast_id/" /opt/dusk/conf/rusk.toml
-    sed -i "s/^bootstrapping_nodes =.*/bootstrapping_nodes = $bootstrapping_nodes/" /opt/dusk/conf/rusk.toml
-    sed -i "s/^genesis_timestamp =.*/genesis_timestamp = $genesis_timestamp/" /opt/dusk/conf/rusk.toml
 
     # Update the wallet.toml with the appropriate prover URL for the given network
     sed -i "s|^prover = .*|prover = \"$prover_url\"|" $CURRENT_HOME/.dusk/rusk-wallet/config.toml
@@ -281,7 +263,7 @@ fi
 echo "Downloading verifier keys"
 
 echo "Selected network: $NETWORK"
-VERIFIER_KEYS_URL="https://testnet.nodes.dusk.network/keys"
+VERIFIER_KEYS_URL="https://mainnet.nodes.dusk.network/keys"
 
 case "$NETWORK" in
     mainnet)
@@ -289,9 +271,6 @@ case "$NETWORK" in
         ;;
     testnet)
         VERIFIER_KEYS_URL="https://testnet.nodes.dusk.network/keys"
-        ;;
-    devnet)
-        VERIFIER_KEYS_URL="https://devnet.nodes.dusk.network/keys"
         ;;
     *)
         echo "Unknown network: $network. Defaulting to mainnet."
@@ -310,6 +289,8 @@ configure_network "$NETWORK"
 # Set permissions for dusk user and group
 chown -R dusk:dusk /opt/dusk
 chmod -R 660 /opt/dusk
+# Directory listing needs execution
+find /opt/dusk -type d -exec chmod +x {} \;
 chmod +x /opt/dusk/bin/*
 
 # Set system parameters
@@ -329,39 +310,7 @@ chmod 644 /etc/logrotate.d/dusk.conf
 systemctl enable rusk
 systemctl daemon-reload
 
-echo "Dusk node installed"
-echo "-----"
-echo "Prerequisites for launching:"
-echo "1. Provide CONSENSUS_KEYS file (default in /opt/dusk/conf/consensus.keys)"
-echo "Run the following commands:"
-echo "rusk-wallet restore"
-echo "rusk-wallet export -d /opt/dusk/conf -n consensus.keys"
-echo
-echo "2. Set DUSK_CONSENSUS_KEYS_PASS (use /opt/dusk/bin/setup_consensus_pwd.sh)"
-echo "Run the following command:"
-echo "sh /opt/dusk/bin/setup_consensus_pwd.sh"
-echo
-echo "-----"
-echo "To launch the node: "
-echo "service rusk start"
-echo
-echo "To run the Rusk wallet:"
-echo "rusk-wallet"
-echo
-echo "To check the logs:"
-echo "tail -F /var/log/rusk.log"
-echo
-echo "The installer also adds a small Rusk querying utility called ruskquery."
-echo "To see what you can query with it:"
-echo "ruskquery"
-echo
-echo "To query the the node for the latest block height:"
-echo "ruskquery block-height"
-echo
-echo "To check if your node installer is up to date:"
-echo "ruskquery version"
-echo
-echo "To reset your Rusk state and wallet cache:"
-echo "ruskreset"
+# Display final instructions
+cat /opt/dusk/installer/assets/finish.msg
 
 rm -rf /opt/dusk/installer
