@@ -13,8 +13,6 @@ VERSIONS=(
     ["mainnet-rusk-wallet"]="0.1.0-rc.0"
     ["testnet-rusk"]="1.0.0"
     ["testnet-rusk-wallet"]="0.1.0-rc.0"
-    ["devnet-rusk"]="1.0.0"
-    ["devnet-rusk-wallet"]="0.1.0-rc.0"
 )
 
 # Default network and feature (Provisioner node)
@@ -34,7 +32,7 @@ while [[ "$#" -gt 0 ]]; do
             ;;
         *)
             echo "Unknown option: $1"
-            echo "Usage: $0 [--network mainnet|testnet|devnet] [--feature default|archive]"
+            echo "Usage: $0 [--network mainnet|testnet] [--feature default|archive]"
             exit 1
             ;;
     esac
@@ -42,11 +40,11 @@ done
 
 # Validate passed network
 case "$NETWORK" in
-    mainnet|testnet|devnet)
+    mainnet|testnet)
         echo "Selected network: $NETWORK"
         ;;
     *)
-        echo "Error: Unknown network $NETWORK. Use 'mainnet', 'testnet', or 'devnet'."
+        echo "Error: Unknown network $NETWORK. Use 'mainnet' or 'testnet'."
         exit 1
         ;;
 esac
@@ -175,13 +173,6 @@ configure_network() {
             base_state="https://testnet.nodes.dusk.network/genesis-state"
             prover_url="https://testnet.provers.dusk.network"
             ;;
-        devnet)
-            kadcast_id="0x3"
-            bootstrapping_nodes="['128.199.32.54', '159.223.29.22', '143.198.225.158']"
-            genesis_timestamp="'2024-12-23T12:00:00Z'"
-            base_state="https://devnet.nodes.dusk.network/genesis-state"
-            prover_url="https://devnet.provers.dusk.network"
-            ;;
         *)
             echo "Unknown network: $network. Defaulting to testnet."
             configure_network "testnet"
@@ -289,9 +280,6 @@ case "$NETWORK" in
         ;;
     testnet)
         VERIFIER_KEYS_URL="https://testnet.nodes.dusk.network/keys"
-        ;;
-    devnet)
-        VERIFIER_KEYS_URL="https://devnet.nodes.dusk.network/keys"
         ;;
     *)
         echo "Unknown network: $network. Defaulting to mainnet."
