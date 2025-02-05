@@ -329,39 +329,7 @@ chmod 644 /etc/logrotate.d/dusk.conf
 systemctl enable rusk
 systemctl daemon-reload
 
-echo "Dusk node installed"
-echo "-----"
-echo "Prerequisites for launching:"
-echo "1. Provide CONSENSUS_KEYS file (default in /opt/dusk/conf/consensus.keys)"
-echo "Run the following commands:"
-echo "rusk-wallet restore"
-echo "rusk-wallet export -d /opt/dusk/conf -n consensus.keys"
-echo
-echo "2. Set DUSK_CONSENSUS_KEYS_PASS (use /opt/dusk/bin/setup_consensus_pwd.sh)"
-echo "Run the following command:"
-echo "sh /opt/dusk/bin/setup_consensus_pwd.sh"
-echo
-echo "-----"
-echo "To launch the node: "
-echo "service rusk start"
-echo
-echo "To run the Rusk wallet:"
-echo "rusk-wallet"
-echo
-echo "To check the logs:"
-echo "tail -F /var/log/rusk.log"
-echo
-echo "The installer also adds a small Rusk querying utility called ruskquery."
-echo "To see what you can query with it:"
-echo "ruskquery"
-echo
-echo "To query the the node for the latest block height:"
-echo "ruskquery block-height"
-echo
-echo "To check if your node installer is up to date:"
-echo "ruskquery version"
-echo
-echo "To reset your Rusk state and wallet cache:"
-echo "ruskreset"
+# Display final instructions
+cat /opt/dusk/installer/assets/finish.msg
 
 rm -rf /opt/dusk/installer
