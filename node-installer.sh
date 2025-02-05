@@ -152,25 +152,21 @@ check_installed() {
 # Configure your local installation based on the selected network
 configure_network() {
     local network=$1
-    local kadcast_id
-    local bootstrapping_nodes
-    local genesis_timestamp
-    local base_state
     local prover_url
 
     case "$network" in
         mainnet)
-            kadcast_id="0x1"
-            bootstrapping_nodes="['165.232.91.113:9000', '64.226.105.70:9000', '137.184.232.115:9000']"
-            genesis_timestamp="'2025-01-07T12:00:00Z'"
-            base_state="https://nodes.dusk.network/genesis-state"
+            mv /opt/dusk/conf/mainnet.genesis /opt/dusk/conf/genesis.toml
+            mv /opt/dusk/conf/mainnet.toml /opt/dusk/conf/rusk.toml
+            rm /opt/dusk/conf/testnet.genesis
+            rm /opt/dusk/conf/testnet.toml
             prover_url="https://provers.dusk.network"
             ;;
         testnet)
-            kadcast_id="0x2"
-            bootstrapping_nodes="['134.122.62.88:9000','165.232.64.16:9000','137.184.118.43:9000']"
-            genesis_timestamp="'2024-12-23T17:00:00Z'"
-            base_state="https://testnet.nodes.dusk.network/genesis-state"
+            mv /opt/dusk/conf/testnet.genesis /opt/dusk/conf/genesis.toml
+            mv /opt/dusk/conf/testnet.toml /opt/dusk/conf/rusk.toml
+            rm /opt/dusk/conf/mainnet.genesis
+            rm /opt/dusk/conf/mainnet.toml
             prover_url="https://testnet.provers.dusk.network"
             ;;
         *)
@@ -179,16 +175,6 @@ configure_network() {
             return
             ;;
     esac
-
-    # Create genesis.toml
-    cat > /opt/dusk/conf/genesis.toml <<EOF
-base_state = "$base_state"
-EOF
-
-    # Update the rusk.toml file with kadcast_id, bootstrapping_nodes & genesis_timestamp
-    sed -i "s/^kadcast_id =.*/kadcast_id = $kadcast_id/" /opt/dusk/conf/rusk.toml
-    sed -i "s/^bootstrapping_nodes =.*/bootstrapping_nodes = $bootstrapping_nodes/" /opt/dusk/conf/rusk.toml
-    sed -i "s/^genesis_timestamp =.*/genesis_timestamp = $genesis_timestamp/" /opt/dusk/conf/rusk.toml
 
     # Update the wallet.toml with the appropriate prover URL for the given network
     sed -i "s|^prover = .*|prover = \"$prover_url\"|" $CURRENT_HOME/.dusk/rusk-wallet/config.toml

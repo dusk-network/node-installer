@@ -1,0 +1,68 @@
+# log_type = 'coloured' (default)
+# log_type = 'json'
+
+# log_level = 'info' (default)
+# log_filter = 'dusk_consensus=debug,node=debug,kadcast=debug'
+
+[chain]
+genesis_timestamp = '2025-02-03T12:00:00Z'
+db_path = '/opt/dusk/rusk'
+consensus_keys_path = '/opt/dusk/conf/consensus.keys'
+min_gas_limit = 150_000
+
+[vm]
+generation_timeout = '3s'
+# Note: changing the following settings is equivalent to forking the chain.
+gas_per_deploy_byte = 100
+min_deployment_gas_price = 2_000
+min_deploy_points = 5_000_000
+block_gas_limit = 3_000_000_000
+
+[vm.features]
+ABI_PUBLIC_SENDER = 0
+# key = activation_height
+# key = activation_height
+# key = activation_height
+
+[databroker]
+max_inv_entries = 100
+max_ongoing_requests = 1000
+
+[mempool]
+max_queue_size = 5000
+max_mempool_txn_count = 10000
+idle_interval = '5m'
+mempool_expiry = '30m'
+mempool_download_redundancy = 5
+
+[kadcast]
+kadcast_id = 0x2
+public_address = 'N/A'
+listen_address = 'N/A'
+bootstrapping_nodes = ['188.166.103.192:9000', '104.248.240.179:9000', '146.190.127.31:9000']
+auto_propagate = false
+channel_size = 10000
+recursive_discovery = true
+
+[kadcast.bucket]
+node_ttl = '120s'
+node_evict_after = '15s'
+bucket_ttl = '10m'
+min_peers = 20
+
+[kadcast.network]
+udp_recv_buffer_size = 50_000_000
+# udp_send_backoff_timeout = '50us'
+udp_send_retry_interval = '5ms'
+udp_send_retry_count = 3
+blocklist_refresh_interval = '10s'
+
+[kadcast.fec.encoder]
+min_repair_packets_per_block = 5
+mtu = 1300
+fec_redundancy = 0.15
+
+[kadcast.fec.decoder]
+cache_ttl = '1m'
+cache_prune_every = '30s'
+max_udp_len = 2097152
