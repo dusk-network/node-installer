@@ -174,8 +174,8 @@ configure_network() {
             prover_url="https://testnet.provers.dusk.network"
             ;;
         *)
-            echo "Unknown network: $network. Defaulting to testnet."
-            configure_network "testnet"
+            echo "Unknown network: $network. Defaulting to mainnet."
+            configure_network "mainnet"
             return
             ;;
     esac
@@ -272,7 +272,7 @@ fi
 echo "Downloading verifier keys"
 
 echo "Selected network: $NETWORK"
-VERIFIER_KEYS_URL="https://testnet.nodes.dusk.network/keys"
+VERIFIER_KEYS_URL="https://mainnet.nodes.dusk.network/keys"
 
 case "$NETWORK" in
     mainnet)
