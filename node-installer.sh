@@ -289,6 +289,8 @@ configure_network "$NETWORK"
 # Set permissions for dusk user and group
 chown -R dusk:dusk /opt/dusk
 chmod -R 660 /opt/dusk
+# Directory listing needs execution
+find /opt/dusk -type d -exec chmod +x {} \;
 chmod +x /opt/dusk/bin/*
 
 # Set system parameters
