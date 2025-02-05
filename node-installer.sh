@@ -11,7 +11,7 @@ declare -A VERSIONS
 VERSIONS=(
     ["mainnet-rusk"]="1.0.0"
     ["mainnet-rusk-wallet"]="0.1.0-rc.0"
-    ["testnet-rusk"]="1.0.0"
+    ["testnet-rusk"]="1.1.0-rc.1"
     ["testnet-rusk-wallet"]="0.1.0-rc.0"
 )
 
@@ -105,14 +105,19 @@ install_component() {
 
     # Apply the FEATURE suffix only for Rusk
     local feature_suffix=""
+    local release_tag="${component}"
     if [[ "$component" == "rusk" ]]; then
         feature_suffix="-${FEATURE}"
+        # This is a temporary workaround to handle different tag name after 1.0.0
+        if [[ "$network" == "testnet" ]]; then
+            release_tag="dusk-rusk"
+        fi
     fi
 
     # Removes any RC version from the URL
     local sanitized_version="${version%-rc.*}" 
     # Construct the download URL
-    local url="https://github.com/dusk-network/rusk/releases/download/${component}-${version}/${component}-${sanitized_version}-linux-${arch}${feature_suffix}.tar.gz"
+    local url="https://github.com/dusk-network/rusk/releases/download/${release_tag}-${version}/${component}-${sanitized_version}-linux-${arch}${feature_suffix}.tar.gz"
 
     echo "Installing $component version $version for $network ($arch${feature_suffix})"
     echo "Downloading from $url"
