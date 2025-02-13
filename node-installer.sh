@@ -9,9 +9,9 @@ echo "Home directory: $CURRENT_HOME"
 declare -A VERSIONS
 # Define versions per network, per component
 VERSIONS=(
-    ["mainnet-rusk"]="1.0.0"
+    ["mainnet-rusk"]="1.1.0"
     ["mainnet-rusk-wallet"]="0.1.0-rc.0"
-    ["testnet-rusk"]="1.1.0-rc.1"
+    ["testnet-rusk"]="1.1.0"
     ["testnet-rusk-wallet"]="0.1.0-rc.0"
 )
 
@@ -108,10 +108,8 @@ install_component() {
     local release_tag="${component}"
     if [[ "$component" == "rusk" ]]; then
         feature_suffix="-${FEATURE}"
-        # This is a temporary workaround to handle different tag name after 1.0.0
-        if [[ "$network" == "testnet" ]]; then
-            release_tag="dusk-rusk"
-        fi
+        # rusk tag name changed after 1.0.0
+        release_tag="dusk-rusk"
     fi
 
     # Removes any RC version from the URL
