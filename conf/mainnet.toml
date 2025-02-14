@@ -19,7 +19,7 @@ min_deploy_points = 5_000_000
 block_gas_limit = 3_000_000_000
 
 [vm.features]
-ABI_PUBLIC_SENDER = TBD
+ABI_PUBLIC_SENDER = 355_000
 # key = activation_height
 # key = activation_height
 # key = activation_height
