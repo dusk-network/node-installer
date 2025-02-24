@@ -84,10 +84,11 @@ else
     exit 1
 fi
 
-if [ "$distro" != "ubuntu" ]; then
-    echo "Unsupported Linux distribution: $distro. This installer only supports Ubuntu."
+if [ "$distro" != "ubuntu" ] && [ "$distro" != "linuxmint" ]; then
+    echo "Unsupported Linux distribution: $distro. This installer only supports Ubuntu and Linux Mint." # Ubuntu based
     exit 1
 fi
+
 
 echo "Detected supported distro: $distro ($arch)"
 
