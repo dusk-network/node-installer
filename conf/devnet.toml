@@ -36,7 +36,7 @@ mempool_expiry = '30m'
 mempool_download_redundancy = 5
 
 [kadcast]
-kadcast_id = 0x2
+kadcast_id = 0x3
 public_address = 'N/A'
 listen_address = 'N/A'
 bootstrapping_nodes = ['128.199.34.157:9000', '64.226.102.139:9000', '137.184.5.87:9000']

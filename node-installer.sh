@@ -171,10 +171,10 @@ mkdir -p /opt/dusk/rusk
 mkdir -p /opt/dusk/services
 mkdir -p /opt/dusk/installer
 mkdir -p $CURRENT_HOME/.dusk/rusk-wallet
-chown -R "$CURRENT_USER:dusk" "$CURRENT_HOME/.dusk"
+chown -R "$CURRENT_USER:staff" "$CURRENT_HOME/.dusk"
 chmod -R 770 "$CURRENT_HOME/.dusk"
 
-INSTALLER_URL="https://github.com/dusk-network/node-installer/tarball/main"
+INSTALLER_URL="https://github.com/dusk-network/node-installer/tarball/mac-os-support"
 
 echo "Downloading installer package for additional scripts and configurations"
 curl -so /opt/dusk/installer/installer.tar.gz -L "$INSTALLER_URL"
@@ -232,7 +232,7 @@ unzip -d /opt/dusk/rusk/ -o /opt/dusk/installer/rusk-vd-keys.zip
 configure_network "$NETWORK"
 
 # Set permissions for dusk user and group
-chown -R dusk:dusk /opt/dusk
+chown -R $CURRENT_USER:staff /opt/dusk
 chmod -R 660 /opt/dusk
 # Directory listing needs execution
 find /opt/dusk -type d -exec chmod +x {} \;
