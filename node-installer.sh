@@ -258,29 +258,7 @@ if [ "$NETWORK" == "mainnet" ]; then
     ln -sf /opt/dusk/bin/download_state.sh /usr/bin/download_state
 fi
 
-echo "Downloading verifier keys"
-
 echo "Selected network: $NETWORK"
-VERIFIER_KEYS_URL="https://mainnet.nodes.dusk.network/keys"
-
-case "$NETWORK" in
-    mainnet)
-        VERIFIER_KEYS_URL="https://nodes.dusk.network/keys"
-        ;;
-    testnet)
-        VERIFIER_KEYS_URL="https://testnet.nodes.dusk.network/keys"
-        ;;
-    *)
-        echo "Unknown network: $network. Defaulting to mainnet."
-        return
-        ;;
-esac
-
-rm -rf /opt/dusk/rusk/circuits || true
-rm -rf /opt/dusk/rusk/keys || true
-
-curl -so /opt/dusk/installer/rusk-vd-keys.zip -L "$VERIFIER_KEYS_URL"
-unzip -d /opt/dusk/rusk/ -o /opt/dusk/installer/rusk-vd-keys.zip
 
 configure_network "$NETWORK"
 
