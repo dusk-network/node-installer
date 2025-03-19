@@ -11,7 +11,7 @@ declare -A VERSIONS
 VERSIONS=(
     ["mainnet-rusk"]="1.1.1"
     ["mainnet-rusk-wallet"]="0.1.0-rc.0"
-    ["testnet-rusk"]="1.1.1"
+    ["testnet-rusk"]="1.2.0"
     ["testnet-rusk-wallet"]="0.1.0-rc.0"
 )
 
