@@ -229,7 +229,7 @@ mkdir -p $CURRENT_HOME/.dusk/rusk-wallet
 chown -R "$CURRENT_USER:dusk" "$CURRENT_HOME/.dusk"
 chmod -R 770 "$CURRENT_HOME/.dusk"
 
-INSTALLER_URL="https://github.com/dusk-network/node-installer/tarball/main"
+INSTALLER_URL="https://github.com/dusk-network/node-installer/archive/refs/tags/v0.5.6.tar.gz"
 
 echo "Downloading installer package for additional scripts and configurations"
 curl -so /opt/dusk/installer/installer.tar.gz -L "$INSTALLER_URL"
