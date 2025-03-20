@@ -5,7 +5,7 @@
 # log_filter = 'dusk_consensus=debug,node=debug,kadcast=debug'
 
 [chain]
-genesis_timestamp = '2025-02-03T12:00:00Z'
+genesis_timestamp = '2025-03-20T09:00:00Z'
 db_path = '/opt/dusk/rusk'
 consensus_keys_path = '/opt/dusk/conf/consensus.keys'
 min_gas_limit = 150_000
@@ -39,7 +39,7 @@ mempool_download_redundancy = 5
 kadcast_id = 0x2
 public_address = 'N/A'
 listen_address = 'N/A'
-bootstrapping_nodes = ['188.166.103.192:9000', '104.248.240.179:9000', '146.190.127.31:9000']
+bootstrapping_nodes = ['164.92.215.215:9000', '134.209.228.209:9000', '209.38.145.57:9000']
 auto_propagate = false
 channel_size = 10000
 recursive_discovery = true
