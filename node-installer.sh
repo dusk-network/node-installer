@@ -170,7 +170,14 @@ else
     exit 1
 fi
 
-echo "Detected OS: $distro"
+# Normalize distro ID for compatible derivatives
+case "$distro" in
+    linuxmint*) distro="ubuntu" ;;
+esac
+
+echo "Detected OS ID: $ID"
+echo "Normalized OS target: $distro"
+
 OS_SCRIPT="/opt/dusk/installer/os/$distro.sh"
 if [ -f "$OS_SCRIPT" ]; then
     echo "Using OS support script: $OS_SCRIPT"
