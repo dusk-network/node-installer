@@ -75,11 +75,15 @@ if ! curl -f -so  /tmp/state.tar.gz -L "$STATE_URL"; then
   exit 1
 fi
 
-service rusk stop
+if [ "$USING_DOCKER" != "true" ]; then
+  service rusk stop
+fi
 
 rm -rf /opt/dusk/rusk/state
 rm -rf /opt/dusk/rusk/chain.db
 tar -xvf /tmp/state.tar.gz -C /opt/dusk/rusk/
-chown -R dusk:dusk /opt/dusk/
+if [ "$USING_DOCKER" != "true" ]; then
+  chown -R dusk:dusk /opt/dusk/
+fi
 
 echo "Operation completed successfully."
