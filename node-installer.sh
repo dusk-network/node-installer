@@ -1,8 +1,13 @@
 #!/bin/bash
 
 # Detect the user running the script
-CURRENT_USER=$(logname)
-CURRENT_HOME=$(eval echo ~"$CURRENT_USER")
+if [ "$USING_DOCKER" != "true" ]; then
+    CURRENT_USER=$(logname)
+    CURRENT_HOME=$(eval echo ~"$CURRENT_USER")
+else
+    CURRENT_USER=root
+    CURRENT_HOME=/root
+fi
 echo "Detected current user: $CURRENT_USER"
 echo "Home directory: $CURRENT_HOME"
 
@@ -16,49 +21,51 @@ VERSIONS=(
 )
 
 # Default network and feature (Provisioner node)
-NETWORK="mainnet"
-FEATURE="default"
+NETWORK=${NETWORK:-"mainnet"}
+FEATURE=${FEATURE:-"default"}
 
-# Parse command-line arguments to check for network or feature flags
-while [[ "$#" -gt 0 ]]; do
-    case "$1" in
-        --network)
-            NETWORK="$2"
-            shift 2
-            ;;
-        --feature)
-            FEATURE="$2"
-            shift 2
+if [ "$USING_DOCKER" != "true" ]; then
+    # Parse command-line arguments to check for network or feature flags
+    while [[ "$#" -gt 0 ]]; do
+        case "$1" in
+            --network)
+                NETWORK="$2"
+                shift 2
+                ;;
+            --feature)
+                FEATURE="$2"
+                shift 2
+                ;;
+            *)
+                echo "Unknown option: $1"
+                echo "Usage: $0 [--network mainnet|testnet] [--feature default|archive]"
+                exit 1
+                ;;
+        esac
+    done
+
+    # Validate passed network
+    case "$NETWORK" in
+        mainnet|testnet)
+            echo "Selected network: $NETWORK"
             ;;
         *)
-            echo "Unknown option: $1"
-            echo "Usage: $0 [--network mainnet|testnet] [--feature default|archive]"
+            echo "Error: Unknown network $NETWORK. Use 'mainnet' or 'testnet'."
             exit 1
             ;;
     esac
-done
 
-# Validate passed network
-case "$NETWORK" in
-    mainnet|testnet)
-        echo "Selected network: $NETWORK"
-        ;;
-    *)
-        echo "Error: Unknown network $NETWORK. Use 'mainnet' or 'testnet'."
-        exit 1
-        ;;
-esac
-
-# Validate passed feature
-case "$FEATURE" in
-    default|archive)
-        echo "Selected feature: $FEATURE"
-        ;;
-    *)
-        echo "Error: Unknown feature $FEATURE. Use 'default' (Provisioner node) or 'archive'."
-        exit 1
-        ;;
-esac
+    # Validate passed feature
+    case "$FEATURE" in
+        default|archive)
+            echo "Selected feature: $FEATURE"
+            ;;
+        *)
+            echo "Error: Unknown feature $FEATURE. Use 'default' (Provisioner node) or 'archive'."
+            exit 1
+            ;;
+    esac
+fi
 
 # Retrieve architecture
 arch=""
@@ -68,28 +75,30 @@ case "$(uname -m)" in
     *) echo "Unsupported architecture: $(uname -m). Only x64 and arm64 are supported."; exit 1;;
 esac
 
-# Check for Linux
-if [ "$(uname -s | tr '[:upper:]' '[:lower:]')" != "linux" ]; then
-    echo "Unsupported platform: $(uname -s). This installer only supports Linux."
-    exit 1
-fi
+if [ "$USING_DOCKER" != "true" ]; then
+    # Check for Linux
+    if [ "$(uname -s | tr '[:upper:]' '[:lower:]')" != "linux" ]; then
+        echo "Unsupported platform: $(uname -s). This installer only supports Linux."
+        exit 1
+    fi
 
-# Detect the Linux distribution
-distro="unknown"
-if [ -f /etc/os-release ]; then
-    . /etc/os-release
-    distro=$(echo "$ID" | tr '[:upper:]' '[:lower:]')
-else
-    echo "Unable to detect the Linux distribution. Ensure this is an Ubuntu-based system."
-    exit 1
-fi
+    # Detect the Linux distribution
+    distro="unknown"
+    if [ -f /etc/os-release ]; then
+        . /etc/os-release
+        distro=$(echo "$ID" | tr '[:upper:]' '[:lower:]')
+    else
+        echo "Unable to detect the Linux distribution. Ensure this is an Ubuntu-based system."
+        exit 1
+    fi
 
-if [ "$distro" != "ubuntu" ]; then
-    echo "Unsupported Linux distribution: $distro. This installer only supports Ubuntu."
-    exit 1
-fi
+    if [ "$distro" != "ubuntu" ]; then
+        echo "Unsupported Linux distribution: $distro. This installer only supports Ubuntu."
+        exit 1
+    fi
 
-echo "Detected supported distro: $distro ($arch)"
+    echo "Detected supported distro: $distro ($arch)"
+fi
 
 # Installs a given component for a given network
 install_component() {
@@ -183,12 +192,14 @@ configure_network() {
     sed -i "s|^prover = .*|prover = \"$prover_url\"|" $CURRENT_HOME/.dusk/rusk-wallet/config.toml
 }
 
-echo "Stopping previous services"
-if systemctl is-active --quiet rusk; then
-    systemctl stop rusk
-    echo "Stopped rusk service."
-else
-    echo "Rusk service not running."
+if [ "$USING_DOCKER" != "true" ]; then
+    echo "Stopping previous services"
+    if systemctl is-active --quiet rusk; then
+        systemctl stop rusk
+        echo "Stopped rusk service."
+    else
+        echo "Rusk service not running."
+    fi
 fi
 
 rm -rf /opt/dusk/installer || true
@@ -201,23 +212,27 @@ check_installed curl curl
 check_installed route net-tools
 check_installed ipcalc ipcalc
 check_installed jq jq
-check_installed logrotate logrotate
-
-# Ensure dusk group and user exist
-if ! id -u dusk >/dev/null 2>&1; then
-    echo "Creating dusk system user and group."
-    groupadd --system dusk
-    useradd --system --create-home --shell /usr/sbin/nologin --gid dusk dusk
-    echo "User 'dusk' and group 'dusk' created."
-else
-    echo "User 'dusk' and group 'dusk' already exist."
+if [ "$USING_DOCKER" != "true" ]; then
+    check_installed logrotate logrotate
 fi
 
-# Add the current user to the dusk group for access
-echo "Adding current user to dusk group for access."
-if ! id -nG "$CURRENT_USER" | grep -qw "dusk"; then
-    usermod -aG dusk "$CURRENT_USER"
-    echo "User $CURRENT_USER has been added to the dusk group. Please log out and back in to apply changes."
+# Ensure dusk group and user exist
+if [ "$USING_DOCKER" != "true" ]; then
+    if ! id -u dusk >/dev/null 2>&1; then
+        echo "Creating dusk system user and group."
+        groupadd --system dusk
+        useradd --system --create-home --shell /usr/sbin/nologin --gid dusk dusk
+        echo "User 'dusk' and group 'dusk' created."
+    else
+        echo "User 'dusk' and group 'dusk' already exist."
+    fi
+
+    # Add the current user to the dusk group for access
+    echo "Adding current user to dusk group for access."
+    if ! id -nG "$CURRENT_USER" | grep -qw "dusk"; then
+        usermod -aG dusk "$CURRENT_USER"
+        echo "User $CURRENT_USER has been added to the dusk group. Please log out and back in to apply changes."
+    fi
 fi
 
 mkdir -p /opt/dusk/bin
@@ -226,10 +241,12 @@ mkdir -p /opt/dusk/rusk
 mkdir -p /opt/dusk/services
 mkdir -p /opt/dusk/installer
 mkdir -p $CURRENT_HOME/.dusk/rusk-wallet
-chown -R "$CURRENT_USER:dusk" "$CURRENT_HOME/.dusk"
+if [ "$USING_DOCKER" != "true" ]; then
+    chown -R "$CURRENT_USER:dusk" "$CURRENT_HOME/.dusk"
+fi
 chmod -R 770 "$CURRENT_HOME/.dusk"
 
-INSTALLER_URL="https://github.com/dusk-network/node-installer/tarball/main"
+INSTALLER_URL="https://github.com/dusk-network/node-installer/tarball/docker-support"
 
 echo "Downloading installer package for additional scripts and configurations"
 curl -so /opt/dusk/installer/installer.tar.gz -L "$INSTALLER_URL"
@@ -262,31 +279,38 @@ echo "Selected network: $NETWORK"
 
 configure_network "$NETWORK"
 
-# Set permissions for dusk user and group
-chown -R dusk:dusk /opt/dusk
+# Set required permissions
 chmod -R 660 /opt/dusk
-# Directory listing needs execution
-find /opt/dusk -type d -exec chmod +x {} \;
 chmod +x /opt/dusk/bin/*
 
-# Set system parameters
-mv -f /opt/dusk/conf/dusk.conf /etc/sysctl.d/dusk.conf
-sysctl -p /etc/sysctl.d/dusk.conf
+if [ "$USING_DOCKER" != "true" ]; then
+    # Set permissions for dusk user and group
+    chown -R dusk:dusk /opt/dusk
 
-echo "Installing services"
-# Overwrite previous service definitions
-mv -f /opt/dusk/services/rusk.service /etc/systemd/system/rusk.service
+    # Directory listing needs execution
+    find /opt/dusk -type d -exec chmod +x {} \;
 
-# Configure logrotate with 644 permissions otherwise configuration is ignored
-mv -f /opt/dusk/services/logrotate.conf /etc/logrotate.d/dusk.conf
-chown root:root /etc/logrotate.d/dusk.conf
-chmod 644 /etc/logrotate.d/dusk.conf
+    # Set system parameters
+    mv -f /opt/dusk/conf/dusk.conf /etc/sysctl.d/dusk.conf
+    sysctl -p /etc/sysctl.d/dusk.conf
 
-# Enable the Rusk service
-systemctl enable rusk
-systemctl daemon-reload
+    echo "Installing services"
+    # Overwrite previous service definitions
+    mv -f /opt/dusk/services/rusk.service /etc/systemd/system/rusk.service
 
-# Display final instructions
-cat /opt/dusk/installer/assets/finish.msg
+    # Configure logrotate with 644 permissions otherwise configuration is ignored
+    mv -f /opt/dusk/services/logrotate.conf /etc/logrotate.d/dusk.conf
+    chown root:root /etc/logrotate.d/dusk.conf
+    chmod 644 /etc/logrotate.d/dusk.conf
 
-rm -rf /opt/dusk/installer
+    # Enable the Rusk service
+    systemctl enable rusk
+    systemctl daemon-reload
+
+    # Display final instructions
+    cat /opt/dusk/installer/assets/finish.msg
+
+    rm -rf /opt/dusk/installer
+else
+    echo "Completed setup"
+fi
