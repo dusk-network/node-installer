@@ -68,29 +68,6 @@ case "$(uname -m)" in
     *) echo "Unsupported architecture: $(uname -m). Only x64 and arm64 are supported."; exit 1;;
 esac
 
-# Check for Linux
-if [ "$(uname -s | tr '[:upper:]' '[:lower:]')" != "linux" ]; then
-    echo "Unsupported platform: $(uname -s). This installer only supports Linux."
-    exit 1
-fi
-
-# Detect the Linux distribution
-distro="unknown"
-if [ -f /etc/os-release ]; then
-    . /etc/os-release
-    distro=$(echo "$ID" | tr '[:upper:]' '[:lower:]')
-else
-    echo "Unable to detect the Linux distribution. Ensure this is an Ubuntu-based system."
-    exit 1
-fi
-
-if [ "$distro" != "ubuntu" ]; then
-    echo "Unsupported Linux distribution: $distro. This installer only supports Ubuntu."
-    exit 1
-fi
-
-echo "Detected supported distro: $distro ($arch)"
-
 # Installs a given component for a given network
 install_component() {
     local network="$1"
@@ -127,31 +104,6 @@ install_component() {
     tar xf /opt/dusk/installer/${component}.tar.gz --strip-components 1 --directory "$component_dir"
 }
 
-# Check for OpenSSL 3 or higher
-if ! command -v openssl >/dev/null 2>&1 || [ "$(openssl version | awk '{print $2}' | cut -d. -f1)" -lt 3 ]; then
-    echo "The required OpenSSL version is not available. Please install OpenSSL 3 or higher"
-    echo "You likely need to upgrade your OS or install a newer OS"
-    exit 1
-fi
-
-update_pkg_database() {
-    echo "Updating package database..."
-    apt update
-}
-
-check_installed() {
-    binary_name=$1
-    package_name=$2
-
-    if ! which $binary_name >/dev/null 2>&1; then
-        echo "$binary_name missing"
-        echo "Installing $package_name"
-        NEEDRESTART_MODE=a apt install $package_name -y
-    else
-        echo "$binary_name is already installed."
-    fi
-}
-
 # Configure your local installation based on the selected network
 configure_network() {
     local network=$1
@@ -183,42 +135,16 @@ configure_network() {
     sed -i "s|^prover = .*|prover = \"$prover_url\"|" $CURRENT_HOME/.dusk/rusk-wallet/config.toml
 }
 
-echo "Stopping previous services"
-if systemctl is-active --quiet rusk; then
-    systemctl stop rusk
-    echo "Stopped rusk service."
-else
-    echo "Rusk service not running."
+# Check for OpenSSL 3 or higher
+if ! command -v openssl >/dev/null 2>&1 || [ "$(openssl version | awk '{print $2}' | cut -d. -f1)" -lt 3 ]; then
+    echo "The required OpenSSL version is not available. Please install OpenSSL 3 or higher"
+    echo "You likely need to upgrade your OS or install a newer OS"
+    exit 1
 fi
 
+# Cleanup previous installer just in case
 rm -rf /opt/dusk/installer || true
 rm -rf /opt/dusk/installer/installer.tar.gz || true
-
-echo "Checking prerequisites"
-update_pkg_database
-check_installed unzip unzip
-check_installed curl curl
-check_installed route net-tools
-check_installed ipcalc ipcalc
-check_installed jq jq
-check_installed logrotate logrotate
-
-# Ensure dusk group and user exist
-if ! id -u dusk >/dev/null 2>&1; then
-    echo "Creating dusk system user and group."
-    groupadd --system dusk
-    useradd --system --create-home --shell /usr/sbin/nologin --gid dusk dusk
-    echo "User 'dusk' and group 'dusk' created."
-else
-    echo "User 'dusk' and group 'dusk' already exist."
-fi
-
-# Add the current user to the dusk group for access
-echo "Adding current user to dusk group for access."
-if ! id -nG "$CURRENT_USER" | grep -qw "dusk"; then
-    usermod -aG dusk "$CURRENT_USER"
-    echo "User $CURRENT_USER has been added to the dusk group. Please log out and back in to apply changes."
-fi
 
 mkdir -p /opt/dusk/bin
 mkdir -p /opt/dusk/conf
@@ -229,11 +155,63 @@ mkdir -p $CURRENT_HOME/.dusk/rusk-wallet
 chown -R "$CURRENT_USER:dusk" "$CURRENT_HOME/.dusk"
 chmod -R 770 "$CURRENT_HOME/.dusk"
 
+# Download and extract installer files
 INSTALLER_URL="https://github.com/dusk-network/node-installer/tarball/main"
-
 echo "Downloading installer package for additional scripts and configurations"
 curl -so /opt/dusk/installer/installer.tar.gz -L "$INSTALLER_URL"
 tar xf /opt/dusk/installer/installer.tar.gz --strip-components 1 --directory /opt/dusk/installer
+
+# Detect and source OS logic
+if [ -f /etc/os-release ]; then
+    . /etc/os-release
+    distro=$(echo "$ID" | tr '[:upper:]' '[:lower:]')
+else
+    echo "Unable to detect OS. /etc/os-release not found."
+    exit 1
+fi
+
+# Normalize distro ID for compatible derivatives
+case "$distro" in
+    linuxmint*) distro="ubuntu" ;;
+esac
+
+echo "Detected OS ID: $ID"
+echo "Normalized OS target: $distro"
+
+OS_SCRIPT="/opt/dusk/installer/os/$distro.sh"
+if [ -f "$OS_SCRIPT" ]; then
+    echo "Using OS support script: $OS_SCRIPT"
+    source "$OS_SCRIPT"
+else
+    echo "No support script found for '$distro'"
+    echo "Want to add support? See: https://github.com/dusk-network/node-installer#contributing-os-support"
+    exit 1
+fi
+
+echo "Update package db and install prerequisites."
+install_deps
+
+# Ensure dusk group and user exist
+if ! id -u dusk >/dev/null 2>&1; then
+    echo "Creating dusk system user and group."
+    groupadd --system dusk
+    useradd --system --create-home --shell /usr/sbin/nologin --gid dusk dusk
+    echo "User 'dusk' and group 'dusk' created."
+fi
+
+echo "Adding current user to dusk group for access."
+if ! id -nG "$CURRENT_USER" | grep -qw "dusk"; then
+    usermod -aG dusk "$CURRENT_USER"
+    echo "User $CURRENT_USER has been added to the dusk group. Please log out and back in to apply changes."
+fi
+
+echo "Stopping previous services"
+if systemctl is-active --quiet rusk; then
+    systemctl stop rusk
+    echo "Stopped rusk service."
+else
+    echo "Rusk service not running."
+fi
 
 # Handle scripts, configs, and service definitions
 mv -f /opt/dusk/installer/bin/* /opt/dusk/bin/
@@ -259,7 +237,6 @@ if [ "$NETWORK" == "mainnet" ]; then
 fi
 
 echo "Selected network: $NETWORK"
-
 configure_network "$NETWORK"
 
 # Set permissions for dusk user and group
@@ -277,10 +254,8 @@ echo "Installing services"
 # Overwrite previous service definitions
 mv -f /opt/dusk/services/rusk.service /etc/systemd/system/rusk.service
 
-# Configure logrotate with 644 permissions otherwise configuration is ignored
-mv -f /opt/dusk/services/logrotate.conf /etc/logrotate.d/dusk.conf
-chown root:root /etc/logrotate.d/dusk.conf
-chmod 644 /etc/logrotate.d/dusk.conf
+# Configure logrotate (OS specific)
+configure_logrotate
 
 # Enable the Rusk service
 systemctl enable rusk

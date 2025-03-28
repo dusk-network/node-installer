@@ -50,16 +50,19 @@
 - [Diagnostics](#-diagnostics)
 - [Fast Syncing with Archival State Download](#-fast-syncing-with-archival-state-download)
   - [Using the Fast Sync Command](#using-the-fast-sync-command)
+- [Contributing OS Support](#contributing-os-support)
 
 ## 📋 Prerequisites
 
-- Operating System: Ubuntu 24.04 LTS x64
+- Operating System: Ubuntu 24.04 LTS  (officially supported)
 - Dependencies: OpenSSL 3, GLibc 2.38+
 - Environment: Any compatible Linux environment (VPS, local, cloud instance)
 
 The installer officially supports 24.04 LTS x64. While it has also been tested
 successfully on Ubuntu 24.10, official support is limited to the LTS version
 listed above. Compatibility with other versions may vary.
+
+The installer has modular OS logic support. See [Contributing OS Support](#contributing-os-support) to learn how to add support for your Linux distribution. 
 
 ## 📦 Packages
 
@@ -343,3 +346,28 @@ in less time.
 > If you are experiencing errors in downloading the state, it might be due to
 > some remnants of previous state syncing. Try to clean up with
 > `sudo rm /tmp/state.tar.gz`
+
+## Contributing OS Support
+
+The Dusk node installer supports modular installation logic for different Linux distributions. We officially support **Ubuntu 24.04 LTS**, but you can add support for other distros by contributing an OS-specific script.
+
+### How it works
+
+The installer will automatically detect your OS based on `etc/os-release`, and look for a matching script under `/os/<distro>.sh`.
+
+If found, the script will be sourced to handle:
+- Package DB updating and dependency installation (`install_deps`)
+- Logrotate configuration (`configure_logrotate`)
+
+If no script is found, the installer exits gracefully with instructions to contribute one.
+
+### How to contribute
+
+1. Duplicate the Ubuntu script:
+```sh
+cp os/ubuntu.sh os/<your-distro>.sh
+```
+Replace <your-distro> with your distro's ID from `/etc/os-release`.
+2. Update `install_deps` to use your package manager. Update `configure_logrotate` if the path or behavior differs on your OS.
+3. Test your script on a fresh instance of your OS.
+4. Submit a pull request with the new file.
