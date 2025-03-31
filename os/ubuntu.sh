@@ -4,7 +4,10 @@ install_deps() {
     echo "Updating package database..."
     apt update
 
-    declare -a packages=("unzip" "curl" "net-tools" "ipcalc" "jq" "logrotate")
+    declare -a packages=("unzip" "curl" "net-tools" "ipcalc" "jq")
+    if [ "$BUILDING_DOCKER_IMAGE" != "true" ]; then
+        packages+=("logrotate")
+    fi
     for pkg in "${packages[@]}"; do
         if ! command -v "$pkg" >/dev/null 2>&1; then
             echo "Installing missing dependency: $pkg"

@@ -1,6 +1,16 @@
 #!/bin/bash
 set -e
 
+# This script interfaces with the user to download state at
+# a specific height from an archiver but doesn't do the actual
+# state replacement itself. Instead it provides a function to
+# replace the state to the main script that invokes this one.
+#
+# The reason for this is to allow the main download_state script
+# to do additional things before and after replacing the state
+# depending on whether or not it's run in a Docker container
+# without having to use environment variables.
+
 STATE_LIST_URL="https://nodes.dusk.network/state/list"
 
 # Function to display a warning message
@@ -49,6 +59,12 @@ get_latest_state() {
   curl -f -L -s "$STATE_LIST_URL" | tail -n 1
 }
 
+replace_state_with_newly_downloaded() {
+  rm -rf /opt/dusk/rusk/state
+  rm -rf /opt/dusk/rusk/chain.db
+  tar -xvf /tmp/state.tar.gz -C /opt/dusk/rusk/
+}
+
 # Check if an argument is provided, otherwise use the fallback value (348211)
 if [ "$1" = "--list" ]; then
   # List all possible states
@@ -74,12 +90,3 @@ if ! curl -f -so  /tmp/state.tar.gz -L "$STATE_URL"; then
   echo "Error: Download failed. Exiting."
   exit 1
 fi
-
-service rusk stop
-
-rm -rf /opt/dusk/rusk/state
-rm -rf /opt/dusk/rusk/chain.db
-tar -xvf /tmp/state.tar.gz -C /opt/dusk/rusk/
-chown -R dusk:dusk /opt/dusk/
-
-echo "Operation completed successfully."

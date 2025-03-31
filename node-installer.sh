@@ -1,10 +1,15 @@
 #!/bin/bash
 
-# Detect the user running the script
-CURRENT_USER=$(logname)
-CURRENT_HOME=$(eval echo ~"$CURRENT_USER")
-echo "Detected current user: $CURRENT_USER"
-echo "Home directory: $CURRENT_HOME"
+# When this script is run depends on the tool that's used to run it.
+#
+# If a user runs this script directly, the node software is installed
+# in /opt/dusk and the rusk-wallet, in ~/.dusk with the dusk user and
+# group having permissions to access it.
+#
+# If the user decides to use Docker instead, then this script will be
+# run during the Docker build. In that case, all installs are done
+# within the container and no additional user or groups are created;
+# the root user within the container is used for everything.
 
 declare -A VERSIONS
 # Define versions per network, per component
@@ -146,20 +151,22 @@ fi
 rm -rf /opt/dusk/installer || true
 rm -rf /opt/dusk/installer/installer.tar.gz || true
 
-mkdir -p /opt/dusk/bin
-mkdir -p /opt/dusk/conf
-mkdir -p /opt/dusk/rusk
-mkdir -p /opt/dusk/services
 mkdir -p /opt/dusk/installer
-mkdir -p $CURRENT_HOME/.dusk/rusk-wallet
-chown -R "$CURRENT_USER:dusk" "$CURRENT_HOME/.dusk"
-chmod -R 770 "$CURRENT_HOME/.dusk"
 
 # Download and extract installer files
-INSTALLER_URL="https://github.com/dusk-network/node-installer/tarball/main"
+INSTALLER_URL="https://github.com/dusk-network/node-installer/tarball/docker-support"
 echo "Downloading installer package for additional scripts and configurations"
 curl -so /opt/dusk/installer/installer.tar.gz -L "$INSTALLER_URL"
 tar xf /opt/dusk/installer/installer.tar.gz --strip-components 1 --directory /opt/dusk/installer
+
+RUNNER_SCRIPT_DIR=/opt/dusk/installer/runner
+if [ "$BUILDING_DOCKER_IMAGE" == "true" ]; then
+    echo "Using runner script: $RUNNER_SCRIPT_DIR/docker.sh"
+    source "$RUNNER_SCRIPT_DIR/docker.sh"
+else
+    echo "Using runner script: $RUNNER_SCRIPT_DIR/systemd.sh"
+    source "$RUNNER_SCRIPT_DIR/systemd.sh"
+fi
 
 # Detect and source OS logic
 if [ -f /etc/os-release ]; then
@@ -188,30 +195,25 @@ else
     exit 1
 fi
 
+# Detect the user running the script
+CURRENT_USER=$(current_user)
+CURRENT_HOME=$(current_home)
+echo "Detected current user: $CURRENT_USER"
+echo "Home directory: $CURRENT_HOME"
+
 echo "Update package db and install prerequisites."
 install_deps
 
-# Ensure dusk group and user exist
-if ! id -u dusk >/dev/null 2>&1; then
-    echo "Creating dusk system user and group."
-    groupadd --system dusk
-    useradd --system --create-home --shell /usr/sbin/nologin --gid dusk dusk
-    echo "User 'dusk' and group 'dusk' created."
-fi
+ensure_dusk_user_and_group_exist
+stop_previous_services
 
-echo "Adding current user to dusk group for access."
-if ! id -nG "$CURRENT_USER" | grep -qw "dusk"; then
-    usermod -aG dusk "$CURRENT_USER"
-    echo "User $CURRENT_USER has been added to the dusk group. Please log out and back in to apply changes."
-fi
-
-echo "Stopping previous services"
-if systemctl is-active --quiet rusk; then
-    systemctl stop rusk
-    echo "Stopped rusk service."
-else
-    echo "Rusk service not running."
-fi
+mkdir -p /opt/dusk/bin
+mkdir -p /opt/dusk/conf
+mkdir -p /opt/dusk/rusk
+mkdir -p /opt/dusk/services
+mkdir -p $CURRENT_HOME/.dusk/rusk-wallet
+change_owner "$CURRENT_USER" "$CURRENT_HOME/.dusk"
+chmod -R 770 "$CURRENT_HOME/.dusk"
 
 # Handle scripts, configs, and service definitions
 mv -f /opt/dusk/installer/bin/* /opt/dusk/bin/
@@ -233,35 +235,22 @@ ln -sf /opt/dusk/bin/ruskquery /usr/bin/ruskquery
 ln -sf /opt/dusk/bin/ruskreset /usr/bin/ruskreset
 ln -sf /opt/dusk/bin/rusk-wallet /usr/bin/rusk-wallet
 if [ "$NETWORK" == "mainnet" ]; then
-    ln -sf /opt/dusk/bin/download_state.sh /usr/bin/download_state
+    link_download_state_bin /usr/bin/download_state
 fi
 
 echo "Selected network: $NETWORK"
 configure_network "$NETWORK"
 
 # Set permissions for dusk user and group
-chown -R dusk:dusk /opt/dusk
+change_owner dusk /opt/dusk
 chmod -R 660 /opt/dusk
+
 # Directory listing needs execution
 find /opt/dusk -type d -exec chmod +x {} \;
-chmod +x /opt/dusk/bin/*
+chmod -R +x /opt/dusk/bin/*
 
-# Set system parameters
-mv -f /opt/dusk/conf/dusk.conf /etc/sysctl.d/dusk.conf
-sysctl -p /etc/sysctl.d/dusk.conf
+setup_systemd
 
-echo "Installing services"
-# Overwrite previous service definitions
-mv -f /opt/dusk/services/rusk.service /etc/systemd/system/rusk.service
-
-# Configure logrotate (OS specific)
-configure_logrotate
-
-# Enable the Rusk service
-systemctl enable rusk
-systemctl daemon-reload
-
-# Display final instructions
-cat /opt/dusk/installer/assets/finish.msg
+display_final_instructions
 
 rm -rf /opt/dusk/installer
