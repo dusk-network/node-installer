@@ -51,6 +51,12 @@
 - [Fast Syncing with Archival State Download](#-fast-syncing-with-archival-state-download)
   - [Using the Fast Sync Command](#using-the-fast-sync-command)
 - [Contributing OS Support](#contributing-os-support)
+- [Using Docker](#-using-docker)
+  - [Download Node Installer Code](#download-node-installer-code)
+  - [Building Node Image](#building-node-image)
+  - [Running](#running)
+  - [Running Query Commands](#running-query-commands)
+  - [Fast Syncing](#fast-syncing)
 
 ## 📋 Prerequisites
 
@@ -63,6 +69,7 @@ successfully on Ubuntu 24.10, official support is limited to the LTS version
 listed above. Compatibility with other versions may vary.
 
 The installer has modular OS logic support. See [Contributing OS Support](#contributing-os-support) to learn how to add support for your Linux distribution. 
+If you don't have a system that meets the requirements, you may use the Docker setup instead.
 
 ## 📦 Packages
 
@@ -371,3 +378,161 @@ Replace <your-distro> with your distro's ID from `/etc/os-release`.
 2. Update `install_deps` to use your package manager. Update `configure_logrotate` if the path or behavior differs on your OS.
 3. Test your script on a fresh instance of your OS.
 4. Submit a pull request with the new file.
+## 🐳 Using Docker
+
+If you don't have a system that meets the prerequisites to run a node, you may run with
+Docker instead.
+
+First, if you don't have Docker installed, follow the [official guide](https://docs.docker.com/desktop/)
+to install it.
+
+### Download Node Installer Code
+
+To build the Docker image for a node, you first need to download the code for the version of the
+node installer you're going to use.
+
+```sh
+wget https://github.com/dusk-network/node-installer/archive/refs/tags/<version>.zip
+```
+
+For example, if you're using version v0.5.6, then you'll run:
+
+```sh
+wget https://github.com/dusk-network/node-installer/archive/refs/tags/v0.5.6.zip
+```
+
+Ensure that the version you select is a version that supports Docker.
+
+After downloading the code, unzip it and change your working directory:
+
+```sh
+unzip node-installer-<version>
+cd node-installer-<version>
+```
+
+Or if you want to use the latest unreleased code:
+
+```sh
+git clone https://github.com/dusk-network/node-installer.git
+cd node-installer
+```
+
+### Building Node Image
+
+To build the image:
+
+```sh
+docker build -t node-installer .
+```
+
+This will build a Docker image with all the prerequisites and binaries to run a node.
+By default, the dependencies installed will be for provisioner nodes on mainnet.
+
+To change that, you need to specify build args to indicate which network you want to run on and
+which feature to use.
+
+```sh
+docker build -t node-installer --build-arg NETWORK=<mainnet|testnet> --build-arg FEATURE=<default|archive> .
+```
+
+Building the image without specifying any build args is equivalent to:
+
+```sh
+docker build -t node-installer --build-arg NETWORK=mainnet --build-arg FEATURE=default .
+```
+
+You can combine args to build for a specific network and feature. For example, if you want to run
+an archive node on testnet:
+
+```sh
+docker build -t node-installer --build-arg NETWORK=testnet --build-arg FEATURE=archive .
+```
+
+### Running
+
+Before running, you need to get your consensus keys. You can create them by following
+[Set Consensus Keys](#-set-consensus-keys).
+
+To start a node:
+
+```sh
+docker run -d \
+  --name rusk \
+  -e DUSK_CONSENSUS_KEYS_PASS=<consensus-keys-password> \
+  -v /path/to/consensus.keys:/opt/dusk/conf/consensus.keys \
+  -v /path/to/rusk-profile:/opt/dusk/rusk \
+  -p 9000:9000/udp \
+  node-installer
+```
+
+Replacing:
+- `<consensus-keys-password>` with your actual consensus keys password. This will set the environment variable
+`DUSK_CONSENSUS_KEYS_PASS`.
+- `/path/to/consensus.keys` with the actual path to where your consensus keys are located. This will enabled rusk to
+access them from within the container.
+- `/path/to/rusk-profile` with the path to the rusk profile, a directory where the state will be stored. This will allow
+rusk to save its current state outside the container so that the state will persist between runs.
+
+This will run a container named rusk in the background.
+
+To check the logs:
+
+```sh
+docker logs rusk
+```
+
+To stop a node:
+
+```sh
+docker stop rusk
+```
+
+To restart a previously stopped node:
+
+```sh
+docker start rusk
+```
+
+### Running Query Commands
+
+You can run any `ruskquery` command to check diagnostics or the installer version:
+
+Checking the block height:
+
+```sh
+docker exec rusk ruskquery block-height
+```
+
+Checking the installer version:
+
+```sh
+docker exec rusk ruskquery version
+```
+
+### Fast Syncing
+
+If you built the image with the `NETWORK` arg set to mainnet, then you can also run the `download_state`
+command for fast archival state syncing.
+
+1. If you've already run the container, stop it and remove it:
+   ```sh
+   docker stop rusk
+   docker rm rusk
+   ```
+
+2. Execute the fast sync command
+   ```sh
+   docker run --rm -it -v /path/to/rusk-profile:/opt/dusk/rusk node-installer download_state
+   ```
+   This will execute the command within a temporary container but the state is saved in
+   `/path/to/rusk-profile`.
+
+   Or syncing up to a specific height.
+   ```sh
+   docker run --rm -it -v /path/to/rusk-profile:/opt/dusk/rusk node-installer download_state 369876
+   ```
+
+   Follow the prompts to confirm the operation.
+
+3. Restart your node:
+   Follow the [Running](#running) guide to start a node.
