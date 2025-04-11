@@ -12,7 +12,7 @@
 <img alt="GitHub Downloads" src="https://img.shields.io/github/downloads/dusk-network/node-installer/total?style=flat-square&label=github%20downloads&color=71B1FF"></a>
 &nbsp;
 <a href="https://discord.gg/dusk-official">
-<img src="https://img.shields.io/discord/847466263064346624?label=discord&style=flat-square&color=5a66f6" alt="Discord"></a>
+<img src="https://img.shields.io/badge/discord-join%20chat-green" alt="Discord"></a>
 &nbsp;
 <a href="https://x.com/DuskFoundation/">
 <img alt="X (formerly Twitter) Follow" src="https://img.shields.io/twitter/follow/DuskFoundation"></a>
