@@ -10,9 +10,9 @@ declare -A VERSIONS
 # Define versions per network, per component
 VERSIONS=(
     ["mainnet-rusk"]="1.3.0"
-    ["mainnet-rusk-wallet"]="0.1.0-rc.0"
+    ["mainnet-rusk-wallet"]="0.2.0"
     ["testnet-rusk"]="1.3.0"
-    ["testnet-rusk-wallet"]="0.1.0-rc.0"
+    ["testnet-rusk-wallet"]="0.2.0"
 )
 
 # Default network and feature (Provisioner node)
