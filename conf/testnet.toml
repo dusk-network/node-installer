@@ -12,17 +12,6 @@ min_gas_limit = 150_000
 
 [vm]
 generation_timeout = '3s'
-# Note: changing the following settings is equivalent to forking the chain.
-gas_per_deploy_byte = 100
-min_deployment_gas_price = 2_000
-min_deploy_points = 5_000_000
-block_gas_limit = 3_000_000_000
-
-[vm.features]
-ABI_PUBLIC_SENDER = 0
-# key = activation_height
-# key = activation_height
-# key = activation_height
 
 [databroker]
 max_inv_entries = 100
