@@ -6,17 +6,25 @@ STATE_LIST_URL="https://nodes.dusk.network/state/list"
 # Function to display a warning message
 display_warning() {
   echo "WARNING: This operation will STOP your node and REPLACE the current state with a new one."
-  read -p "Are you sure you want to proceed? (Y/n): " choice
+  
+  while : ; do
+    read -r -p "Are you sure you want to proceed? [y/N]: " choice
+    choice=${choice,,}  # to lowercase
 
-  case "$choice" in
-    Y )
-      return 0  # User confirmed, proceed
-      ;;
-    * )
-      echo "Operation aborted."
-      exit 1  # User declined, exit script
-      ;;
-  esac
+    case "$choice" in
+      y|yes)
+        echo "Proceeding with state replacement..."
+        return 0
+        ;;
+      n|no|"")
+        echo "Operation aborted by user."
+        exit 1
+        ;;
+      *)
+        echo "Please answer 'y' or 'n'."
+        ;;
+    esac
+  done
 }
 
 # Function to display all published states
