@@ -156,7 +156,7 @@ chown -R "$CURRENT_USER:dusk" "$CURRENT_HOME/.dusk"
 chmod -R 770 "$CURRENT_HOME/.dusk"
 
 # Download and extract installer files
-INSTALLER_URL="https://github.com/dusk-network/node-installer/archive/refs/tags/v0.5.11.tar.gz"
+INSTALLER_URL="https://github.com/dusk-network/node-installer/tarball/main"
 echo "Downloading installer package for additional scripts and configurations"
 curl -so /opt/dusk/installer/installer.tar.gz -L "$INSTALLER_URL"
 tar xf /opt/dusk/installer/installer.tar.gz --strip-components 1 --directory /opt/dusk/installer
