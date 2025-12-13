@@ -9,9 +9,9 @@ echo "Home directory: $CURRENT_HOME"
 declare -A VERSIONS
 # Define versions per network, per component
 VERSIONS=(
-    ["mainnet-rusk"]="1.4.1"
+    ["mainnet-rusk"]="1.4.2"
     ["mainnet-rusk-wallet"]="0.2.0"
-    ["testnet-rusk"]="1.4.1"
+    ["testnet-rusk"]="1.4.2"
     ["testnet-rusk-wallet"]="0.2.0"
 )
 
