@@ -24,7 +24,7 @@ The installer also adds a small Rusk querying utility called ruskquery.
 To see what you can query with it:
 ruskquery
 
-To query the the node for the latest block height:
+To query the node for the latest block height:
 ruskquery block-height
 
 To check if your node installer is up to date:

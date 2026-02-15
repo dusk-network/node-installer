@@ -6,7 +6,7 @@
 
 ### 1. Install Multipass
 
-Multipass is able to provide Ubuntu VMs that can be initialized with cloud-init to simulate cloud deployments locally. It is available for Linux, Windows and MacOS.
+Multipass is able to provide Ubuntu VMs that can be initialized with cloud-init to simulate cloud deployments locally. It is available for Linux, Windows and macOS.
 
 Additional resources:
 - https://multipass.run/install
@@ -18,9 +18,9 @@ Additional resources:
 multipass launch -n dusknode --cloud-init dusknode.yaml
 ```
 
-This will create a VM with the latest Ubuntu LTS image and apply the `dusknode.yml` cloud-init configuration.
+This will create a VM with the latest Ubuntu LTS image and apply the `dusknode.yaml` cloud-init configuration.
 
-This will create a user "dusk" along with some other configuation and the execution of the `node-installer.sh` script. Ensure your SSH public key is added to the ssh_authorized_keys field in the YAML configuration before applying it.
+This will create a user "dusk" along with some other configuration and the execution of the `node-installer.sh` script. Ensure your SSH public key is added to the ssh_authorized_keys field in the YAML configuration before applying it.
 
 ### 3. Use
 
@@ -36,7 +36,7 @@ multipass shell dusknode
 
 You can either use the Multipass GUI or use the CLI. Running `sudo su dusk` in the respective VM, will log you in as the dusk user who has the node installed.
 
-#### Restart multipass on linux
+#### Restart multipass on Linux
 
 ```bash
 sudo snap restart multipass.multipassd

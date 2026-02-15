@@ -4,7 +4,7 @@
 </h1>
 
 <p align="center">
-  Official <img height="11" src="assets/dusk_circular_light.svg#gh-dark-mode-only"><img height="11" src="assets/dusk_circular_dark.svg#gh-light-mode-only"><a href="https://dusk.network/"> Dusk</a> Node installer, an easy-to-use installer for running a Dusk node on the Dusk mainnet, Nocturne testnet and the Lunare devnet.
+  Official <img height="11" src="assets/dusk_circular_light.svg#gh-dark-mode-only"><img height="11" src="assets/dusk_circular_dark.svg#gh-light-mode-only"><a href="https://dusk.network/"> Dusk</a> Node installer, an easy-to-use installer for running a Dusk node on the Dusk mainnet and Nocturne testnet.
 </p>
 
 <p align=center>
@@ -21,7 +21,7 @@
 <img alt="Static Badge" src="https://img.shields.io/badge/read%20the%20docs-E2DFE9?style=flat-square&logo=data%3Aimage%2Fsvg%2Bxml%3Bbase64%2CPHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI%2BCjxwYXRoIGZpbGwtcnVsZT0iZXZlbm9kZCIgY2xpcC1ydWxlPSJldmVub2RkIiBkPSJNODEuMjk4IDEuNzM3OEM4OC4yMjI5IDAuNDM3NzI0IDk1LjQyMjcgLTAuMTYyMzEyIDEwMi43OTggMC4wMzc3QzE1NC45OTYgMS40Mzc3OSAxOTcuODQ1IDQzLjc0MDQgMTk5LjkyIDk1LjkxODZDMjAyLjE3IDE1Mi45OTcgMTU2LjU3MSAyMDAgOTkuOTk3NiAyMDBDOTMuNjIyNyAyMDAgODcuMzcyOSAxOTkuNCA4MS4zMjMgMTk4LjI1QzM1LjAyNDIgMTg5LjQ5OSAwIDE0OC44MjIgMCA5OS45OTM5QzAgNTEuMTY1OCAzNC45OTkyIDEwLjQ4ODMgODEuMjk4IDEuNzM3OFpNMTAyLjc3MyAxNzYuNjc0QzEwMS43MjMgMTc4LjAyNCAxMDIuODIyIDE3OS45NzQgMTA0LjUyMiAxNzkuODc0QzE0Ni42MjEgMTc3LjUyNCAxNzkuOTk2IDE0Mi42NzEgMTc5Ljk5NiA5OS45OTM5QzE3OS45OTYgNTcuMzE2MiAxNDYuNTk2IDIyLjQ2NDEgMTA0LjQ5NyAyMC4xMTM5QzEwMi43OTggMjAuMDEzOSAxMDEuNzIzIDIxLjk2NDEgMTAyLjc3MyAyMy4zMTQxQzExOS4yNDcgNDQuNDY1NCAxMjkuMDQ3IDcxLjA5MjEgMTI5LjA0NyA5OS45OTM5QzEyOS4wNDcgMTI4Ljg5NiAxMTkuMjIyIDE1NS40OTcgMTAyLjc3MyAxNzYuNjc0WiIgZmlsbD0iIzEwMTAxMCIvPgo8L3N2Zz4K"></a>
 </p>
 
-> For more information checkout the
+> For more information check out the
 > [node operator documentation](https://docs.dusk.network/operator/overview/) on
 > our docs.
 
@@ -54,7 +54,7 @@
 
 ## 📋 Prerequisites
 
-- Operating System: Ubuntu 24.04 LTS  (officially supported)
+- Operating System: Ubuntu 24.04 LTS (officially supported)
 - Dependencies: OpenSSL 3, GLibc 2.38+
 - Environment: Any compatible Linux environment (VPS, local, cloud instance)
 
@@ -77,7 +77,7 @@ The configuration files, binaries, services and scripts can be found in
 `/opt/dusk/`.
 
 The log files can be found in `/var/log/rusk.log` and
-`/var/log/rusk-recovery.log`.
+`/var/log/rusk_recovery.log`.
 
 ## 🔑 Pre-Installation Setup
 
@@ -128,7 +128,7 @@ add `duskadmin` to the `sudo` group:
 sudo usermod -aG sudo duskadmin
 ```
 
-Log out from you node for the group changes to take effect.
+Log out and back in for the group changes to take effect.
 
 ### Step 4: Verify Access
 
@@ -141,7 +141,7 @@ ssh duskadmin@<your-server-ip>
 
 ### Step 5: Firewall
 
-It's important to setup a firewall. A firewall controls incoming and outgoing
+It's important to set up a firewall. A firewall controls incoming and outgoing
 traffic and ensures your system is protected.
 
 You can use common tools like `ufw`, `iptables`, or `firewalld`. At a minimum,
@@ -178,7 +178,7 @@ the following command:
 curl --proto '=https' --tlsv1.2 -sSfL https://github.com/dusk-network/node-installer/releases/latest/download/node-installer.sh | sudo bash
 ```
 
-:warning: **CAUTION** To run the **not release yet** unstable version of the
+:warning: **CAUTION** To run the **not released yet** unstable version of the
 Node Installer execute the following command:
 
 ```sh
@@ -188,7 +188,7 @@ curl --proto '=https' --tlsv1.2 -sSfL https://raw.githubusercontent.com/dusk-net
 ### Networks
 
 By default, the installer runs the node for our mainnet. If you'd like to run a
-node for the Nocturne testnet or Lunare devnet, you can specify the network
+node for the Nocturne testnet, you can specify the network
 using the `--network` flag:
 
 ```sh
@@ -199,7 +199,6 @@ Available network options:
 
 - `mainnet` (default)
 - `testnet`
-- `devnet`
 
 ### Features
 
@@ -214,7 +213,7 @@ You can combine both flags to install a specific network and feature. For
 example:
 
 ```sh
-curl --proto '=https' --tlsv1.2 -sSfL https://github.com/dusk-network/node-installer/releases/latest/download/node-installer.sh | sudo bash -s -- --network devnet --feature archive
+curl --proto '=https' --tlsv1.2 -sSfL https://github.com/dusk-network/node-installer/releases/latest/download/node-installer.sh | sudo bash -s -- --network testnet --feature archive
 ```
 
 Available feature options:
@@ -326,7 +325,7 @@ download_state --list
    ```
 
    If you want to sync up with a specific state instead of the default one, you
-   need to pass the block height of the state you want to syncup with.
+   need to pass the block height of the state you want to sync up with.
    ```sh
    download_state 369876
    ```
@@ -353,7 +352,7 @@ The Dusk node installer supports modular installation logic for different Linux 
 
 ### How it works
 
-The installer will automatically detect your OS based on `etc/os-release`, and look for a matching script under `/os/<distro>.sh`.
+The installer will automatically detect your OS based on `/etc/os-release`, and look for a matching script under `os/<distro>.sh`.
 
 If found, the script will be sourced to handle:
 - Package DB updating and dependency installation (`install_deps`)
