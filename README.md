@@ -242,6 +242,12 @@ right directory with the right name, copy the following command:
 rusk-wallet export -d /opt/dusk/conf -n consensus.keys
 ```
 
+Also ensure that the proper permissions are set for the keys:
+
+```sh
+chown dusk:dusk /opt/dusk/conf/consensus.keys
+```
+
 ### 🔐 Set consensus password
 
 Run the following command and it will prompt you to enter the password for the

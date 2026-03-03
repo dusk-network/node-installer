@@ -6,7 +6,10 @@ Run the following commands:
 rusk-wallet restore
 rusk-wallet export -d /opt/dusk/conf -n consensus.keys
 
-2. Set DUSK_CONSENSUS_KEYS_PASS (use /opt/dusk/bin/setup_consensus_pwd.sh)
+2. Ensure that the proper permissions are set for the keys:
+chown dusk:dusk /opt/dusk/conf/consensus.keys
+
+3. Set DUSK_CONSENSUS_KEYS_PASS (use /opt/dusk/bin/setup_consensus_pwd.sh)
 Run the following command:
 sh /opt/dusk/bin/setup_consensus_pwd.sh
 
