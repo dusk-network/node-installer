@@ -304,12 +304,21 @@ ruskquery block-height
 To significantly reduce the time required to sync your node to the latest
 published state, you can use the `download_state` command. This command stops
 your node and replaces its current state with the latest published state from
-one of Dusk's archival nodes. Currently this is only available for mainnet.
+one of Dusk's archival nodes. The command automatically uses the archival
+endpoint for the network installed on the node by reading
+`/opt/dusk/conf/rusk.toml`, including mainnet and Nocturne testnet. If needed,
+you can override the detected network explicitly.
 
 To see the available published states, run:
 
 ```sh
 download_state --list
+```
+
+To override the detected network explicitly, run:
+
+```sh
+download_state --network testnet --list
 ```
 
 ### Using the Fast Sync Command
@@ -328,6 +337,11 @@ download_state --list
    need to pass the block height of the state you want to sync up with.
    ```sh
    download_state 369876
+   ```
+
+   If needed, you can also override the detected network while downloading:
+   ```sh
+   download_state --network testnet 369876
    ```
 
    Follow the prompts to confirm the operation.
