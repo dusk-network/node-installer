@@ -11,13 +11,14 @@ declare -A VERSIONS
 VERSIONS=(
     ["mainnet-rusk"]="1.6.1"
     ["mainnet-rusk-wallet"]="0.3.0"
-    ["testnet-rusk"]="1.7.0-rc.0"
+    ["testnet-rusk"]="1.7.0-rc.1"
     ["testnet-rusk-wallet"]="0.4.0"
 )
 
 # Default network and feature (Provisioner node)
 NETWORK="mainnet"
 FEATURE="default"
+TESTNET_CONSENSUS_SPIN_TIME="1779886800"
 
 # Parse command-line arguments to check for network or feature flags
 while [[ "$#" -gt 0 ]]; do
@@ -108,6 +109,11 @@ install_component() {
 configure_network() {
     local network=$1
     local prover_url
+    local service_file="/opt/dusk/services/rusk.service"
+
+    if [ -f "$service_file" ]; then
+        sed -i '/^Environment="RUSK_CONSENSUS_SPIN_TIME=/d' "$service_file"
+    fi
 
     case "$network" in
         mainnet)
@@ -122,6 +128,9 @@ configure_network() {
             mv /opt/dusk/conf/testnet.toml /opt/dusk/conf/rusk.toml
             rm /opt/dusk/conf/mainnet.genesis
             rm /opt/dusk/conf/mainnet.toml
+            if [ -f "$service_file" ]; then
+                sed -i "/^Environment=\"RUSK_RECOVERY_INPUT=/a Environment=\"RUSK_CONSENSUS_SPIN_TIME=$TESTNET_CONSENSUS_SPIN_TIME\"" "$service_file"
+            fi
             prover_url="https://testnet.provers.dusk.network"
             ;;
         *)
