@@ -4,7 +4,7 @@
 </h1>
 
 <p align="center">
-  Official <img height="11" src="assets/dusk_circular_light.svg#gh-dark-mode-only"><img height="11" src="assets/dusk_circular_dark.svg#gh-light-mode-only"><a href="https://dusk.network/"> Dusk</a> Node installer, an easy-to-use installer for running a Dusk node on the Dusk mainnet and Nocturne testnet.
+  Official <img height="11" src="assets/dusk_circular_light.svg#gh-dark-mode-only"><img height="11" src="assets/dusk_circular_dark.svg#gh-light-mode-only"><a href="https://dusk.network/"> Dusk</a> Node installer, an easy-to-use installer for running a Dusk node on the Dusk mainnet, Nocturne testnet, and devnet.
 </p>
 
 <p align=center>
@@ -188,8 +188,8 @@ curl --proto '=https' --tlsv1.2 -sSfL https://raw.githubusercontent.com/dusk-net
 ### Networks
 
 By default, the installer runs the node for our mainnet. If you'd like to run a
-node for the Nocturne testnet, you can specify the network
-using the `--network` flag:
+node for the Nocturne testnet or devnet, you can specify the network using the
+`--network` flag:
 
 ```sh
 curl --proto '=https' --tlsv1.2 -sSfL https://github.com/dusk-network/node-installer/releases/latest/download/node-installer.sh | sudo bash -s -- --network testnet
@@ -199,6 +199,7 @@ Available network options:
 
 - `mainnet` (default)
 - `testnet`
+- `devnet`
 
 ### Features
 

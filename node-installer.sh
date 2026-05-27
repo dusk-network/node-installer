@@ -13,6 +13,8 @@ VERSIONS=(
     ["mainnet-rusk-wallet"]="0.3.0"
     ["testnet-rusk"]="1.7.0-rc.1"
     ["testnet-rusk-wallet"]="0.4.0"
+    ["devnet-rusk"]="1.7.0-rc.1"
+    ["devnet-rusk-wallet"]="0.4.0"
 )
 
 # Default network and feature (Provisioner node)
@@ -33,7 +35,7 @@ while [[ "$#" -gt 0 ]]; do
             ;;
         *)
             echo "Unknown option: $1"
-            echo "Usage: $0 [--network mainnet|testnet] [--feature default|archive]"
+            echo "Usage: $0 [--network mainnet|testnet|devnet] [--feature default|archive]"
             exit 1
             ;;
     esac
@@ -41,11 +43,11 @@ done
 
 # Validate passed network
 case "$NETWORK" in
-    mainnet|testnet)
+    mainnet|testnet|devnet)
         echo "Selected network: $NETWORK"
         ;;
     *)
-        echo "Error: Unknown network $NETWORK. Use 'mainnet' or 'testnet'."
+        echo "Error: Unknown network $NETWORK. Use 'mainnet', 'testnet', or 'devnet'."
         exit 1
         ;;
 esac
@@ -121,6 +123,8 @@ configure_network() {
             mv /opt/dusk/conf/mainnet.toml /opt/dusk/conf/rusk.toml
             rm /opt/dusk/conf/testnet.genesis
             rm /opt/dusk/conf/testnet.toml
+            rm /opt/dusk/conf/devnet.genesis
+            rm /opt/dusk/conf/devnet.toml
             prover_url="https://provers.dusk.network"
             ;;
         testnet)
@@ -128,10 +132,21 @@ configure_network() {
             mv /opt/dusk/conf/testnet.toml /opt/dusk/conf/rusk.toml
             rm /opt/dusk/conf/mainnet.genesis
             rm /opt/dusk/conf/mainnet.toml
+            rm /opt/dusk/conf/devnet.genesis
+            rm /opt/dusk/conf/devnet.toml
             if [ -f "$service_file" ]; then
                 sed -i "/^Environment=\"RUSK_RECOVERY_INPUT=/a Environment=\"RUSK_CONSENSUS_SPIN_TIME=$TESTNET_CONSENSUS_SPIN_TIME\"" "$service_file"
             fi
             prover_url="https://testnet.provers.dusk.network"
+            ;;
+        devnet)
+            mv /opt/dusk/conf/devnet.genesis /opt/dusk/conf/genesis.toml
+            mv /opt/dusk/conf/devnet.toml /opt/dusk/conf/rusk.toml
+            rm /opt/dusk/conf/mainnet.genesis
+            rm /opt/dusk/conf/mainnet.toml
+            rm /opt/dusk/conf/testnet.genesis
+            rm /opt/dusk/conf/testnet.toml
+            prover_url="https://devnet.provers.dusk.network"
             ;;
         *)
             echo "Unknown network: $network. Defaulting to mainnet."
