@@ -9,11 +9,11 @@ echo "Home directory: $CURRENT_HOME"
 declare -A VERSIONS
 # Define versions per network, per component
 VERSIONS=(
-    ["mainnet-rusk"]="1.6.1"
+    ["mainnet-rusk"]="1.7.0"
     ["mainnet-rusk-wallet"]="0.3.0"
-    ["testnet-rusk"]="1.7.0-rc.1"
+    ["testnet-rusk"]="1.7.0"
     ["testnet-rusk-wallet"]="0.4.0"
-    ["devnet-rusk"]="1.7.0-rc.1"
+    ["devnet-rusk"]="1.7.0"
     ["devnet-rusk-wallet"]="0.4.0"
 )
 
@@ -184,7 +184,7 @@ chown -R "$CURRENT_USER:dusk" "$CURRENT_HOME/.dusk"
 chmod -R 770 "$CURRENT_HOME/.dusk"
 
 # Download and extract installer files
-INSTALLER_URL="https://github.com/dusk-network/node-installer/tarball/main"
+INSTALLER_URL="https://github.com/dusk-network/node-installer/archive/refs/tags/v0.5.20.tar.gz"
 echo "Downloading installer package for additional scripts and configurations"
 curl -so /opt/dusk/installer/installer.tar.gz -L "$INSTALLER_URL"
 tar xf /opt/dusk/installer/installer.tar.gz --strip-components 1 --directory /opt/dusk/installer
