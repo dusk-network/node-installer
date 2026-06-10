@@ -20,6 +20,7 @@ VERSIONS=(
 # Default network and feature (Provisioner node)
 NETWORK="mainnet"
 FEATURE="default"
+MAINNET_CONSENSUS_SPIN_TIME="1781175600"
 TESTNET_CONSENSUS_SPIN_TIME="1779886800"
 
 # Parse command-line arguments to check for network or feature flags
@@ -125,6 +126,9 @@ configure_network() {
             rm -f /opt/dusk/conf/testnet.toml
             rm -f /opt/dusk/conf/devnet.genesis
             rm -f /opt/dusk/conf/devnet.toml
+            if [ -f "$service_file" ]; then
+                sed -i "/^Environment=\"RUSK_RECOVERY_INPUT=/a Environment=\"RUSK_CONSENSUS_SPIN_TIME=$MAINNET_CONSENSUS_SPIN_TIME\"" "$service_file"
+            fi
             prover_url="https://provers.dusk.network"
             ;;
         testnet)
