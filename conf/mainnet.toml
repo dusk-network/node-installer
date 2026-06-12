@@ -4,6 +4,10 @@
 # log_level = 'info' (default)
 # log_filter = 'dusk_consensus=debug,node=debug,kadcast=debug'
 
+#[http]
+#listen = true
+#listen_address = '127.0.0.1:8080'
+
 [chain]
 genesis_timestamp = '2025-01-07T12:00:00Z'
 db_path = '/opt/dusk/rusk'
