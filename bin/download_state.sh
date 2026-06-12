@@ -153,10 +153,16 @@ display_warning
 
 # Download the file
 STATE_URL="$STATE_BASE_URL/$state_number"
-echo "Downloading state $state_number from $STATE_URL..."
 
-if ! curl -f -so  /tmp/state.tar.gz -L "$STATE_URL"; then
-  echo "Error: Download failed. Exiting."
+STATE_ARCHIVE=$(mktemp --suffix=.tar.gz /tmp/dusk-state.XXXXXX)
+echo "Downloading state $state_number from $STATE_URL to $STATE_ARCHIVE..."
+cleanup_state_archive() {
+  rm -f "$STATE_ARCHIVE"
+}
+trap cleanup_state_archive EXIT
+
+if ! curl -f -L -sS -o "$STATE_ARCHIVE" "$STATE_URL"; then
+  echo "Error: Failed to download state $state_number from $STATE_URL."
   exit 1
 fi
 
@@ -164,7 +170,10 @@ service rusk stop
 
 rm -rf /opt/dusk/rusk/state
 rm -rf /opt/dusk/rusk/chain.db
-tar -xvf /tmp/state.tar.gz -C /opt/dusk/rusk/
+if ! tar -xvf "$STATE_ARCHIVE" -C /opt/dusk/rusk/; then
+  echo "Error: Failed to extract downloaded state archive."
+  exit 1
+fi
 chown -R dusk:dusk /opt/dusk/
 
 echo "Operation completed successfully."
