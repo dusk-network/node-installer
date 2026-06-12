@@ -174,12 +174,24 @@ fi
 rm -rf /opt/dusk/installer || true
 rm -rf /opt/dusk/installer/installer.tar.gz || true
 
+# Ensure dusk group and user exist before setting file ownership
+if ! getent group dusk >/dev/null 2>&1; then
+    echo "Creating dusk system group."
+    groupadd --system dusk
+fi
+
+if ! id -u dusk >/dev/null 2>&1; then
+    echo "Creating dusk system user."
+    useradd --system --create-home --shell /usr/sbin/nologin --gid dusk dusk
+    echo "User 'dusk' created."
+fi
+
 mkdir -p /opt/dusk/bin
 mkdir -p /opt/dusk/conf
 mkdir -p /opt/dusk/rusk
 mkdir -p /opt/dusk/services
 mkdir -p /opt/dusk/installer
-mkdir -p $CURRENT_HOME/.dusk/rusk-wallet
+mkdir -p "$CURRENT_HOME/.dusk/rusk-wallet"
 chown -R "$CURRENT_USER:dusk" "$CURRENT_HOME/.dusk"
 chmod -R 770 "$CURRENT_HOME/.dusk"
 
@@ -218,14 +230,6 @@ fi
 
 echo "Update package db and install prerequisites."
 install_deps
-
-# Ensure dusk group and user exist
-if ! id -u dusk >/dev/null 2>&1; then
-    echo "Creating dusk system user and group."
-    groupadd --system dusk
-    useradd --system --create-home --shell /usr/sbin/nologin --gid dusk dusk
-    echo "User 'dusk' and group 'dusk' created."
-fi
 
 echo "Adding current user to dusk group for access."
 if ! id -nG "$CURRENT_USER" | grep -qw "dusk"; then
