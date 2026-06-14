@@ -27,7 +27,7 @@ runcmd:
   - ufw allow 8080/tcp comment "Node HTTP listener" # HTTP listener
   - ufw allow 9000/udp comment "Kadcast" # Kadcast P2P
   - ufw --force enable
-  - curl --proto '=https' --tlsv1.2 -sSfL https://github.com/dusk-network/node-installer/releases/latest/download/node-installer.sh | sudo sh # Download latest Dusk node installer release and run it
+  - curl --proto '=https' --tlsv1.2 -sSfL https://github.com/dusk-network/node-installer/releases/latest/download/node-installer.sh | sudo bash # Download latest Dusk node installer release and run it
   - echo "Cloud-init has finished" > /home/dusk/setup.log
   - chown dusk:dusk /home/dusk/setup.log
   - chmod 600 /home/dusk/setup.log
