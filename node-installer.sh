@@ -1,11 +1,5 @@
 #!/bin/bash
 
-# Detect the user running the script
-CURRENT_USER=$(logname)
-CURRENT_HOME=$(eval echo ~"$CURRENT_USER")
-echo "Detected current user: $CURRENT_USER"
-echo "Home directory: $CURRENT_HOME"
-
 declare -A VERSIONS
 # Define versions per network, per component
 VERSIONS=(
@@ -20,27 +14,78 @@ VERSIONS=(
 # Default network and feature (Provisioner node)
 NETWORK="mainnet"
 FEATURE="default"
+TARGET_USER=""
+DUSK_USER="dusk"
+DUSK_GROUP="dusk"
 MAINNET_CONSENSUS_SPIN_TIME="1781175600"
 TESTNET_CONSENSUS_SPIN_TIME="1779886800"
+
+usage() {
+    echo "Usage: $0 [--network mainnet|testnet|devnet] [--feature default|archive] [--user username]"
+}
 
 # Parse command-line arguments to check for network or feature flags
 while [[ "$#" -gt 0 ]]; do
     case "$1" in
         --network)
+            if [[ -z "$2" || "$2" == --* ]]; then
+                echo "Error: --network requires a value."
+                usage
+                exit 1
+            fi
             NETWORK="$2"
             shift 2
             ;;
         --feature)
+            if [[ -z "$2" || "$2" == --* ]]; then
+                echo "Error: --feature requires a value."
+                usage
+                exit 1
+            fi
             FEATURE="$2"
+            shift 2
+            ;;
+        --user)
+            if [[ -z "$2" || "$2" == --* ]]; then
+                echo "Error: --user requires a value."
+                usage
+                exit 1
+            fi
+            TARGET_USER="$2"
             shift 2
             ;;
         *)
             echo "Unknown option: $1"
-            echo "Usage: $0 [--network mainnet|testnet|devnet] [--feature default|archive]"
+            usage
             exit 1
             ;;
     esac
 done
+
+if [[ -z "$TARGET_USER" ]]; then
+    TARGET_USER=$(logname 2>/dev/null)
+fi
+
+if [[ -z "$TARGET_USER" ]]; then
+    echo "Error: Failed to detect target user. Use --user username to set it explicitly."
+    exit 1
+fi
+
+if ! id -u "$TARGET_USER" >/dev/null 2>&1; then
+    echo "Error: Target user '$TARGET_USER' does not exist."
+    exit 1
+fi
+
+CURRENT_USER="$TARGET_USER"
+CURRENT_HOME=$(getent passwd "$CURRENT_USER" | cut -d: -f6)
+
+if [[ -z "$CURRENT_HOME" ]]; then
+    echo "Error: Failed to determine home directory for target user '$CURRENT_USER'."
+    exit 1
+fi
+
+echo "Selected target user: $CURRENT_USER"
+echo "Home directory: $CURRENT_HOME"
 
 # Validate passed network
 case "$NETWORK" in
@@ -160,7 +205,7 @@ configure_network() {
     esac
 
     # Update the wallet.toml with the appropriate prover URL for the given network
-    sed -i "s|^prover = .*|prover = \"$prover_url\"|" $CURRENT_HOME/.dusk/rusk-wallet/config.toml
+    sed -i "s|^prover = .*|prover = \"$prover_url\"|" "$CURRENT_HOME/.dusk/rusk-wallet/config.toml"
 }
 
 # Check for OpenSSL 3 or higher
@@ -174,16 +219,16 @@ fi
 rm -rf /opt/dusk/installer || true
 rm -rf /opt/dusk/installer/installer.tar.gz || true
 
-# Ensure dusk group and user exist before setting file ownership
-if ! getent group dusk >/dev/null 2>&1; then
-    echo "Creating dusk system group."
-    groupadd --system dusk
+# Ensure Dusk service group and user exist before setting file ownership
+if ! getent group "$DUSK_GROUP" >/dev/null 2>&1; then
+    echo "Creating $DUSK_GROUP system group."
+    groupadd --system "$DUSK_GROUP"
 fi
 
-if ! id -u dusk >/dev/null 2>&1; then
-    echo "Creating dusk system user."
-    useradd --system --create-home --shell /usr/sbin/nologin --gid dusk dusk
-    echo "User 'dusk' created."
+if ! id -u "$DUSK_USER" >/dev/null 2>&1; then
+    echo "Creating $DUSK_USER system user."
+    useradd --system --create-home --shell /usr/sbin/nologin --gid "$DUSK_GROUP" "$DUSK_USER"
+    echo "User '$DUSK_USER' created."
 fi
 
 mkdir -p /opt/dusk/bin
@@ -192,7 +237,7 @@ mkdir -p /opt/dusk/rusk
 mkdir -p /opt/dusk/services
 mkdir -p /opt/dusk/installer
 mkdir -p "$CURRENT_HOME/.dusk/rusk-wallet"
-chown -R "$CURRENT_USER:dusk" "$CURRENT_HOME/.dusk"
+chown -R "$CURRENT_USER:$DUSK_GROUP" "$CURRENT_HOME/.dusk"
 chmod -R 770 "$CURRENT_HOME/.dusk"
 
 # Download and extract installer files
@@ -231,10 +276,10 @@ fi
 echo "Update package db and install prerequisites."
 install_deps
 
-echo "Adding current user to dusk group for access."
-if ! id -nG "$CURRENT_USER" | grep -qw "dusk"; then
-    usermod -aG dusk "$CURRENT_USER"
-    echo "User $CURRENT_USER has been added to the dusk group. Please log out and back in to apply changes."
+echo "Adding target user to $DUSK_GROUP group for access."
+if ! id -nG "$CURRENT_USER" | grep -qw "$DUSK_GROUP"; then
+    usermod -aG "$DUSK_GROUP" "$CURRENT_USER"
+    echo "User $CURRENT_USER has been added to the $DUSK_GROUP group. Please log out and back in to apply changes."
 fi
 
 echo "Stopping previous services"
@@ -257,7 +302,9 @@ mv /opt/dusk/installer/rusk/rusk /opt/dusk/bin/
 # Download, unpack and install Rusk wallet
 install_component "$NETWORK" "rusk-wallet"
 mv /opt/dusk/installer/rusk-wallet/rusk-wallet /opt/dusk/bin/
-mv -f /opt/dusk/conf/wallet.toml $CURRENT_HOME/.dusk/rusk-wallet/config.toml
+mv -f /opt/dusk/conf/wallet.toml "$CURRENT_HOME/.dusk/rusk-wallet/config.toml"
+chown "$CURRENT_USER:$DUSK_GROUP" "$CURRENT_HOME/.dusk/rusk-wallet/config.toml"
+chmod 660 "$CURRENT_HOME/.dusk/rusk-wallet/config.toml"
 
 # Symlink to make available system-wide
 ln -sf /opt/dusk/bin/rusk /usr/bin/rusk
@@ -278,8 +325,8 @@ fi
 echo "Selected network: $NETWORK"
 configure_network "$NETWORK"
 
-# Set permissions for dusk user and group
-chown -R dusk:dusk /opt/dusk
+# Set permissions for Dusk service user and group
+chown -R "$DUSK_USER:$DUSK_GROUP" /opt/dusk
 chmod -R 660 /opt/dusk
 # Directory listing needs execution
 find /opt/dusk -type d -exec chmod +x {} \;
