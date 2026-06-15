@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 # Detect the user running the script
 CURRENT_USER=$(logname)
@@ -104,8 +105,8 @@ install_component() {
     local component_dir="/opt/dusk/installer/${component}"
     mkdir -p "$component_dir"
 
-    curl -so /opt/dusk/installer/${component}.tar.gz -L "$url" || { echo "Failed to download $component"; exit 1; }
-    tar xf /opt/dusk/installer/${component}.tar.gz --strip-components 1 --directory "$component_dir"
+    curl -fLso "/opt/dusk/installer/${component}.tar.gz" "$url" || { echo "Failed to download $component from $url"; exit 1; }
+    tar xf "/opt/dusk/installer/${component}.tar.gz" --strip-components 1 --directory "$component_dir" || { echo "Failed to extract $component archive"; exit 1; }
 }
 
 # Configure your local installation based on the selected network
@@ -198,8 +199,8 @@ chmod -R 770 "$CURRENT_HOME/.dusk"
 # Download and extract installer files
 INSTALLER_URL="https://github.com/dusk-network/node-installer/tarball/main"
 echo "Downloading installer package for additional scripts and configurations"
-curl -so /opt/dusk/installer/installer.tar.gz -L "$INSTALLER_URL"
-tar xf /opt/dusk/installer/installer.tar.gz --strip-components 1 --directory /opt/dusk/installer
+curl -fLso /opt/dusk/installer/installer.tar.gz "$INSTALLER_URL" || { echo "Failed to download installer package from $INSTALLER_URL"; exit 1; }
+tar xf /opt/dusk/installer/installer.tar.gz --strip-components 1 --directory /opt/dusk/installer || { echo "Failed to extract installer package"; exit 1; }
 
 # Detect and source OS logic
 if [ -f /etc/os-release ]; then
