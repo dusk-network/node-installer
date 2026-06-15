@@ -139,7 +139,14 @@ if [[ "$LIST_STATES" == "1" ]]; then
   # List all possible states
   list_states
   exit 0
-elif [[ -n "$STATE_NUMBER" ]]; then
+fi
+
+if [[ "$EUID" -ne 0 ]]; then
+  echo "Error: download_state must be run as root. Use: sudo download_state"
+  exit 1
+fi
+
+if [[ -n "$STATE_NUMBER" ]]; then
   # User provided a specific state, check if it exists
   state_number=$STATE_NUMBER
   state_exists "$STATE_NUMBER"
