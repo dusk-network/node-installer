@@ -41,6 +41,7 @@
 - [Installation](#⬇️-installation)
   - [Networks](#networks)
   - [Features](#features)
+  - [Target User](#target-user)
 - [Configuration](#⚙️-configuration)
   - [Set Consensus Keys](#-set-consensus-keys)
   - [Set Consensus Password](#-set-consensus-password)
@@ -222,6 +223,18 @@ Available feature options:
 - `default` (Provisioner node, default)
 - `archive` (Archive node)
 
+### Target User
+
+The installer writes wallet configuration to an operator user's home directory.
+By default it uses `SUDO_USER`, then `logname`, then the current user. In
+automation or root-only environments, pass the operator user explicitly:
+
+```sh
+curl --proto '=https' --tlsv1.2 -sSfL https://github.com/dusk-network/node-installer/releases/latest/download/node-installer.sh | sudo bash -s -- --user duskadmin
+```
+
+The Rusk systemd service itself still runs as the dedicated `dusk` service user.
+
 ## ⚙️ Configuration
 
 The installer comes with sane defaults, only requiring minimal configuration.
@@ -237,10 +250,11 @@ To generate the consensus keys locally, run `rusk-wallet` and either create a
 new wallet or use a recovery phrase with `rusk-wallet restore`.
 
 To generate and export the consensus key-pair and put the `.keys` file in the
-right directory with the right name, copy the following command:
+right directory with the right name, copy the following commands:
 
 ```sh
-rusk-wallet export -d /opt/dusk/conf -n consensus.keys
+rusk-wallet export -d "$HOME" -n consensus.keys
+sudo install -o root -g dusk -m 640 "$HOME/consensus.keys" /opt/dusk/conf/consensus.keys
 ```
 
 ### 🔐 Set consensus password
@@ -249,7 +263,7 @@ Run the following command and it will prompt you to enter the password for the
 consensus keys file:
 
 ```sh
-sh /opt/dusk/bin/setup_consensus_pwd.sh
+sudo sh /opt/dusk/bin/setup_consensus_pwd.sh
 ```
 
 ### ↻ Reset Rusk state

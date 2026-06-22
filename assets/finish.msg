@@ -4,11 +4,12 @@ Prerequisites for launching:
 1. Provide CONSENSUS_KEYS file (default in /opt/dusk/conf/consensus.keys)
 Run the following commands:
 rusk-wallet restore
-rusk-wallet export -d /opt/dusk/conf -n consensus.keys
+rusk-wallet export -d "$HOME" -n consensus.keys
+sudo install -o root -g dusk -m 640 "$HOME/consensus.keys" /opt/dusk/conf/consensus.keys
 
 2. Set DUSK_CONSENSUS_KEYS_PASS (use /opt/dusk/bin/setup_consensus_pwd.sh)
 Run the following command:
-sh /opt/dusk/bin/setup_consensus_pwd.sh
+sudo sh /opt/dusk/bin/setup_consensus_pwd.sh
 
 -----
 To launch the node: 
