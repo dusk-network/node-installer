@@ -345,7 +345,7 @@ install -d -o root -g root -m 700 "$COMPONENTS_DIR"
 install -d -o root -g root -m 700 "$STAGE_DIR"
 
 # Download and extract installer files before touching the live installation.
-INSTALLER_URL="https://github.com/dusk-network/node-installer/archive/refs/tags/v0.5.22.tar.gz"
+INSTALLER_URL="https://github.com/dusk-network/node-installer/tarball/main"
 echo "Downloading installer package for additional scripts and configurations"
 curl -fLso "$INSTALLER_DIR/installer.tar.gz" "$INSTALLER_URL" || {
     echo "Failed to download installer package from $INSTALLER_URL"
