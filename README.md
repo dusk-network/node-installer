@@ -41,6 +41,7 @@
 - [Installation](#⬇️-installation)
   - [Networks](#networks)
   - [Features](#features)
+  - [Target user](#target-user)
 - [Configuration](#⚙️-configuration)
   - [Set Consensus Keys](#-set-consensus-keys)
   - [Set Consensus Password](#-set-consensus-password)
@@ -221,6 +222,16 @@ Available feature options:
 
 - `default` (Provisioner node, default)
 - `archive` (Archive node)
+
+### Target user
+
+The installer writes the wallet configuration to the detected operator user's
+home directory. In automation or non-login environments, you can set the target
+user explicitly with the `--user` flag:
+
+```sh
+curl --proto '=https' --tlsv1.2 -sSfL https://github.com/dusk-network/node-installer/releases/latest/download/node-installer.sh | sudo bash -s -- --user duskadmin
+```
 
 ## ⚙️ Configuration
 
