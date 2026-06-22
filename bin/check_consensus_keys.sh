@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 CONSENSUS_KEYS=`grep consensus_keys_path /opt/dusk/conf/rusk.toml | sed -n "s/^[^=]*= *'\([^']*\)'/\1/p"`
 if ! test -f "$CONSENSUS_KEYS"; then
@@ -8,5 +9,10 @@ fi
 
 if ! test -f "/opt/dusk/services/dusk.conf"; then
     echo "CONSENSUS_KEYS password not set" 1>&2
+    exit 1
+fi
+
+if ! grep -Eq '^[[:space:]]*DUSK_CONSENSUS_KEYS_PASS=' /opt/dusk/services/dusk.conf; then
+    echo "DUSK_CONSENSUS_KEYS_PASS not set in /opt/dusk/services/dusk.conf" 1>&2
     exit 1
 fi

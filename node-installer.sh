@@ -1,11 +1,5 @@
 #!/bin/bash
-set -e
-
-# Detect the user running the script
-CURRENT_USER=$(logname)
-CURRENT_HOME=$(eval echo ~"$CURRENT_USER")
-echo "Detected current user: $CURRENT_USER"
-echo "Home directory: $CURRENT_HOME"
+set -euo pipefail
 
 declare -A VERSIONS
 # Define versions per network, per component
@@ -21,27 +15,90 @@ VERSIONS=(
 # Default network and feature (Provisioner node)
 NETWORK="mainnet"
 FEATURE="default"
+TARGET_USER=""
+DUSK_USER="dusk"
+DUSK_GROUP="dusk"
+INSTALLER_DIR="/opt/dusk/installer"
+BUNDLE_DIR="$INSTALLER_DIR/bundle"
+COMPONENTS_DIR="$INSTALLER_DIR/components"
+STAGE_DIR="$INSTALLER_DIR/stage"
 MAINNET_CONSENSUS_SPIN_TIME="1781175600"
 TESTNET_CONSENSUS_SPIN_TIME="1779886800"
+
+usage() {
+    echo "Usage: $0 [--network mainnet|testnet|devnet] [--feature default|archive] [--user username]"
+}
 
 # Parse command-line arguments to check for network or feature flags
 while [[ "$#" -gt 0 ]]; do
     case "$1" in
         --network)
+            if [[ -z "${2:-}" || "${2:-}" == --* ]]; then
+                echo "Error: --network requires a value."
+                usage
+                exit 1
+            fi
             NETWORK="$2"
             shift 2
             ;;
         --feature)
+            if [[ -z "${2:-}" || "${2:-}" == --* ]]; then
+                echo "Error: --feature requires a value."
+                usage
+                exit 1
+            fi
             FEATURE="$2"
+            shift 2
+            ;;
+        --user)
+            if [[ -z "${2:-}" || "${2:-}" == --* ]]; then
+                echo "Error: --user requires a value."
+                usage
+                exit 1
+            fi
+            TARGET_USER="$2"
             shift 2
             ;;
         *)
             echo "Unknown option: $1"
-            echo "Usage: $0 [--network mainnet|testnet|devnet] [--feature default|archive]"
+            usage
             exit 1
             ;;
     esac
 done
+
+if [[ "$(id -u)" -ne 0 ]]; then
+    echo "Error: The installer must be run as root, for example through sudo."
+    exit 1
+fi
+
+if [[ -z "$TARGET_USER" && -n "${SUDO_USER:-}" && "${SUDO_USER:-}" != "root" ]]; then
+    TARGET_USER="$SUDO_USER"
+fi
+
+if [[ -z "$TARGET_USER" ]]; then
+    TARGET_USER="$(logname 2>/dev/null || true)"
+fi
+
+if [[ -z "$TARGET_USER" ]]; then
+    TARGET_USER="$(id -un)"
+fi
+
+if ! id -u "$TARGET_USER" >/dev/null 2>&1; then
+    echo "Error: Target user '$TARGET_USER' does not exist."
+    exit 1
+fi
+
+CURRENT_USER="$TARGET_USER"
+CURRENT_HOME="$(getent passwd "$CURRENT_USER" | cut -d: -f6)"
+
+if [[ -z "$CURRENT_HOME" ]]; then
+    echo "Error: Failed to determine home directory for target user '$CURRENT_USER'."
+    exit 1
+fi
+
+echo "Selected target user: $CURRENT_USER"
+echo "Home directory: $CURRENT_HOME"
 
 # Validate passed network
 case "$NETWORK" in
@@ -73,12 +130,35 @@ case "$(uname -m)" in
     *) echo "Unsupported architecture: $(uname -m). Only x64 and arm64 are supported."; exit 1;;
 esac
 
-# Installs a given component for a given network
+verify_component() {
+    local component="$1"
+    local version="$2"
+    local bin_path="$3"
+    local version_output
+
+    if [[ ! -x "$bin_path" ]]; then
+        echo "Error: Expected executable $bin_path was not found."
+        exit 1
+    fi
+
+    version_output="$("$bin_path" --version 2>&1)" || {
+        echo "Error: Failed to run $bin_path --version"
+        echo "$version_output"
+        exit 1
+    }
+
+    if [[ "$version_output" != *"$version"* ]]; then
+        echo "Error: $component version check failed. Expected '$version', got '$version_output'."
+        exit 1
+    fi
+}
+
+# Downloads and verifies a given component for a given network.
 install_component() {
     local network="$1"
     local component="$2"
     local key="${network}-${component}"
-    local version="${VERSIONS[$key]}"
+    local version="${VERSIONS[$key]:-}"
 
     if [[ -z "$version" ]]; then
         echo "Error: Version not found for $key"
@@ -95,117 +175,191 @@ install_component() {
     fi
 
     # Removes any RC version from the URL
-    local sanitized_version="${version%-rc.*}" 
+    local sanitized_version="${version%-rc.*}"
     # Construct the download URL
     local url="https://github.com/dusk-network/rusk/releases/download/${release_tag}-${version}/${component}-${sanitized_version}-linux-${arch}${feature_suffix}.tar.gz"
 
     echo "Installing $component version $version for $network ($arch${feature_suffix})"
     echo "Downloading from $url"
 
-    local component_dir="/opt/dusk/installer/${component}"
+    local component_dir="$COMPONENTS_DIR/${component}"
+    rm -rf "$component_dir"
     mkdir -p "$component_dir"
 
-    curl -fLso "/opt/dusk/installer/${component}.tar.gz" "$url" || { echo "Failed to download $component from $url"; exit 1; }
-    tar xf "/opt/dusk/installer/${component}.tar.gz" --strip-components 1 --directory "$component_dir" || { echo "Failed to extract $component archive"; exit 1; }
+    curl -fLso "$COMPONENTS_DIR/${component}.tar.gz" "$url" || {
+        echo "Failed to download $component from $url"
+        exit 1
+    }
+    tar xf "$COMPONENTS_DIR/${component}.tar.gz" --strip-components 1 --directory "$component_dir" || {
+        echo "Failed to extract $component archive"
+        exit 1
+    }
+    chmod +x "$component_dir/$component"
+    verify_component "$component" "$version" "$component_dir/$component"
 }
 
-# Configure your local installation based on the selected network
+# Configure a staged installation based on the selected network.
 configure_network() {
-    local network=$1
+    local network="$1"
+    local conf_dir="$2"
+    local service_file="$3"
+    local wallet_config="$4"
     local prover_url
-    local service_file="/opt/dusk/services/rusk.service"
 
-    if [ -f "$service_file" ]; then
+    if [[ -f "$service_file" ]]; then
         sed -i '/^Environment="RUSK_CONSENSUS_SPIN_TIME=/d' "$service_file"
     fi
 
     case "$network" in
         mainnet)
-            mv /opt/dusk/conf/mainnet.genesis /opt/dusk/conf/genesis.toml
-            mv /opt/dusk/conf/mainnet.toml /opt/dusk/conf/rusk.toml
-            rm -f /opt/dusk/conf/testnet.genesis
-            rm -f /opt/dusk/conf/testnet.toml
-            rm -f /opt/dusk/conf/devnet.genesis
-            rm -f /opt/dusk/conf/devnet.toml
-            if [ -f "$service_file" ]; then
+            mv "$conf_dir/mainnet.genesis" "$conf_dir/genesis.toml"
+            mv "$conf_dir/mainnet.toml" "$conf_dir/rusk.toml"
+            rm -f "$conf_dir/testnet.genesis"
+            rm -f "$conf_dir/testnet.toml"
+            rm -f "$conf_dir/devnet.genesis"
+            rm -f "$conf_dir/devnet.toml"
+            if [[ -f "$service_file" ]]; then
                 sed -i "/^Environment=\"RUSK_RECOVERY_INPUT=/a Environment=\"RUSK_CONSENSUS_SPIN_TIME=$MAINNET_CONSENSUS_SPIN_TIME\"" "$service_file"
             fi
             prover_url="https://provers.dusk.network"
             ;;
         testnet)
-            mv /opt/dusk/conf/testnet.genesis /opt/dusk/conf/genesis.toml
-            mv /opt/dusk/conf/testnet.toml /opt/dusk/conf/rusk.toml
-            rm -f /opt/dusk/conf/mainnet.genesis
-            rm -f /opt/dusk/conf/mainnet.toml
-            rm -f /opt/dusk/conf/devnet.genesis
-            rm -f /opt/dusk/conf/devnet.toml
-            if [ -f "$service_file" ]; then
+            mv "$conf_dir/testnet.genesis" "$conf_dir/genesis.toml"
+            mv "$conf_dir/testnet.toml" "$conf_dir/rusk.toml"
+            rm -f "$conf_dir/mainnet.genesis"
+            rm -f "$conf_dir/mainnet.toml"
+            rm -f "$conf_dir/devnet.genesis"
+            rm -f "$conf_dir/devnet.toml"
+            if [[ -f "$service_file" ]]; then
                 sed -i "/^Environment=\"RUSK_RECOVERY_INPUT=/a Environment=\"RUSK_CONSENSUS_SPIN_TIME=$TESTNET_CONSENSUS_SPIN_TIME\"" "$service_file"
             fi
             prover_url="https://testnet.provers.dusk.network"
             ;;
         devnet)
-            mv /opt/dusk/conf/devnet.genesis /opt/dusk/conf/genesis.toml
-            mv /opt/dusk/conf/devnet.toml /opt/dusk/conf/rusk.toml
-            rm -f /opt/dusk/conf/mainnet.genesis
-            rm -f /opt/dusk/conf/mainnet.toml
-            rm -f /opt/dusk/conf/testnet.genesis
-            rm -f /opt/dusk/conf/testnet.toml
+            mv "$conf_dir/devnet.genesis" "$conf_dir/genesis.toml"
+            mv "$conf_dir/devnet.toml" "$conf_dir/rusk.toml"
+            rm -f "$conf_dir/mainnet.genesis"
+            rm -f "$conf_dir/mainnet.toml"
+            rm -f "$conf_dir/testnet.genesis"
+            rm -f "$conf_dir/testnet.toml"
             prover_url="https://devnet.provers.dusk.network"
             ;;
         *)
             echo "Unknown network: $network. Defaulting to mainnet."
-            configure_network "mainnet"
+            configure_network "mainnet" "$conf_dir" "$service_file" "$wallet_config"
             return
             ;;
     esac
 
-    # Update the wallet.toml with the appropriate prover URL for the given network
-    sed -i "s|^prover = .*|prover = \"$prover_url\"|" $CURRENT_HOME/.dusk/rusk-wallet/config.toml
+    sed -i "s|^prover = .*|prover = \"$prover_url\"|" "$wallet_config"
+}
+
+install_staged_files() {
+    install -d -o root -g "$DUSK_GROUP" -m 751 /opt/dusk
+    install -d -o root -g root -m 755 /opt/dusk/bin
+    install -d -o root -g "$DUSK_GROUP" -m 750 /opt/dusk/conf
+    install -d -o root -g "$DUSK_GROUP" -m 750 /opt/dusk/services
+    install -d -o "$DUSK_USER" -g "$DUSK_GROUP" -m 770 /opt/dusk/rusk
+
+    for bin_file in "$STAGE_DIR/bin"/*; do
+        install -o root -g root -m 755 "$bin_file" "/opt/dusk/bin/$(basename "$bin_file")"
+    done
+
+    install -o root -g root -m 755 "$COMPONENTS_DIR/rusk/rusk" /opt/dusk/bin/rusk
+    install -o root -g root -m 755 "$COMPONENTS_DIR/rusk-wallet/rusk-wallet" /opt/dusk/bin/rusk-wallet
+
+    for conf_file in "$STAGE_DIR/conf"/*; do
+        case "$(basename "$conf_file")" in
+            dusk.conf|wallet.toml)
+                continue
+                ;;
+        esac
+        install -o root -g "$DUSK_GROUP" -m 660 "$conf_file" "/opt/dusk/conf/$(basename "$conf_file")"
+    done
+
+    for service_file in "$STAGE_DIR/services"/*; do
+        case "$(basename "$service_file")" in
+            rusk.conf.user)
+                if [[ ! -f /opt/dusk/services/rusk.conf.user ]]; then
+                    install -o root -g root -m 600 "$service_file" /opt/dusk/services/rusk.conf.user
+                else
+                    chown root:root /opt/dusk/services/rusk.conf.user
+                    chmod 600 /opt/dusk/services/rusk.conf.user
+                fi
+                ;;
+            rusk.conf.default)
+                install -o root -g root -m 600 "$service_file" /opt/dusk/services/rusk.conf.default
+                ;;
+            rusk.service)
+                install -o root -g root -m 644 "$service_file" /opt/dusk/services/rusk.service
+                install -o root -g root -m 644 "$service_file" /etc/systemd/system/rusk.service
+                ;;
+            logrotate.conf)
+                install -o root -g root -m 644 "$service_file" /opt/dusk/services/logrotate.conf
+                ;;
+            *)
+                install -o root -g "$DUSK_GROUP" -m 660 "$service_file" "/opt/dusk/services/$(basename "$service_file")"
+                ;;
+        esac
+    done
+
+    if [[ ! -f /opt/dusk/services/dusk.conf ]]; then
+        install -o root -g root -m 600 /dev/null /opt/dusk/services/dusk.conf
+    else
+        chown root:root /opt/dusk/services/dusk.conf
+        chmod 600 /opt/dusk/services/dusk.conf
+    fi
+
+    install -d -o "$CURRENT_USER" -g "$DUSK_GROUP" -m 770 "$CURRENT_HOME/.dusk"
+    install -d -o "$CURRENT_USER" -g "$DUSK_GROUP" -m 770 "$CURRENT_HOME/.dusk/rusk-wallet"
+    install -o "$CURRENT_USER" -g "$DUSK_GROUP" -m 660 "$STAGE_DIR/conf/wallet.toml" "$CURRENT_HOME/.dusk/rusk-wallet/config.toml"
+
+    install -o root -g root -m 644 "$STAGE_DIR/conf/dusk.conf" /etc/sysctl.d/dusk.conf
+    chown -R "$DUSK_USER:$DUSK_GROUP" /opt/dusk/rusk
+    chmod -R u+rwX,g+rwX,o-rwx /opt/dusk/rusk
 }
 
 # Check for OpenSSL 3 or higher
-if ! command -v openssl >/dev/null 2>&1 || [ "$(openssl version | awk '{print $2}' | cut -d. -f1)" -lt 3 ]; then
+if ! command -v openssl >/dev/null 2>&1 || [[ "$(openssl version | awk '{print $2}' | cut -d. -f1)" -lt 3 ]]; then
     echo "The required OpenSSL version is not available. Please install OpenSSL 3 or higher"
     echo "You likely need to upgrade your OS or install a newer OS"
     exit 1
 fi
 
+# Ensure Dusk service group and user exist before setting file ownership
+if ! getent group "$DUSK_GROUP" >/dev/null 2>&1; then
+    echo "Creating $DUSK_GROUP system group."
+    groupadd --system "$DUSK_GROUP"
+fi
+
+if ! id -u "$DUSK_USER" >/dev/null 2>&1; then
+    echo "Creating $DUSK_USER system user."
+    useradd --system --create-home --shell /usr/sbin/nologin --gid "$DUSK_GROUP" "$DUSK_USER"
+    echo "User '$DUSK_USER' created."
+fi
+
 # Cleanup previous installer just in case
-rm -rf /opt/dusk/installer || true
-rm -rf /opt/dusk/installer/installer.tar.gz || true
+rm -rf "$INSTALLER_DIR" || true
+install -d -o root -g root -m 700 "$BUNDLE_DIR"
+install -d -o root -g root -m 700 "$COMPONENTS_DIR"
+install -d -o root -g root -m 700 "$STAGE_DIR"
 
-# Ensure dusk group and user exist before setting file ownership
-if ! getent group dusk >/dev/null 2>&1; then
-    echo "Creating dusk system group."
-    groupadd --system dusk
-fi
-
-if ! id -u dusk >/dev/null 2>&1; then
-    echo "Creating dusk system user."
-    useradd --system --create-home --shell /usr/sbin/nologin --gid dusk dusk
-    echo "User 'dusk' created."
-fi
-
-mkdir -p /opt/dusk/bin
-mkdir -p /opt/dusk/conf
-mkdir -p /opt/dusk/rusk
-mkdir -p /opt/dusk/services
-mkdir -p /opt/dusk/installer
-mkdir -p "$CURRENT_HOME/.dusk/rusk-wallet"
-chown -R "$CURRENT_USER:dusk" "$CURRENT_HOME/.dusk"
-chmod -R 770 "$CURRENT_HOME/.dusk"
-
-# Download and extract installer files
+# Download and extract installer files before touching the live installation.
 INSTALLER_URL="https://github.com/dusk-network/node-installer/tarball/main"
 echo "Downloading installer package for additional scripts and configurations"
-curl -fLso /opt/dusk/installer/installer.tar.gz "$INSTALLER_URL" || { echo "Failed to download installer package from $INSTALLER_URL"; exit 1; }
-tar xf /opt/dusk/installer/installer.tar.gz --strip-components 1 --directory /opt/dusk/installer || { echo "Failed to extract installer package"; exit 1; }
+curl -fLso "$INSTALLER_DIR/installer.tar.gz" "$INSTALLER_URL" || {
+    echo "Failed to download installer package from $INSTALLER_URL"
+    exit 1
+}
+tar xf "$INSTALLER_DIR/installer.tar.gz" --strip-components 1 --directory "$BUNDLE_DIR" || {
+    echo "Failed to extract installer package"
+    exit 1
+}
 
 # Detect and source OS logic
-if [ -f /etc/os-release ]; then
+if [[ -f /etc/os-release ]]; then
     . /etc/os-release
-    distro=$(echo "$ID" | tr '[:upper:]' '[:lower:]')
+    distro="$(echo "$ID" | tr '[:upper:]' '[:lower:]')"
 else
     echo "Unable to detect OS. /etc/os-release not found."
     exit 1
@@ -219,9 +373,10 @@ esac
 echo "Detected OS ID: $ID"
 echo "Normalized OS target: $distro"
 
-OS_SCRIPT="/opt/dusk/installer/os/$distro.sh"
-if [ -f "$OS_SCRIPT" ]; then
+OS_SCRIPT="$BUNDLE_DIR/os/$distro.sh"
+if [[ -f "$OS_SCRIPT" ]]; then
     echo "Using OS support script: $OS_SCRIPT"
+    # shellcheck source=/dev/null
     source "$OS_SCRIPT"
 else
     echo "No support script found for '$distro'"
@@ -232,11 +387,25 @@ fi
 echo "Update package db and install prerequisites."
 install_deps
 
-echo "Adding current user to dusk group for access."
-if ! id -nG "$CURRENT_USER" | grep -qw "dusk"; then
-    usermod -aG dusk "$CURRENT_USER"
-    echo "User $CURRENT_USER has been added to the dusk group. Please log out and back in to apply changes."
+echo "Adding target user to $DUSK_GROUP group for access."
+if ! id -nG "$CURRENT_USER" | grep -qw "$DUSK_GROUP"; then
+    usermod -aG "$DUSK_GROUP" "$CURRENT_USER"
+    echo "User $CURRENT_USER has been added to the $DUSK_GROUP group. Please log out and back in to apply changes."
 fi
+
+# Download, unpack, and verify binaries before changing the live install.
+install_component "$NETWORK" "rusk"
+install_component "$NETWORK" "rusk-wallet"
+
+install -d -o root -g root -m 700 "$STAGE_DIR/bin"
+install -d -o root -g root -m 700 "$STAGE_DIR/conf"
+install -d -o root -g root -m 700 "$STAGE_DIR/services"
+cp -a "$BUNDLE_DIR/bin/." "$STAGE_DIR/bin/"
+cp -a "$BUNDLE_DIR/conf/." "$STAGE_DIR/conf/"
+cp -a "$BUNDLE_DIR/services/." "$STAGE_DIR/services/"
+
+echo "Selected network: $NETWORK"
+configure_network "$NETWORK" "$STAGE_DIR/conf" "$STAGE_DIR/services/rusk.service" "$STAGE_DIR/conf/wallet.toml"
 
 echo "Stopping previous services"
 if systemctl is-active --quiet rusk; then
@@ -246,19 +415,7 @@ else
     echo "Rusk service not running."
 fi
 
-# Handle scripts, configs, and service definitions
-mv -f /opt/dusk/installer/bin/* /opt/dusk/bin/
-mv /opt/dusk/installer/conf/* /opt/dusk/conf/
-mv -n /opt/dusk/installer/services/* /opt/dusk/services/
-
-# Download, unpack and install Rusk
-install_component "$NETWORK" "rusk"
-mv /opt/dusk/installer/rusk/rusk /opt/dusk/bin/
-
-# Download, unpack and install Rusk wallet
-install_component "$NETWORK" "rusk-wallet"
-mv /opt/dusk/installer/rusk-wallet/rusk-wallet /opt/dusk/bin/
-mv -f /opt/dusk/conf/wallet.toml $CURRENT_HOME/.dusk/rusk-wallet/config.toml
+install_staged_files
 
 # Symlink to make available system-wide
 ln -sf /opt/dusk/bin/rusk /usr/bin/rusk
@@ -276,23 +433,8 @@ if [[ "$NETWORK" == "mainnet" || "$NETWORK" == "testnet" ]]; then
     ln -sf /opt/dusk/bin/download_state.sh /usr/bin/download_state
 fi
 
-echo "Selected network: $NETWORK"
-configure_network "$NETWORK"
-
-# Set permissions for dusk user and group
-chown -R dusk:dusk /opt/dusk
-chmod -R 660 /opt/dusk
-# Directory listing needs execution
-find /opt/dusk -type d -exec chmod +x {} \;
-chmod +x /opt/dusk/bin/*
-
 # Set system parameters
-mv -f /opt/dusk/conf/dusk.conf /etc/sysctl.d/dusk.conf
 sysctl -p /etc/sysctl.d/dusk.conf
-
-echo "Installing services"
-# Overwrite previous service definitions
-mv -f /opt/dusk/services/rusk.service /etc/systemd/system/rusk.service
 
 # Configure logrotate (OS specific)
 configure_logrotate
@@ -302,6 +444,6 @@ systemctl enable rusk
 systemctl daemon-reload
 
 # Display final instructions
-cat /opt/dusk/installer/assets/finish.msg
+cat "$BUNDLE_DIR/assets/finish.msg"
 
-rm -rf /opt/dusk/installer
+rm -rf "$INSTALLER_DIR"

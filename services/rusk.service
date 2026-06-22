@@ -14,12 +14,12 @@ WorkingDirectory=/opt/dusk
 
 ExecStartPre=!/bin/bash -c '/opt/dusk/bin/rusk recovery state >> /var/log/rusk_recovery.log'
 ExecStartPre=!/bin/bash -c '/opt/dusk/bin/check_consensus_keys.sh'
-ExecStartPre=!/bin/bash -c '/opt/dusk/bin/detect_ips.sh > /opt/dusk/services/rusk.conf.default'
+ExecStartPre=!/bin/bash -c '/opt/dusk/bin/detect_ips.sh > /opt/dusk/services/rusk.conf.default && chown root:root /opt/dusk/services/rusk.conf.default && chmod 600 /opt/dusk/services/rusk.conf.default'
 ExecStartPre=!/bin/bash -c 'chown -R dusk /opt/dusk/rusk/state'
 
-EnvironmentFile=/opt/dusk/services/rusk.conf.default
-EnvironmentFile=/opt/dusk/services/rusk.conf.user
-EnvironmentFile=/opt/dusk/services/dusk.conf
+EnvironmentFile=-/opt/dusk/services/rusk.conf.default
+EnvironmentFile=-/opt/dusk/services/rusk.conf.user
+EnvironmentFile=-/opt/dusk/services/dusk.conf
 
 ExecStart=/opt/dusk/bin/rusk \
             --config /opt/dusk/conf/rusk.toml
