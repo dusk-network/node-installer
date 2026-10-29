@@ -4,9 +4,9 @@ set -euo pipefail
 declare -A VERSIONS
 # Define versions per network, per component
 VERSIONS=(
-    ["mainnet-rusk"]="1.7.1"
+    ["mainnet-rusk"]="1.7.2"
     ["mainnet-rusk-wallet"]="0.3.0"
-    ["testnet-rusk"]="1.7.1"
+    ["testnet-rusk"]="1.7.2"
     ["testnet-rusk-wallet"]="0.4.0"
     ["devnet-rusk"]="1.7.0"
     ["devnet-rusk-wallet"]="0.4.0"
@@ -345,7 +345,7 @@ install -d -o root -g root -m 700 "$COMPONENTS_DIR"
 install -d -o root -g root -m 700 "$STAGE_DIR"
 
 # Download and extract installer files before touching the live installation.
-INSTALLER_URL="https://github.com/dusk-network/node-installer/tarball/main"
+INSTALLER_URL="https://github.com/dusk-network/node-installer/archive/refs/tags/v0.5.23.tar.gz"
 echo "Downloading installer package for additional scripts and configurations"
 curl -fLso "$INSTALLER_DIR/installer.tar.gz" "$INSTALLER_URL" || {
     echo "Failed to download installer package from $INSTALLER_URL"
