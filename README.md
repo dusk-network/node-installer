@@ -257,6 +257,12 @@ rusk-wallet export -d "$HOME" -n consensus.keys
 sudo install -o root -g dusk -m 640 "$HOME/consensus.keys" /opt/dusk/conf/consensus.keys
 ```
 
+Also ensure that the proper permissions are set for the keys:
+
+```sh
+chown dusk:dusk /opt/dusk/conf/consensus.keys
+```
+
 ### 🔐 Set consensus password
 
 Run the following command and it will prompt you to enter the password for the
