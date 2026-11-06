@@ -5,6 +5,7 @@ RUSK_CONFIG_FILE="/opt/dusk/conf/rusk.toml"
 NETWORK=""
 LIST_STATES=0
 STATE_NUMBER=""
+TMPDIR=${TMPDIR:-/tmp}
 
 usage() {
   echo "Usage: $0 [--network mainnet|testnet] [--list] [state_number]"
@@ -161,7 +162,7 @@ display_warning
 # Download the file
 STATE_URL="$STATE_BASE_URL/$state_number"
 
-STATE_ARCHIVE=$(mktemp --suffix=.tar.gz /tmp/dusk-state.XXXXXX)
+STATE_ARCHIVE=$(mktemp --suffix=.tar.gz -t "dusk-state.XXXXXX")
 echo "Downloading state $state_number from $STATE_URL to $STATE_ARCHIVE..."
 cleanup_state_archive() {
   rm -f "$STATE_ARCHIVE"
