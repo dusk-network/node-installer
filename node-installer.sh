@@ -4,9 +4,9 @@ set -euo pipefail
 declare -A VERSIONS
 # Define versions per network, per component
 VERSIONS=(
-    ["mainnet-rusk"]="1.7.3"
+    ["mainnet-rusk"]="1.7.4"
     ["mainnet-rusk-wallet"]="0.3.0"
-    ["testnet-rusk"]="1.7.3"
+    ["testnet-rusk"]="1.7.4"
     ["testnet-rusk-wallet"]="0.4.0"
     ["devnet-rusk"]="1.7.0"
     ["devnet-rusk-wallet"]="0.4.0"
